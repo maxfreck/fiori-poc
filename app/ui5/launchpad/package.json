@@ -1,0 +1,31 @@
+{
+  "name": "launchpad",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Fiori launchpad",
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5"
+  ],
+  "main": "webapp/index.html",
+  "dependencies": {
+    "@openui5/sap.m": "^1",
+    "@openui5/sap.uxap": "^1",
+    "@openui5/themelib_sap_fiori_3": "^1"
+  },
+  "devDependencies": {
+    "@sap/ux-ui5-tooling": "^1.8.4",
+    "@ui5/cli": "^2.0.0"
+  },
+  "scripts": {
+    "build": "ui5 build --config=ui5.yaml --clean-dest --dest dist",
+    "deploy": "node ../deploy.js"
+  },
+  "ui5": {
+    "dependencies": [
+      "@sap/ux-ui5-tooling"
+    ]
+  },
+  "sapuxLayer": "CUSTOMER_BASE"
+}

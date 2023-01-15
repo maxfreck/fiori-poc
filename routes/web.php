@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/ui5/{app}/{path?}', App\Fiori\Http\Controllers\ServeUI5::class)
+    ->where('path', '.+')
+    ->name('ui5');

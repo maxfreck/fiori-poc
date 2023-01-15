@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        //oData
+        \Lodata::discover(\App\Models\persons::class);
     }
 }
