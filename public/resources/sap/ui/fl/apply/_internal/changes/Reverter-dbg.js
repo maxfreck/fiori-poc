@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,25 +33,19 @@ sap.ui.define([
 	}
 
 	function revertAndDeleteChangeOnControl(oChange, oControl, mRevertProperties, mPropertyBag) {
-		return Reverter.revertChangeOnControl(oChange, oControl, mRevertProperties)
-			.then(function(vRevertResult) {
-				return FlexCustomData.destroyAppliedCustomData(vRevertResult || oControl, oChange, mPropertyBag.modifier)
-					.then(function () {
-						return !!vRevertResult;
-					});
-			})
-			.then(function(bSuccess) {
-				if (bSuccess) {
-					// TODO should be changed as soon as new flex persistence is in place
-					mPropertyBag.flexController._oChangePersistence._deleteChangeInMap(oChange);
-				}
-			});
+		return Reverter.revertChangeOnControl(oChange, oControl, mRevertProperties).then(function(vRevertResult) {
+			FlexCustomData.destroyAppliedCustomData(vRevertResult || oControl, oChange, mPropertyBag.modifier);
+			if (vRevertResult) {
+				// TODO should be changed as soon as new flex persistence is in place
+				mPropertyBag.flexController._oChangePersistence._deleteChangeInMap(oChange);
+			}
+		});
 	}
 
 	/**
 	 * Reverts a specific change on the passed control if it is currently applied.
 	 *
-	 * @param {sap.ui.fl.Change} oChange - Change object that should be reverted on the passed control
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - Change object that should be reverted on the passed control
 	 * @param {sap.ui.core.Control} oControl - Control which is the target of the passed change
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Component instance that is currently loading
@@ -98,7 +92,7 @@ sap.ui.define([
 	/**
 	 * Reverts all given changes in one app component.
 	 *
-	 * @param {sap.ui.fl.Change[]} aChanges - Array of changes to be reverted
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} aChanges - Array of changes to be reverted
 	 * @param {object} mPropertyBag - Object with additional properties
 	 * @param {sap.ui.core.Component} mPropertyBag.appComponent - Component instance that is currently loading
 	 * @param {sap.ui.core.util.reflection.BaseTreeModifier} mPropertyBag.modifier - Polymorph reuse operations handling the changes on the given view type

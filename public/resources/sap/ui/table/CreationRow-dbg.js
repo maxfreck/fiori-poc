@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -32,7 +32,7 @@ sap.ui.define([
 	 * <code>sap.ui.commons</code> library.
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -65,7 +65,7 @@ sap.ui.define([
 				/**
 				 * The default toolbar.
 				 */
-				_defaultToolbar : {type : "sap.ui.core.Toolbar", multiple : false, visibility : "hidden"}
+				_defaultToolbar: {type: "sap.ui.core.Toolbar", multiple: false, visibility: "hidden"}
 			},
 			events: {
 				/**

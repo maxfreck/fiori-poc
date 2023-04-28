@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,7 +8,7 @@
 // Delegate class used to help create content in the filterbar and fill relevant metadata
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
-sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDelegate) {
+sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate", "sap/ui/mdc/enum/FilterBarValidationStatus"], function(AggregationBaseDelegate, FilterBarValidationStatus) {
 	"use strict";
 	/**
 	 * @class Base Delegate for {@link sap.ui.mdc.FilterBar FilterBar}. Extend this object in your project to use all functionalites of the {@link sap.ui.mdc.FilterBar FilterBar}.
@@ -39,7 +39,10 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * This method always requires a return value once it has been called. If an item for a given property <code>sPropertyName</code>
 	 * has already been created, it is required to either return the existing instance or create a new instance.
 	 *
-	 * @public
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterBarDelegate.addItem = function(sPropertyName, oControl, mPropertyBag) {
 		return AggregationBaseDelegate.addItem(sPropertyName, oControl, mPropertyBag);
@@ -58,7 +61,10 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * @param {Object} [mPropertyBag] Instance of property bag from SAPUI5 flexibility
 	 *
 	 * @returns {Promise} Promise that resolved with <code>true</code>, <code>false</code> to allow/prevent default behavior of the change
-	 * @public
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterBarDelegate.removeItem = function(oItem, oControl, mPropertyBag) {
 		// return true within the Promise for default behavior
@@ -73,6 +79,11 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * @param {sap.ui.mdc.Control} oControl - The instance of a filter bar
 	 * @param {Object} mPropertyBag Instance of a property bag from the SAPUI5 flexibility change API
 	 * @returns {Promise} Promise that is resolved once the propertyInfo property has been updated
+	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterBarDelegate.addCondition = function(sPropertyName, oControl, mPropertyBag) {
 		return Promise.resolve();
@@ -86,10 +97,16 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * @param {sap.ui.mdc.Control} oControl - The instance of a filter bar
 	 * @param {Object} mPropertyBag Instance of a property bag from the SAPUI5 flexibility change API
 	 * @returns {Promise} Promise that is resolved once the propertyInfo property has been updated
+	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterBarDelegate.removeCondition = function(sPropertyName, oControl, mPropertyBag) {
 		return Promise.resolve();
     };
+
 
 	/**
 	 * Retrieves the relevant metadata for a given payload and returns the property info array.
@@ -97,37 +114,12 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * @param {sap.ui.mdc.Control} oControl Instance of an <code>sap.ui.mdc.Control</code>
 	 * @returns {Promise<sap.ui.mdc.filterbar.PropertyInfo[]>} Once resolved, an array of property info objects is returned
 	 *
-	 * @typedef {sap.ui.mdc.filterbar.PropertyInfo} sap.ui.mdc.filterbar.PropertyInfo
-	 *
-	 * @property {string} path
-	 *   The identifier of the property
-	 * @property {string} label
-	 *   The label of the identifier
-	 * @property {string} [tooltip]
-	 *   The tooltip of the identifier
-	 * @property {string} datatype
-	 *   The name of the type of the property
-	 * @property {object} [constraints]
-	 *   Defines constraints for the data type of the property
-	 * @property {object} [formatOptions]
-	 *   Defines format options for the data type of the property
-	 * @property {string} group
-	 *   The group identifier to which the property belongs
-	 * @property {string} groupLabel
-	 *   The group name of the group identifier
-	 * @property {boolean} [caseSensitive = false]
-	 *   If <code>true</code> defines that the filter value will be treated as case-sensitive
-	 * @property {sap.ui.mdc.enum.FieldDisplay} [display]
-	 *   Describes how the value will be presented to the user
-	 * @property {boolean} [hiddenFilter = false]
-	 *   Defines if the filter will be visible on the filter bar
-	 * @property {boolean} [required = false]
-	 *   Defines if the filter is mandatory
-	 * @property {int} maxConditions
-	 *   Defines if the filter supports multiple values <code>-1</code> or single values <code>1</code>
-	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
-	 FilterBarDelegate.fetchProperties = function(oControl) {
+	FilterBarDelegate.fetchProperties = function(oControl) {
 		return AggregationBaseDelegate.fetchProperties(oControl);
 	};
 
@@ -135,11 +127,78 @@ sap.ui.define(["sap/ui/mdc/AggregationBaseDelegate"], function(AggregationBaseDe
 	 * This method is called when the 'Clear' button was pressed.
 	 *
 	 * @param {sap.ui.mdc.Control} oControl - The instance of a filter bar
-	 * @returns {Promise} Promise that is resolved once the action completes.
+	 * @returns {Promise} Promise that is resolved once the action completes
+	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterBarDelegate.clearFilters = function(oControl) {
 		return Promise.resolve();
     };
+
+	/**
+	 * A validator to evaluate the filter bar state.
+	 *
+	 * @param {sap.ui.mdc.FilterBar} oFilterBar Instance of a <code>sap.ui.mdc.FilterBar</code>
+	 * @param {map} [mValidation] Object describing the validation result. This object is only provided when called from the {@link sap.ui.mdc.FilterBar FilterBar}
+	 * @param {string} [mValidation.status] Status of the validation {@link sap.ui.mdc.enum.FilterBarValidationStatus}
+	 * @returns {sap.ui.mdc.enum.FilterBarValidationStatus} The inner filter bar state
+	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 */
+    FilterBarDelegate.determineValidationState = function(oFilterBar) {
+		 return oFilterBar.checkFilters();
+	};
+
+	/**
+	 * Visualizes the filter bar validation state.
+	 *
+	 * @param {sap.ui.mdc.FilterBar} oFilterBar Instance of a <code>sap.ui.mdc.FilterBar</code>
+	 * @param {map} mValidation Describes the validation result. This object is only provided when called from the {@link sap.ui.mdc.FilterBar FilterBar}
+	 * @param {sap.ui.mdc.enum.FilterBarValidationStatus} mValidation.status of the validation as returned via {@link sap.ui.mdc.filterbar.FilterBarBase#checkValidationState checkValidationState}
+	 *
+	 * @private
+	 * @experimental
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 */
+    FilterBarDelegate.visualizeValidationState = function(oFilterBar, mValidation) {
+		 var sErrorMessage;
+
+		 if (mValidation.status === FilterBarValidationStatus.NoError) {
+			 return;
+		 }
+
+		 if (mValidation.status === FilterBarValidationStatus.RequiredHasNoValue) {
+			 sErrorMessage = oFilterBar.getText("filterbar.REQUIRED_CONDITION_MISSING");
+		 } else if (mValidation.status === FilterBarValidationStatus.FieldInErrorState ) {
+			 sErrorMessage = oFilterBar.getText("filterbar.VALIDATION_ERROR");
+		 }
+
+		 if (oFilterBar.getShowMessages() && !oFilterBar._isLiveMode()) {
+
+			 sap.ui.require(["sap/m/MessageBox", "sap/base/Log"], function (MessageBox, Log) {
+				 try {
+
+					 if (oFilterBar._bIsBeingDestroyed) {
+						 return;
+					 }
+					 MessageBox.error(sErrorMessage, {
+						 styleClass: (this.$() && this.$().closest(".sapUiSizeCompact").length) ? "sapUiSizeCompact" : "",
+						 onClose: oFilterBar.setFocusOnFirstErroneousField.bind(oFilterBar)
+					 });
+				 } catch (x) {
+					 Log.error(x.message);
+				 }
+			 });
+		 }
+	};
+
 
 	return FilterBarDelegate;
 });

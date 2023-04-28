@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,18 +11,18 @@ sap.ui.define([
 	"sap/ui/model/FilterOperator",
 	"sap/m/VariantItem",
 	"sap/m/VariantManagement",
-	"sap/ui/fl/Utils",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/registry/Settings",
 	"sap/ui/core/Control",
 	"sap/ui/core/library",
-	'sap/base/Log'
+	"sap/base/Log"
 ], function(
 	Context,
 	Filter,
 	FilterOperator,
 	VariantItem,
 	MVariantManagement,
-	flUtils,
+	ControlVariantApplyAPI,
 	flSettings,
 	Control,
 	coreLibrary,
@@ -49,7 +49,9 @@ sap.ui.define([
 	var VariantManagement = Control.extend("sap.ui.fl.variants.VariantManagement", /** @lends sap.ui.fl.variants.VariantManagement.prototype */ {
 		metadata: {
 			interfaces: [
-				"sap.m.IOverflowToolbarContent"
+				"sap.ui.core.IShrinkable",
+				"sap.m.IOverflowToolbarContent",
+				"sap.m.IToolbarInteractiveControl"
 			],
 			library: "sap.ui.fl",
 			designtime: "sap/ui/fl/designtime/variants/VariantManagement.designtime",
@@ -149,6 +151,29 @@ sap.ui.define([
 					type: "sap.ui.core.TitleLevel",
 					group: "Appearance",
 					defaultValue: TitleLevel.Auto
+				},
+
+				/**
+				 * Defines the style of the title.
+				 * For more information, see {@link sap.m.Title#setTitleStyle}.
+				 *
+				 * @since 1.109
+				 */
+				titleStyle: {
+					type: "sap.ui.core.TitleLevel",
+					group: "Appearance",
+					defaultValue: TitleLevel.Auto
+				},
+
+				/**
+				 * Sets the maximum width of the control.
+				 *
+				 * @since 1.109
+				 */
+				maxWidth: {
+					type: "sap.ui.core.CSSSize",
+					group: "Dimension",
+					defaultValue: "100%"
 				}
 			},
 			events: {
@@ -294,6 +319,7 @@ sap.ui.define([
 			apiVersion: 2,
 			render: function(oRm, oControl) {
 				oRm.openStart("div", oControl);
+				oRm.style("max-width", oControl.getMaxWidth());
 				oRm.openEnd();
 				oRm.renderControl(oControl._oVM);
 				oRm.close("div");
@@ -310,7 +336,7 @@ sap.ui.define([
 		this.addStyleClass("sapUiFlVarMngmt"); // required for finding the control by RTA/FL
 		this._oRb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.fl");
 
-		this.setModelName(flUtils.VARIANT_MODEL_NAME);
+		this.setModelName(ControlVariantApplyAPI.getVariantModelName());
 
 		this.attachModelContextChange(this._setModel, this);
 
@@ -335,7 +361,7 @@ sap.ui.define([
 	 * Registers invalidations event which is fired when width of the control is changed.
 	 *
 	 * @protected
-	 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
+	 * @returns {{canOverflow: boolean, invalidationEvents: string[]}} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
 	 */
 	VariantManagement.prototype.getOverflowToolbarConfig = function() {
 		return {
@@ -634,6 +660,12 @@ sap.ui.define([
 		return this;
 	};
 
+	VariantManagement.prototype.setTitleStyle = function(sValue) {
+		this.setProperty("titleStyle", sValue);
+		this._oVM.setTitleStyle(sValue);
+		return this;
+	};
+
 	VariantManagement.prototype.setEditable = function(bValue) {
 		this.setProperty("editable", bValue);
 		this._oVM.setShowFooter(bValue);
@@ -718,6 +750,23 @@ sap.ui.define([
 	};
 
 	/**
+	 * Indicates the design mode was entered.
+	 * @private
+	 * @ui5-restricted sap.ui.fl, sap.ui.rta
+	 */
+	VariantManagement.prototype.enteringDesignMode = function() {
+		this._oVM.setDesignMode(true);
+	};
+	/**
+	 * Indicates the design mode was left.
+	 * @private
+	 * @ui5-restricted sap.ui.fl, sap.ui.rta
+	 */
+	VariantManagement.prototype.leavingDesignMode = function() {
+		this._oVM.setDesignMode(false);
+	};
+
+	/**
 	 * Determines if the current variant is modified.
 	 * @public
 	 * @returns {boolean} If the current variant is modified <code>true</code>, otherwise <code>false</code>
@@ -765,6 +814,22 @@ sap.ui.define([
 		this.setProperty("modelName", sModelName);
 
 		return this;
+	};
+
+
+	/**
+	 * Reinitializes the inner model registration. This is necessary when using a session dependent <code>VariantManagement</code>
+	 * control that may be used across the lifecycle of more than one application.
+	 *
+	 * Since the <code>VariantModel</code> is being recreated depending on the lifecycle of the application,
+	 * we need to ensure that when navigating into an application upon reusing the VM control, the latest context
+	 * should be used.
+	 *
+	 * @ui-restricted sap.ui.mdc
+	 */
+	VariantManagement.prototype.reinitialize = function() {
+		this.oContext = null;
+		this._setModel();
 	};
 
 	VariantManagement.prototype._setModel = function() {
@@ -871,7 +936,7 @@ sap.ui.define([
 		if (!sModelName) {
 			return null;
 		}
-		if (sModelName !== flUtils.VARIANT_MODEL_NAME) {
+		if (sModelName !== ControlVariantApplyAPI.getVariantModelName()) {
 			return this.getId();
 		}
 
@@ -925,7 +990,7 @@ sap.ui.define([
 	/**
 	 * Retrieves the apply automatically state for a variant.
 	 * @private
-	 * @ui5-restricted sap.mdc
+	 * @ui5-restricted sap.ui.mdc
 	 * @param {object} oVariant the fl-variant object
 	 * @returns {boolean} apply automatically state
 	 */
@@ -972,13 +1037,25 @@ sap.ui.define([
 	 * Adds a control to the association {@link #for for}.
 	 * @public
 	 * @param {sap.ui.core.ID | sap.ui.core.Control} vFor The control to add; if empty, nothing is inserted
-	 * @returns {Object} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 */
 	VariantManagement.prototype.addFor = function(vFor) {
 		this.addAssociation("for", vFor);
 		return this;
 	};
 
+	/**
+	 * Required by the {@link sap.m.IToolbarInteractiveControl} interface.
+	 * Determines if the Control is interactive.
+	 *
+	 * @returns {boolean} If it is an interactive Control
+	 *
+	 * @private
+	 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+	 */
+	VariantManagement.prototype._getToolbarInteractive = function () {
+		return true;
+	};
 
 	return VariantManagement;
 });

@@ -1,10 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	"sap/ui/mdc/p13n/Engine"
+	"sap/m/p13n/Engine"
 ], function(Engine) {
 	"use strict";
 
@@ -130,6 +130,20 @@ sap.ui.define([
 			return Engine.getInstance().retrieveState(oControl).then(function(oEngineState){
 				return Engine.getInstance().externalizeKeys(oControl, oEngineState);
 			});
+		},
+
+		/**
+		 * Resets the state by discarding all personalization changes created. When using a <code>VariantManagement</control>, the state
+		 * is being reset to the currently selected variant. When using a <code>PersistenceProvider</code> control with its <code>mode</code>
+		 * property configured to </code>auto</code>, the state is reset as provided in the XML view.
+		 *
+		 * @param {sap.ui.mdc.Control} oControl The control instance to be reset
+		 *
+		 * @returns {Promise} <code>Promise</code> that resolves after the state has been reset
+		 */
+		resetState: function(oControl) {
+			var aInternalKeys = Engine.getInstance().getRegisteredControllers(oControl);
+			return Engine.getInstance().reset(oControl, aInternalKeys);
 		},
 
 		/**

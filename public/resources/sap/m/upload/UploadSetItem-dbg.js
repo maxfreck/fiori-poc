@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -34,7 +34,7 @@ sap.ui.define([
 	 * @class Item that represents one file to be uploaded using the {@link sap.m.upload.UploadSet} control.
 	 * @extends sap.ui.core.Element
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @public
 	 * @since 1.63
@@ -134,20 +134,24 @@ sap.ui.define([
 				 * This event is fired when an open action is invoked on an item.
 				 */
 				openPressed: {
-					/**
-					 * The item on which the open action has been invoked.
-					 */
-					item: {type: "sap.m.upload.UploadSetItem"},
+					 parameters: {
+						/**
+						* The item on which the open action has been invoked.
+						*/
+						item: {type: "sap.m.upload.UploadSetItem"}
+					},
 					allowPreventDefault: true
 				},
 				/**
 				 * This event is fired when a remove action is invoked on an item.
 				 */
 				removePressed: {
-					/**
-					 * The item on which the remove action was invoked.
-					 */
-					item: {type: "sap.m.upload.UploadSetItem"},
+					 parameters: {
+						/**
+						* The item on which the open action has been invoked.
+						*/
+						item: {type: "sap.m.upload.UploadSetItem"}
+					},
 					allowPreventDefault: true
 				}
 			}
@@ -328,6 +332,9 @@ sap.ui.define([
 			this.setProperty("enabledEdit", bEnable, true);
 			if (this.getParent()) {
 				this._getEditButton().setEnabled(bEnable);
+				if (!bEnable) {
+					this.getParent().handleItemGetDisabled(this);
+				}
 			}
 		}
 		return this;
@@ -338,6 +345,9 @@ sap.ui.define([
 			this.setProperty("visibleEdit", bVisible, true);
 			if (this.getParent()) {
 				this._getEditButton().setVisible(bVisible);
+				if (!bVisible) {
+					this.getParent().handleItemGetDisabled(this);
+				}
 			}
 		}
 		return this;
@@ -725,7 +735,13 @@ sap.ui.define([
 
 	UploadSetItem.prototype._setInEditMode = function (bInEditMode) {
 		if (bInEditMode && !this._bInEditMode) {
-			var oSplit = UploadSetItem._splitFileName(this.getFileName());
+			var oSplit = UploadSetItem._splitFileName(this.getFileName()),
+				iMaxLength = this.getParent().getMaxFileNameLength(),
+				iFileExtensionLength = oSplit.extension ? oSplit.extension.length + 1 : 0;
+			iMaxLength = iMaxLength ? iMaxLength : 0;
+			var iNameMaxLength = iMaxLength - iFileExtensionLength;
+			iNameMaxLength = iNameMaxLength < 0 ? 0 : iNameMaxLength;
+			this._getFileNameEdit().setProperty("maxLength", iNameMaxLength, true);
 			this._getFileNameEdit().setValue(oSplit.name);
 		}
 		this._bInEditMode = bInEditMode;
@@ -853,7 +869,9 @@ sap.ui.define([
 			this._oProgressBox.addStyleClass("sapMUSProgressBox");
 			this.addDependent(this._oProgressBox);
 		}
-
+		if (this._oProgressBox) {
+			this._oProgressBox.setVisible(this.getUploadState() !== UploadState.Complete);
+		}
 		return this._oProgressBox;
 	};
 
@@ -964,7 +982,7 @@ sap.ui.define([
 		if (aButtonsToRender.length > 0) {
 			oRm.openStart("div").class("sapMUCButtonContainer").openEnd();
 			aButtonsToRender.forEach(function (oBtn, iIndex) {
-				if (iIndex < (aButtonsToRender.length - 1)) {
+				if (iIndex < (aButtonsToRender.length)) {
 					oBtn.addStyleClass("sapMUCFirstButton");
 				}
 				oRm.renderControl(oBtn);
@@ -1056,6 +1074,18 @@ sap.ui.define([
 		if (this._oProgressBox) {
 			this._oProgressBox.destroy();
 			this._oProgressBox = null;
+		}
+		if (this._oListItem) {
+			this._oListItem.destroy();
+			this._oListItem = null;
+		}
+		if (this._oIcon) {
+			this._oIcon.destroy();
+			this._oIcon = null;
+		}
+		if (this._oDynamicContent) {
+			this._oDynamicContent.destroy();
+			this._oDynamicContent = null;
 		}
 	};
 

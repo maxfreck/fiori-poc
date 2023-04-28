@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -34,7 +34,7 @@ sap.ui.define([
 	 * @experimental Since 1.67
 	 * @since 1.67
 	 * @private
-	 * @ui5-restricted UI5 controls, OVP, tests
+	 * @ui5-restricted UI5 controls, sap.ovp, tests
 	 */
 	var FlexRuntimeInfoAPI = /** @lends sap.ui.fl.apply.api.FlexRuntimeInfoAPI */{
 		/**

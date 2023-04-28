@@ -1,21 +1,27 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"sap/ui/integration/cards/BaseContent",
+	"./BaseContent",
 	"./ComponentContentRenderer",
+	"sap/ui/integration/library",
+	"sap/m/IllustratedMessageType",
 	"sap/ui/core/ComponentContainer",
 	"sap/ui/core/Component"
 ], function (
 	BaseContent,
 	ComponentContentRenderer,
+	library,
+	IllustratedMessageType,
 	ComponentContainer,
 	Component
 ) {
 	"use strict";
+
+	var CardPreviewMode = library.CardPreviewMode;
 
 	/**
 	 * Constructor for a new <code>Component</code> Card Content.
@@ -29,7 +35,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @experimental
 	 * @constructor
@@ -54,11 +60,16 @@ sap.ui.define([
 		}
 	};
 
-	ComponentContent.prototype.setConfiguration = function (oConfiguration) {
-		BaseContent.prototype.setConfiguration.apply(this, arguments);
-		oConfiguration = this.getParsedConfiguration();
+	ComponentContent.prototype.applyConfiguration = function () {
+		var oConfiguration = this.getParsedConfiguration();
 
 		if (!oConfiguration) {
+			return;
+		}
+
+		if (this.getCardInstance().getPreviewMode() === CardPreviewMode.Abstract) {
+			// TODO _updated event is always needed, so that the busy indicator knows when to stop. We should review this for contents which do not have data.
+			this.fireEvent("_actionContentReady");
 			return;
 		}
 
@@ -76,8 +87,14 @@ sap.ui.define([
 				this.fireEvent("_updated");
 			}.bind(this),
 			componentFailed: function () {
+				var oCard = oCard = this.getCardInstance();
+
 				this.fireEvent("_actionContentReady");
-				this.handleError("Card content failed to create component");
+				this.handleError({
+					type: IllustratedMessageType.ErrorScreen,
+					title: oCard.getTranslatedText("CARD_DATA_LOAD_ERROR"),
+					description: "Card content failed to create component"
+				});
 			}.bind(this)
 		});
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,6 +13,7 @@ sap.ui.define([
 	"sap/ui/base/ManagedObjectObserver",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/Configuration",
+	"sap/ui/core/InvisibleText",
 	"sap/ui/core/delegate/ScrollEnablement",
 	"sap/ui/Device",
 	"sap/ui/base/ManagedObject",
@@ -30,6 +31,7 @@ sap.ui.define([
 	ManagedObjectObserver,
 	ResizeHandler,
 	Configuration,
+	InvisibleText,
 	ScrollEnablement,
 	Device,
 	ManagedObject,
@@ -108,7 +110,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -387,6 +389,7 @@ sap.ui.define([
 	DynamicPage.NAVIGATION_CLASS_NAME = "sapFDynamicPageNavigation";
 
 	DynamicPage.ARIA_ROLE_DESCRIPTION = "DYNAMIC_PAGE_ROLE_DESCRIPTION";
+	DynamicPage.ARIA_LABEL_TOOLBAR_FOOTER_ACTIONS = "ARIA_LABEL_TOOLBAR_FOOTER_ACTIONS";
 
 	/**
 	 * LIFECYCLE METHODS
@@ -403,11 +406,11 @@ sap.ui.define([
 			horizontal: false,
 			vertical: true
 		});
-		this._oScrollHelper.setOnAfterScrollToElement(this._onAfterScrollToElement.bind(this));
 		this._oStickyHeaderObserver = null;
 		this._oHeaderObserver = null;
 		this._oSubHeaderAfterRenderingDelegate = {onAfterRendering: function() {
 				this._bStickySubheaderInTitleArea = false; // reset the flag as the stickySubHeader is freshly rerendered with the iconTabBar
+				this._cacheDomElements();
 				this._adjustStickyContent();
 			}};
 
@@ -430,6 +433,7 @@ sap.ui.define([
 		this._detachScrollHandler();
 		this._detachResizeHandlers();
 		this._toggleAdditionalNavigationClass();
+		this._setFooterAriaLabelledBy();
 	};
 
 	DynamicPage.prototype.onAfterRendering = function () {
@@ -486,6 +490,8 @@ sap.ui.define([
 		if (this._oStickySubheader) {
 			this._oStickySubheader.removeEventDelegate(this._oSubHeaderAfterRenderingDelegate);
 		}
+
+		this._destroyInvisibleText();
 	};
 
 	DynamicPage.prototype.setShowFooter = function (bShowFooter) {
@@ -512,6 +518,12 @@ sap.ui.define([
 		this._detachHeaderEventListeners();
 
 		return this.destroyAggregation("header");
+	};
+
+	DynamicPage.prototype.destroyFooter = function () {
+		this._destroyInvisibleText();
+
+		return this.destroyAggregation("footer");
 	};
 
 	DynamicPage.prototype._detachHeaderEventListeners = function () {
@@ -621,35 +633,6 @@ sap.ui.define([
 	 * PRIVATE METHODS
 	 */
 
-	/**
-	 * Offsets to the required scroll position.
-	 * The offset is the offset of the scroll container from the top of the content container.
-	 *
-	 * This is required because <code>sap.ui.code>ScrollEnablement.prototype.scrollToElement</code>
-	 * scrolls the element to the very top of the scroll container, regardless of the scroll container top-padding.
-	 *
-	 * @private
-	 */
-	DynamicPage.prototype._onAfterScrollToElement = function () {
-		var iScrollTop = this.$wrapper.scrollTop(),
-			iOffsetBeforeSnap = this._getTitleAreaHeight(),
-			bWasStickySubheaderInTitleArea = this._bStickySubheaderInTitleArea,
-			iOffset;
-
-		// synchronously call the existing listener for the native 'scroll' event
-		this._toggleHeaderOnScroll();
-
-		iOffset = iOffsetBeforeSnap;
-		// if the subheader was sticked (removed from the topmost part of the scrollable area) =>
-		// all elements bellow it became offset with X pixels, where X is the subHeader height =>
-		// the element (target of <code>scrollToElement</code>) was offset respectively =>
-		// adjust the scroll position to ensure the element is back visible (outside scroll overflow)
-		if (this._bStickySubheaderInTitleArea && !bWasStickySubheaderInTitleArea && this.$wrapper.scrollTop() === iScrollTop) {
-			iOffset += this._getHeight(this._oStickySubheader);
-		}
-
-		this.$wrapper.scrollTop(iScrollTop - iOffset);
-	};
 
 	/**
 	 * If the header is larger than the allowed height, the <code>preserveHeaderStateOnScroll</code> property will be ignored
@@ -760,6 +743,12 @@ sap.ui.define([
 		}
 
 		oDynamicPageHeader.$().css("visibility", bTabbable ? "visible" : "hidden");
+
+		// ensure constant header height while the header is hidden in the scroll overflow
+		// in order to avoid unnecessary jumps of the scroll position
+		// due to reflow of the header content while in the scroll overflow
+		oDynamicPageHeader.$().css("height", bTabbable ? "" : this._getHeaderHeight() + "px");
+		oDynamicPageHeader.$().css("overflow", bTabbable ? "" : "hidden");
 	};
 
 	/**
@@ -1251,9 +1240,10 @@ sap.ui.define([
 	 * @private
 	 */
 	DynamicPage.prototype._needsVerticalScrollBar = function () {
-		// use Math.floor in order to avoid adding a scrollbar when
-		// the returned max scrollHeight is less than 1px
-		return Math.floor(this._getMaxScrollPosition()) > 0;
+		// treat maxScrollHeight values in the range [0, 1] as 0,
+		// to cover the known cases where the nested content overflows
+		// the container with up to 1px because of rounding issues
+		return Math.floor(this._getMaxScrollPosition()) > 1;
 	};
 
 	/**
@@ -1351,6 +1341,7 @@ sap.ui.define([
 		// (1) add top padding for the area underneath the title element
 		// so that the title does not overlap the content of the scroll container
 		oWrapperElement.style.paddingTop = iTitleHeight + "px";
+		this._oScrollHelper.setScrollPaddingTop(iTitleHeight);
 
 		// (2) also make the area underneath the title invisible (using clip-path)
 		// to allow usage of *transparent background* of the title element
@@ -1365,11 +1356,9 @@ sap.ui.define([
 	};
 
 	DynamicPage.prototype._updateFitContainer = function (bNeedsVerticalScrollBar) {
-		var bNoScrollBar = typeof bNeedsVerticalScrollBar !== 'undefined' ? !bNeedsVerticalScrollBar : !this._needsVerticalScrollBar(),
-			bFitContent = this.getFitContent(),
-			bToggleClass = bFitContent || bNoScrollBar;
+		var bNoScrollBar = typeof bNeedsVerticalScrollBar !== 'undefined' ? !bNeedsVerticalScrollBar : !this._needsVerticalScrollBar();
 
-		this.$contentFitContainer.toggleClass("sapFDynamicPageContentFitContainer", bToggleClass);
+		this.$contentFitContainer.toggleClass("sapFDynamicPageContentFitContainer", bNoScrollBar);
 	};
 
 	/**
@@ -2439,6 +2428,33 @@ sap.ui.define([
 		return DynamicPage.FOOTER;
 	};
 
-	return DynamicPage;
+	/**
+	 * Sets the <code>aria-labelledby</code> attribute of the {@link sap.f.DynamicPage} footer.
+	 * @private
+	 */
+	DynamicPage.prototype._setFooterAriaLabelledBy = function () {
+		var oFooter = this.getFooter();
 
+		if (oFooter && !oFooter.getAriaLabelledBy().length) {
+			this._oInvisibleText = new InvisibleText({
+				id: oFooter.getId() + "-FooterActions-InvisibleText",
+				text: Core.getLibraryResourceBundle("sap.f").getText(DynamicPage.ARIA_LABEL_TOOLBAR_FOOTER_ACTIONS)
+			}).toStatic();
+
+			oFooter.addAriaLabelledBy(this._oInvisibleText);
+		}
+	};
+
+	/**
+	 * Destroys the invisible text object associated with the footer of the {@link sap.f.DynamicPage} control.
+	 * @private
+	 */
+	DynamicPage.prototype._destroyInvisibleText = function () {
+		if (this._oInvisibleText) {
+			this._oInvisibleText.destroy();
+			this._oInvisibleText = null;
+		}
+	};
+
+	return DynamicPage;
 });

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -29,7 +29,7 @@
 	 * @namespace
 	 */
 	var LinkRenderer = {
-			apiVersion: 2
+		apiVersion: 2
 	};
 
 	// shortcut for sap.m.EmptyIndicator
@@ -86,11 +86,9 @@
 			default:
 				// Set a valid non empty value for the href attribute representing that there is no navigation,
 				// so we don't confuse the screen readers.
-				/*eslint-disable no-script-url */
-				sHref = sHref && oControl._isHrefValid(sHref) && oControl.getEnabled() ? sHref : "javascript:void(0)";
+				sHref = sHref && oControl._isHrefValid(sHref) && oControl.getEnabled() ? sHref : "#";
+				oRm.attr("href", sHref);
 		}
-
-		sHref && oRm.attr("href", sHref);
 
 		oAccAttributes.describedby = sTypeSemanticInfo ? {value: sTypeSemanticInfo.trim(), append: true} : undefined;
 

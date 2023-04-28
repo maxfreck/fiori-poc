@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -62,11 +62,6 @@ sap.ui.define([
 	 * elements either automatically (e.g. XMLView) or programmatically (using {@link #createId}).
 	 * With method {@link #byId}, elements or controls can be found with their view-local ID.
 	 * Also see {@link topic:91f28be26f4d1014b6dd926db0e91070 "Support for Unique IDs"} in the documentation.
-	 *
-	 * <strong>Note: For Views defined using XML markup</strong>
-	 * On root level, you can only define content for the default aggregation, e.g. without adding the <code>&lt;content&gt;</code> tag.
-	 * If you want to specify content for another aggregation of a view like <code>dependents</code>, place it in a child
-	 * control's dependents aggregation or add it by using {@link sap.ui.core.mvc.XMLView.addDependent}.
 	 *
 	 * <h3>View Definition</h3>
 	 * A view can be defined by {@link sap.ui.core.mvc.View.extend extending} this class and implementing
@@ -147,7 +142,7 @@ sap.ui.define([
 	 * The default implementation of this method returns <code>false</code>.
 	 *
 	 * @extends sap.ui.core.Control
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @public
 	 * @alias sap.ui.core.mvc.View
@@ -441,12 +436,16 @@ sap.ui.define([
 	 * @private
 	 */
 	var createAndConnectController = function(oThis, mSettings) {
+		var bAsync = mSettings.async;
+		var connectToView = function (oController) {
+			oThis.oController = oController;
+			oController.oView = oThis;
+		};
 
 		if (!Configuration.getControllerCodeDeactivated()) {
 			// only set when used internally
 			var oController = mSettings.controller,
-				sName = oController && typeof oController.getMetadata === "function" && oController.getMetadata().getName(),
-				bAsync = mSettings.async;
+				sName = oController && typeof oController.getMetadata === "function" && oController.getMetadata().getName();
 
 			if (!oController && oThis.getControllerName) {
 				oThis.bControllerIsViewManaged = true;
@@ -483,11 +482,6 @@ sap.ui.define([
 			}
 
 			if (oController) {
-				var connectToView = function(oController) {
-					oThis.oController = oController;
-					oController.oView = oThis;
-				};
-
 				if (bAsync) {
 					if (!oThis.oAsyncState) {
 						throw new Error("The view " + oThis.sViewName + " runs in sync mode and therefore cannot use async controller extensions!");
@@ -497,9 +491,14 @@ sap.ui.define([
 					connectToView(oController);
 				}
 			}
+		} else if (bAsync) {
+			Controller.extend("sap.ui.core.mvc.EmptyControllerImpl", { "_sap.ui.core.mvc.EmptyControllerImpl": true });
+			return Controller.create({
+				name: "sap.ui.core.mvc.EmptyControllerImpl"
+			}).then(connectToView);
 		} else {
-			sap.ui.controller("sap.ui.core.mvc.EmptyControllerImpl", {"_sap.ui.core.mvc.EmptyControllerImpl":true});
-			oThis.oController = sap.ui.controller("sap.ui.core.mvc.EmptyControllerImpl");
+			sap.ui.controller("sap.ui.core.mvc.EmptyControllerImpl", {"_sap.ui.core.mvc.EmptyControllerImpl":true}); // legacy-relevant: Sync path
+			oThis.oController = sap.ui.controller("sap.ui.core.mvc.EmptyControllerImpl"); // legacy-relevant: Sync path
 		}
 	};
 
@@ -1019,7 +1018,7 @@ sap.ui.define([
 	 * <ul>
 	 * <li>{@link sap.ui.core.mvc.XMLView.create}</li>
 	 * <li>{@link sap.ui.core.mvc.JSONView.create}</li>
-	 * <li>{@link sap.ui.core.mvc.HTMLView.create}</li>
+	 * <li>{@link sap.ui.core.mvc.HTMLView.create} (deprecated)</li>
 	 * </ul>
 	 *
 	 * @param {object} oOptions
@@ -1033,7 +1032,7 @@ sap.ui.define([
 	 *     can be given in the form <code>module:my/views/Main</code> to load a typed view.
 	 * @param {any} [oOptions.definition]
 	 *     The view definition. Only supported for XML and HTML views. See also {@link sap.ui.core.mvc.XMLView.create}
-	 *     and {@link sap.ui.core.mvc.HTMLView.create} for more information
+	 *     and {@link sap.ui.core.mvc.HTMLView.create} (deprecated) for more information.
 	 * @param {sap.ui.core.mvc.ViewType} [oOptions.type]
 	 *     Specifies what kind of view will be instantiated. All valid view types are listed in the enumeration
 	 *     {@link sap.ui.core.mvc.ViewType}.

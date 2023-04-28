@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,6 +13,7 @@ sap.ui.define([
 	"./format/TimezoneUtil",
 	'sap/ui/thirdparty/URI',
 	"sap/ui/core/_ConfigurationProvider",
+	"sap/ui/core/date/CalendarWeekNumbering",
 	"sap/base/util/UriParameters",
 	"sap/base/util/deepEqual",
 	"sap/base/util/Version",
@@ -30,6 +31,7 @@ sap.ui.define([
 		TimezoneUtil,
 		URI,
 		_ConfigurationProvider,
+		CalendarWeekNumbering,
 		UriParameters,
 		deepEqual,
 		Version,
@@ -44,9 +46,11 @@ sap.ui.define([
 	// Singleton instance for configuration
 	var oConfiguration;
 	var M_SETTINGS;
-	var VERSION = "1.108.2";
+	var VERSION = "1.113.0";
 
 	// Helper Functions
+	var Object_hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
+
 	function detectLanguage() {
 
 		function navigatorLanguage() {
@@ -210,6 +214,7 @@ sap.ui.define([
 		"timezone"              : { type : "string",   defaultValue : TimezoneUtil.getLocalTimezone() },
 		"formatLocale"          : { type : "Locale",   defaultValue : null },
 		"calendarType"          : { type : "string",   defaultValue : null },
+		"calendarWeekNumbering" : { type : CalendarWeekNumbering, defaultValue : CalendarWeekNumbering.Default},
 		"trailingCurrencyCode"  : { type : "boolean",  defaultValue : true },
 		"accessibility"         : { type : "boolean",  defaultValue : true },
 		"autoAriaBodyRole"      : { type : "boolean",  defaultValue : false,     noUrl:true }, //whether the framework automatically adds the ARIA role 'application' to the html body
@@ -270,10 +275,12 @@ sap.ui.define([
 		"xx-waitForTheme"       : { type : "string",  defaultValue : ""}, // rendering|init
 		"xx-hyphenation" : { type : "string",  defaultValue : ""}, // (empty string)|native|thirdparty|disable
 		"xx-flexBundleRequestForced" : { type : "boolean",  defaultValue : false },
+		"xx-skipAutomaticFlLibLoading" : { type : "boolean",  defaultValue: false },
 		"xx-cssVariables"       : { type : "string",   defaultValue : "false" }, // false|true|additional (additional just includes the css_variables.css in addition)
 		"xx-debugModuleLoading"	: { type : "boolean",  defaultValue: false },
 		"statistics"            : { type : "boolean",  defaultValue : false },
-		"xx-acc-keys"           : { type : "boolean",  defaultValue : false }
+		"xx-acc-keys"           : { type : "boolean",  defaultValue : false },
+		"xx-measure-cards"      : { type : "boolean",  defaultValue : false }
 	};
 
 	var M_COMPAT_FEATURES = {
@@ -340,7 +347,7 @@ sap.ui.define([
 		init: function() {
 			this.bInitialized = true;
 
-			this.oFormatSettings = new Configuration.FormatSettings(this);
+			this.oFormatSettings = new FormatSettings(this);
 
 			/* Object that carries the real configuration data */
 			var config = this; // eslint-disable-line consistent-this
@@ -383,10 +390,12 @@ sap.ui.define([
 				this._compatversion[n] = _getCVers(n);
 			}
 
+			var oUriParams;
+
 			// apply the settings from the url (only if not blocked by app configuration)
 			if ( !config.ignoreUrlParams ) {
 				var sUrlPrefix = "sap-ui-";
-				var oUriParams = UriParameters.fromQuery(window.location.search);
+				oUriParams = UriParameters.fromQuery(window.location.search);
 
 				// first map SAP parameters, can be overwritten by "sap-ui-*" parameters
 				if ( oUriParams.has('sap-language') ) {
@@ -420,13 +429,15 @@ sap.ui.define([
 				if (oUriParams.has('sap-timezone')) {
 					// validate the IANA timezone ID, but do not trigger a localizationChanged event
 					// because the initialization should not trigger a "*Changed" event
-					Log.warning("Timezone configuration cannot be changed at the moment");
 					var sTimezone = oUriParams.get('sap-timezone');
 					if (checkTimezone(sTimezone)) {
 						/*
 						TODO Timezone Configuration: re-activate following line when re-enabling Configuration#setTimezone
 						this.timezone = sTimezone;
 						*/
+						this._experimentalTimezone = sTimezone;
+					} else {
+						this._experimentalTimezone = undefined;
 					}
 				}
 
@@ -566,8 +577,10 @@ sap.ui.define([
 			}
 
 			// in case the flexibilityServices configuration was set to a non-empty, non-default value, sap.ui.fl becomes mandatory
+			// if not overruled by xx-skipAutomaticFlLibLoading
 			if (config.flexibilityServices
 					&& config.flexibilityServices !== M_SETTINGS.flexibilityServices.defaultValue
+					&& !config['xx-skipAutomaticFlLibLoading']
 					&& config.modules.indexOf("sap.ui.fl.library") == -1) {
 				config.modules.push("sap.ui.fl.library");
 			}
@@ -784,8 +797,9 @@ sap.ui.define([
 		},
 
 		/**
-		 * <b>Note: Due to compatibility considerations, this function will always return the timezone of the browser/host system
-		 * in this release</b>
+		 * <b>Note: Due to compatibility considerations, the time zone can only be changed for test
+		 * purposes via the <code>sap-timezone</code> URL parameter. If this parameter is not set,
+		 * the time zone of the browser/host system is returned.</b>
 		 *
 		 * Retrieves the configured IANA timezone ID.
 		 *
@@ -796,7 +810,7 @@ sap.ui.define([
 		getTimezone : function () {
 			// TODO Timezone Configuration: re-activate following line when re-enabling Configuration#setTimezone
 			// return this.getValue("timezone");
-			return TimezoneUtil.getLocalTimezone();
+			return this._experimentalTimezone || TimezoneUtil.getLocalTimezone();
 		},
 
 		/**
@@ -1065,6 +1079,46 @@ sap.ui.define([
 				this.calendarType = mChanges.calendarType = sCalendarType;
 				this._endCollect();
 			}
+			return this;
+		},
+
+		/**
+		 * Returns the calendar week numbering algorithm used to determine the first day of the week
+		 * and the first calendar week of the year, see {@link sap.ui.core.date.CalendarWeekNumbering}.
+		 *
+		 * @returns {sap.ui.core.date.CalendarWeekNumbering} The calendar week numbering algorithm
+		 *
+		 * @public
+		 * @since 1.113.0
+		 */
+		getCalendarWeekNumbering: function() {
+			return this.getValue("calendarWeekNumbering");
+		},
+
+		/**
+		 * Sets the calendar week numbering algorithm which is used to determine the first day of the week
+		 * and the first calendar week of the year, see {@link sap.ui.core.date.CalendarWeekNumbering}.
+		 *
+		 * @param {sap.ui.core.date.CalendarWeekNumbering} sCalendarWeekNumbering
+		 *   The calendar week numbering algorithm
+		 * @returns {this}
+		 *   <code>this</code> to allow method chaining
+		 * @throws {Error}
+		 *   If <code>sCalendarWeekNumbering</code> is not a valid calendar week numbering algorithm,
+		 *   defined in {@link sap.ui.core.date.CalendarWeekNumbering}
+		 *
+		 * @public
+		 * @since 1.113.0
+		 */
+		setCalendarWeekNumbering: function(sCalendarWeekNumbering) {
+			checkEnum(CalendarWeekNumbering, sCalendarWeekNumbering, "calendarWeekNumbering");
+
+			if (this.calendarWeekNumbering !== sCalendarWeekNumbering) {
+				var mChanges = this._collect();
+				this.calendarWeekNumbering = mChanges.calendarWeekNumbering = sCalendarWeekNumbering;
+				this._endCollect();
+			}
+
 			return this;
 		},
 
@@ -1760,6 +1814,17 @@ sap.ui.define([
 		},
 
 		/**
+		 * Gets if performance measurement for UI5 Integration Cards should happen.
+		 *
+		 * @returns {boolean} whether measurement should be executed
+		 * @since 1.112.0
+		 * @experimental
+		 */
+		getMeasureCards: function () {
+			return this.getValue("xx-measure-cards");
+		},
+
+		/**
 		 * Sets the security token handlers for an OData V4 model. See chapter
 		 * {@link topic:9613f1f2d88747cab21896f7216afdac/section_STH Security Token Handling}.
 		 *
@@ -1859,12 +1924,12 @@ sap.ui.define([
 		 * @returns {any} Value of the configuration parameter, will be of the type specified in M_SETTINGS
 		 *
 		 * @private
-	 	 * @ui5-restricted sap.ui.core.Core jquery.sap.global
+	 	 * @ui5-restricted sap.ui.core.Core, jquery.sap.global
 	 	 * @since 1.106
 		 */
 		getValue: function(sName) {
 			var vValue;
-			if (typeof sName !== "string" || !Object.prototype.hasOwnProperty.call(M_SETTINGS, sName)) {
+			if (typeof sName !== "string" || !Object_hasOwn(M_SETTINGS, sName)) {
 				throw new TypeError(
 					"Parameter 'sName' must be the name of a valid configuration option (one of "
 					+ Object.keys(M_SETTINGS).map(function(key) {
@@ -2018,11 +2083,11 @@ sap.ui.define([
 	 * the modifications. To be on the safe side, applications should do any modifications
 	 * early in their lifecycle or recreate any model/UI that is locale dependent.
 	 *
-	 * @name sap.ui.core.Configuration.FormatSettings
+	 * @alias sap.ui.core.Configuration.FormatSettings
 	 * @extends sap.ui.base.Object
 	 * @public
 	 */
-	BaseObject.extend("sap.ui.core.Configuration.FormatSettings", /** @lends sap.ui.core.Configuration.FormatSettings.prototype */ {
+	var FormatSettings = BaseObject.extend("sap.ui.core.Configuration.FormatSettings", /** @lends sap.ui.core.Configuration.FormatSettings.prototype */ {
 		constructor : function(oConfiguration) {
 			this.oConfiguration = oConfiguration;
 			this.mSettings = {};
@@ -2046,10 +2111,11 @@ sap.ui.define([
 		 * @public
 		 */
 		getFormatLocale : function() {
-			function fallback(that) {
-				var oLocale = that.oConfiguration.getValue("language");
+			function fallback(oFormatSettings) {
+				var oLocale = oFormatSettings.oConfiguration.getValue("language");
 				// if any user settings have been defined, add the private use subtag "sapufmt"
-				if ( !isEmptyObject(that.mSettings) ) {
+				if (!isEmptyObject(oFormatSettings.mSettings)
+						|| oFormatSettings.oConfiguration.getCalendarWeekNumbering() !== CalendarWeekNumbering.Default) {
 					// TODO move to Locale/LocaleData
 					var l = oLocale.toString();
 					if ( l.indexOf("-x-") < 0 ) {
@@ -2418,6 +2484,7 @@ sap.ui.define([
 		 * @param {int} iValue must be an integer value between 0 and 6
 		 * @returns {this} Returns <code>this</code> to allow method chaining
 		 * @public
+		 * @deprecated Since 1.113.0. Use {@link sap.ui.core.Configuration#setCalendarWeekNumbering} instead.
 		 */
 		setFirstDayOfWeek : function(iValue) {
 			check(typeof iValue == "number" && iValue >= 0 && iValue <= 6, "iValue must be an integer value between 0 and 6");

@@ -1,6 +1,6 @@
 /* !
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -12,7 +12,10 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexObjects/ControllerExtensionChange",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObject",
 	"sap/ui/fl/apply/_internal/flexObjects/FlVariant",
+	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/apply/_internal/flexObjects/UIChange",
 	"sap/ui/fl/Layer",
+	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	_pick,
@@ -23,24 +26,21 @@ sap.ui.define([
 	ControllerExtensionChange,
 	FlexObject,
 	FlVariant,
+	States,
+	UIChange,
 	Layer,
+	LayerUtils,
 	Utils
 ) {
 	"use strict";
 
-	/**
-	 * @enum {string}
-	 * Valid flex object types.
-	 *
-	 * @alias sap.ui.fl.apply._internal.flexObjects.FlexObjectFactory.FLEX_OBJECT_TYPES
-	 * @private
-	 */
 	var FLEX_OBJECT_TYPES = {
 		BASE_FLEX_OBJECT: FlexObject,
 		COMP_VARIANT_OBJECT: CompVariant,
 		FL_VARIANT_OBJECT: FlVariant,
 		CONTROLLER_EXTENSION: ControllerExtensionChange,
-		APP_DESCRIPTOR_CHANGE: AppDescriptorChange
+		APP_DESCRIPTOR_CHANGE: AppDescriptorChange,
+		UI_CHANGE: UIChange
 	};
 
 	function getFlexObjectClass(oNewFileContent) {
@@ -53,7 +53,7 @@ sap.ui.define([
 		} else if (oNewFileContent.appDescriptorChange) {
 			return FLEX_OBJECT_TYPES.APP_DESCRIPTOR_CHANGE;
 		}
-		return FLEX_OBJECT_TYPES.BASE_FLEX_OBJECT;
+		return FLEX_OBJECT_TYPES.UI_CHANGE;
 	}
 
 	function createBasePropertyBag(mProperties) {
@@ -66,10 +66,12 @@ sap.ui.define([
 			texts: mProperties.texts,
 			supportInformation: {
 				service: mProperties.ODataService,
+				oDataInformation: mProperties.oDataInformation,
 				command: mProperties.command,
 				compositeCommand: mProperties.compositeCommand,
 				generator: mProperties.generator,
 				sapui5Version: Core.getConfiguration().getVersion().toString(),
+				sourceChangeFileName: mProperties.support && mProperties.support.sourceChangeFileName,
 				sourceSystem: mProperties.sourceSystem,
 				sourceClient: mProperties.sourceClient,
 				originalLanguage: mProperties.originalLanguage,
@@ -78,7 +80,8 @@ sap.ui.define([
 			flexObjectMetadata: {
 				changeType: sChangeType,
 				reference: mProperties.reference,
-				packageName: mProperties.packageName
+				packageName: mProperties.packageName,
+				projectId: mProperties.projectId
 			}
 		};
 	}
@@ -88,7 +91,7 @@ sap.ui.define([
 	 *
 	 * @namespace sap.ui.fl.apply._internal.flexObjects.FlexObjectFactory
 	 * @since 1.100
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl
 	 */
@@ -99,9 +102,10 @@ sap.ui.define([
 	 *
 	 * @param {object} oFileContent - File content
 	 * @param {class} [ObjectClass] - Object class to be instantiated
+	 * @param {boolean} [bPersisted] - Whether to set the state to PERSISTED after creation
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} Created flex object
 	 */
-	FlexObjectFactory.createFromFileContent = function (oFileContent, ObjectClass) {
+	FlexObjectFactory.createFromFileContent = function (oFileContent, ObjectClass, bPersisted) {
 		var oNewFileContent = Object.assign({}, oFileContent);
 		var FlexObjectClass = ObjectClass || getFlexObjectClass(oNewFileContent);
 		if (!FlexObjectClass) {
@@ -121,7 +125,22 @@ sap.ui.define([
 			return mPropertyMap;
 		}, {});
 		var oFlexObject = new FlexObjectClass(mProperties);
+		if (bPersisted) {
+			oFlexObject.setState(States.LifecycleState.PERSISTED);
+		}
 		return oFlexObject;
+	};
+
+	FlexObjectFactory.createUIChange = function(mPropertyBag) {
+		var mProperties = createBasePropertyBag(mPropertyBag);
+		if (!mProperties.layer) {
+			mProperties.layer = mPropertyBag.isUserDependent ? Layer.USER : LayerUtils.getCurrentLayer();
+		}
+		mProperties.selector = mPropertyBag.selector;
+		mProperties.jsOnly = mPropertyBag.jsOnly;
+		mProperties.variantReference = mPropertyBag.variantReference;
+		mProperties.fileType = mPropertyBag.fileType || "change";
+		return new UIChange(mProperties);
 	};
 
 	FlexObjectFactory.createAppDescriptorChange = function(mPropertyBag) {

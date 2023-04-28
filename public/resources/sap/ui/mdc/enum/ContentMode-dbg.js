@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,7 +8,7 @@ sap.ui.define(function() {
 	"use strict";
 
 	/**
-	 * Defines in which mode the content of a <code>Field</code>, <code>FilterField</code> or <code>MultiValueField</code> is rendered.
+	 * Defines in which mode the content of a {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} is rendered.
 	 *
 	 * @enum {string}
 	 * @private

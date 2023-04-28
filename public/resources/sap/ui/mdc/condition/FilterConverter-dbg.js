@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 sap.ui.define([
@@ -24,7 +24,7 @@ function(
 	 *
 	 * @namespace
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.78.0
 	 * @alias sap.ui.mdc.condition.FilterConverter
 	 *
@@ -77,7 +77,7 @@ function(
 			 *
 			 * @param {object} oConditions map of {@link sap.ui.mdc.condition.ConditionObject conditions}
 			 * @param {object} oConditionTypes map containing the types of the condition. Will be used to convert the values of a condition.
-			 * @param {function} [fConvert2FilterCallback] callback function
+			 * @param {function} [fConvert2FilterCallback] deprecated (since 1.113) and not called anymore.
 			 * @param {boolean} [bCaseSensitive] If <code>true</code>, the filtering for search strings is case-sensitive
 			 * @returns {sap.ui.model.Filter} Filter object for filtering a {@link sap.ui.model.ListBinding ListBinding}
 			 *
@@ -165,16 +165,13 @@ function(
 						try {
 							oFilter = oOperator.getModelFilter(oCondition, sFieldPath, oDataType, bCaseSensitiveType, sBaseType);
 						} catch (error) {
-							// in case the getModelFilter fails - because the oDataType is missing - we show a console error.
-							Log.error("FilterConverter", "Not able to convert the condition for path '" + sFieldPath + "' into a filter! The type is missing!");
-							continue;
-						}
-
-						if (fConvert2FilterCallback) {
-							oFilter = fConvert2FilterCallback(oCondition, sFieldPath, oDataType, oFilter);
-							if (!oFilter) {
-								continue;
+							if (error) {
+								Log.error("FilterConverter", error);
+							} else {
+								// in case the getModelFilter fails - because the oDataType is missing - we show a console error.
+								Log.error("FilterConverter", "Not able to convert the condition for path '" + sFieldPath + "' into a filter! The type is missing!");
 							}
+							continue;
 						}
 
 						if (!oOperator.exclude) {
@@ -210,12 +207,6 @@ function(
 						}
 					}
 
-					// if (fHandleFiltersOfSameFieldPathCallback) {
-					// 	if (!fHandleFiltersOfSameFieldPathCallback(aLocalIncludeFilters, aLocalExcludeFilters, aOverallFilters) {
-					// 		continue;
-					// 	}
-					// }
-
 					// take the single Filter or combine all with OR
 					oFilter = undefined;
 					if (aLocalIncludeFilters.length === 1) {
@@ -250,13 +241,6 @@ function(
 					}
 
 				}
-
-				// if (fHandleAllFiltersCallback) {
-				// 	var oFilter = fHandleAllFiltersCallback(aOverallFilters);
-				// 	if (oFilter) {
-				// 		return oFilter;
-				// 	}
-				// }
 
 				// AND-combine filters for different properties and apply filters
 				if (aOverallFilters.length === 1) {

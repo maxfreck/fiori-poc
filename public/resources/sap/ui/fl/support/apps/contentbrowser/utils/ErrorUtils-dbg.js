@@ -1,14 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"sap/m/MessagePopoverItem",
+	"sap/m/MessageItem",
 	"sap/m/MessagePopover",
 	"sap/ui/model/json/JSONModel"],
-function (MessagePopoverItem, MessagePopover, JSONModel) {
+function (MessageItem, MessagePopover, JSONModel) {
 	"use strict";
 
 	/**
@@ -17,7 +17,7 @@ function (MessagePopoverItem, MessagePopover, JSONModel) {
 		 * @constructor
 		 * @alias sap.ui.fl.support.apps.contentbrowser.utils.ErrorUtils
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @experimental Since 1.45
 		 */
 	var ErrorUtils = {};
@@ -26,7 +26,7 @@ function (MessagePopoverItem, MessagePopover, JSONModel) {
 	ErrorUtils._messagesModel = undefined;
 	ErrorUtils._emptyModel = new JSONModel([]);
 
-	ErrorUtils._messageTemplate = new MessagePopoverItem({
+	ErrorUtils._messageTemplate = new MessageItem({
 		type: "{messages>type}",
 		title: "{messages>title}",
 		description: "{messages>description}"

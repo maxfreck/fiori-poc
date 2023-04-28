@@ -319,13 +319,13 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 116023,
+			"size": 125154,
 			"designtime": true,
 			"theme": "sap_belize_hcw"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 115649,
+			"size": 124780,
 			"designtime": true,
 			"theme": "sap_belize_hcw"
 		},

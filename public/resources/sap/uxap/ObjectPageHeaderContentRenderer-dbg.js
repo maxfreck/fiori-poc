@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -32,6 +32,9 @@ sap.ui.define([
 		if (bRenderEditBtn) {
 			oRm.openStart("div", oControl)
 				.class("sapUxAPObjectPageHeaderContentFlexBox")
+				/**
+				 * @deprecated As of version 1.40.1
+				 */
 				.class("sapUxAPObjectPageHeaderContentDesign-" + oControl.getContentDesign());
 
 			if (oHeader) {
@@ -45,6 +48,9 @@ sap.ui.define([
 		if (bRenderEditBtn) {
 			oRm.class("sapUxAPObjectPageHeaderContentCellLeft");
 		} else {
+			/**
+			 * @deprecated As of version 1.40.1
+			 */
 			oRm.class("sapUxAPObjectPageHeaderContentDesign-" + oControl.getContentDesign());
 			if (oHeader) {
 				oRm.class('sapUxAPObjectPageContentObjectImage-' + oHeader.getObjectImageShape());

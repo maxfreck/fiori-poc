@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,15 +16,18 @@ sap.ui.define([
 	/**
 	 * Constructor for a new <code>ListContent</code>.
 	 *
+	 * This is the basis for different value help list contents. It cannot be used directly.
+	 *
 	 * @param {string} [sId] ID for the new element, generated automatically if no ID is given
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element.
 	 * @extends sap.ui.mdc.valuehelp.base.Content
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.base.ListContent
@@ -47,7 +50,7 @@ sap.ui.define([
 				},
 
 				/**
-				 * If set, <code>getKeyForText</code> returns the first item that matches the text.
+				 * If set, <code>getItemForValue</code> returns the first item that matches the text.
 				 *
 				 * This is the case if the text of the item starts with the text entered.
 				 */
@@ -66,27 +69,6 @@ sap.ui.define([
 				}
 			},
 			aggregations: {
-				/**
-				 * Sets the in parameters of a field help.
-				 *
-				 * If set, the field help reads the data of these entities in the model and uses it to filter in the value help.
-				 */
-				inParameters: { // TODO: remove!
-					type: "sap.ui.mdc.field.InParameter",
-					group: "Data",
-					multiple: true
-				},
-
-				/**
-				 * Sets the out parameters of a field help.
-				 *
-				 * If set, the fields sets the data of these entities in the model based to the selected values.
-				 */
-				outParameters: { // TODO: remove!
-					type: "sap.ui.mdc.field.OutParameter",
-					group: "Data",
-					multiple: true
-				}
 			},
 			events: {
 			}
@@ -125,8 +107,9 @@ sap.ui.define([
 		return iCount;
 	};
 
-
-	// has navigate method ?
+	ListContent.prototype.getListBinding = function () {
+		throw new Error("ListContent: Every listcontent must implement this method.");
+	};
 
 	return ListContent;
 

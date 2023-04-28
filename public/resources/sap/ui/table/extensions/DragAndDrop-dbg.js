@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -137,6 +137,14 @@ sap.ui.define([
 					}
 				}
 			} else if (oDropControl.isA("sap.ui.table.Column")) {
+				var iTargetColumnIndex = TableUtils.getCellInfo(TableUtils.getCell(this, oEvent.target)).columnIndex;
+
+				if (oDraggedControl.isA("sap.ui.table.Column")
+					&& !TableUtils.Column.isColumnMovableTo(oDraggedControl, iTargetColumnIndex, true)) {
+					oEvent.setMarked("NonDroppable");
+					return;
+				}
+
 				var mTableCntRect = this.getDomRef("sapUiTableCnt").getBoundingClientRect();
 				oDragSession.setIndicatorConfig({
 					height: mTableCntRect.height - (this._getScrollExtension().isHorizontalScrollbarVisible() ? 16 : 0)
@@ -244,7 +252,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.table.extensions.ExtensionBase
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.extensions.DragAndDrop

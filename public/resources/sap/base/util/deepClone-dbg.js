@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["./isPlainObject"], function(isPlainObject) {
@@ -68,6 +68,10 @@ sap.ui.define(["./isPlainObject"], function(isPlainObject) {
 		if (src == null) {
 			return src;
 		} else if (src instanceof Date) {
+			if (src.clone) { // sap.ui.core.date.UI5Date
+				return src.clone();
+			}
+
 			// clone date object using #getTime(). Officially the date constructor does not support parameter Date.
 			return new Date(src.getTime());
 		} else if (Array.isArray(src)) {

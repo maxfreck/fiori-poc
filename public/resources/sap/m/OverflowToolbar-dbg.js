@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,6 +10,7 @@ sap.ui.define([
 	"sap/ui/core/Core",
 	"./library",
 	"sap/ui/core/Control",
+	"sap/ui/core/Element",
 	"sap/m/ToggleButton",
 	"sap/ui/core/InvisibleText",
 	"sap/m/Toolbar",
@@ -21,13 +22,13 @@ sap.ui.define([
 	"sap/ui/Device",
 	"./OverflowToolbarRenderer",
 	"sap/base/Log",
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/dom/jquery/Focusable" // jQuery Plugin "lastFocusableDomRef"
 ], function(
 	coreLibrary,
 	oCore,
 	library,
 	Control,
+	Element,
 	ToggleButton,
 	InvisibleText,
 	Toolbar,
@@ -38,8 +39,7 @@ sap.ui.define([
 	IconPool,
 	Device,
 	OverflowToolbarRenderer,
-	Log,
-	jQuery
+	Log
 ) {
 	"use strict";
 
@@ -129,7 +129,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.Toolbar,sap.m.IBar
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -255,6 +255,42 @@ sap.ui.define([
 	};
 
 	/**
+	 * This method is a hook for the RenderManager that gets called
+	 * during the rendering of child Controls. It allows to add,
+	 * remove and update existing accessibility attributes (ARIA) of
+	 * those controls.
+	 *
+	 * @param {sap.ui.core.Control} oElement - The Control that gets rendered by the RenderManager
+	 * @param {object} mAriaProps - The mapping of "aria-" prefixed attributes
+	 * @protected
+	 */
+	OverflowToolbar.prototype.enhanceAccessibilityState = function (oElement, mAriaProps) {
+		Toolbar.prototype.enhanceAccessibilityState.apply(this, arguments);
+		if (oElement === this.getAggregation("_overflowButton")) {
+			this._enhanceOverflowButtonAccessibility(mAriaProps);
+		}
+	};
+
+	OverflowToolbar.prototype._enhanceOverflowButtonAccessibility = function (mAriaProps) {
+		var oPopover = this.getAggregation("_popover"),
+			oOverflowButton = this.getAggregation("_overflowButton");
+
+		if (!oOverflowButton) {
+			return;
+		}
+
+		// the overflow toolbar button is better represented as a menu button
+		// because it opens a menu with the overflowed content
+		// because of that the aria-pressed is to be removed and the aria-expanded is to be added
+		mAriaProps.expanded = oOverflowButton.getPressed();
+		delete mAriaProps.pressed;
+
+		if (oPopover && oPopover.getDomRef()) {
+			mAriaProps.controls = oPopover.getId();
+		}
+	};
+
+	/**
 	 * Sets the <code>asyncMode</code> property.
 	 *
 	 * @since 1.67
@@ -268,6 +304,14 @@ sap.ui.define([
 		return this.setProperty("asyncMode", bValue, true);
 	};
 
+	/**
+	 * Called before the control is rendered
+	 */
+	OverflowToolbar.prototype.onBeforeRendering = function () {
+		if (!this.getDomRef()) {
+			this._bControlsInfoCached = false;
+		}
+	};
 
 	/**
 	 * Called after the control is rendered
@@ -1099,7 +1143,7 @@ sap.ui.define([
 	 */
 	OverflowToolbar.prototype._popOverClosedHandler = function () {
 		this._getOverflowButton().setPressed(false); // Turn off the toggle button
-		if (jQuery(document.activeElement).control(0)) {
+		if (Element.closestTo(document.activeElement)) {
 			return;
 		}
 		this._getOverflowButton().focus();
@@ -1124,6 +1168,21 @@ sap.ui.define([
 			this._bOverflowButtonNeeded = bValue;
 		}
 		return this;
+	};
+
+	/**
+	 *
+	 * @returns {number} Toolbar interactive Controls count
+	 * @private
+	 */
+	OverflowToolbar.prototype._getToolbarInteractiveControlsCount = function () {
+		var aInteractiveControlsRendered = this._getVisibleAndNonOverflowContent().filter(function(oControl) {
+			return this._getControlPriority(oControl) !== OverflowToolbarPriority.AlwaysOverflow
+				&& oControl.isA("sap.m.IToolbarInteractiveControl")
+				&& typeof (oControl._getToolbarInteractive) === "function" && oControl._getToolbarInteractive();
+		}, this);
+
+		return this._getOverflowButtonNeeded() ? aInteractiveControlsRendered.length + 1 : aInteractiveControlsRendered.length;
 	};
 
 	/***************************************AGGREGATIONS AND LISTENERS******************************************/
@@ -1283,7 +1342,7 @@ sap.ui.define([
 			oControl.attachEvent("_change", this._onContentPropertyChangedOverflowToolbar, this);
 
 			// Check if the control implements sap.m.IOverflowToolbarContent interface
-			if (oControl.getMetadata().getInterfaces().indexOf("sap.m.IOverflowToolbarContent") > -1) {
+			if (oControl.isA("sap.m.IOverflowToolbarContent")) {
 				aInvalidationEvents = oControl.getOverflowToolbarConfig().invalidationEvents;
 
 				if (aInvalidationEvents && Array.isArray(aInvalidationEvents)) {
@@ -1308,7 +1367,7 @@ sap.ui.define([
 			oControl.detachEvent("_change", this._onContentPropertyChangedOverflowToolbar, this);
 
 			// Check if the control implements sap.m.IOverflowToolbarContent interface
-			if (oControl.getMetadata().getInterfaces().indexOf("sap.m.IOverflowToolbarContent") > -1) {
+			if (oControl.isA("sap.m.IOverflowToolbarContent")) {
 				aInvalidationEvents = oControl.getOverflowToolbarConfig().invalidationEvents;
 
 				if (aInvalidationEvents && Array.isArray(aInvalidationEvents)) {

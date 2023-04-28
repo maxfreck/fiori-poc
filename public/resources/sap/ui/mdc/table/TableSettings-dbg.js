@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,9 +11,9 @@
 // ---------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------
 sap.ui.define([
-	"sap/m/OverflowToolbarButton", "sap/m/library", "sap/m/MenuButton", "sap/ui/core/library", 	"sap/ui/Device", "sap/ui/core/ShortcutHintsMixin", "sap/ui/core/theming/Parameters"
+	"sap/m/OverflowToolbarButton", "sap/m/library", "sap/m/OverflowToolbarMenuButton", "sap/ui/core/library", 	"sap/ui/Device", "sap/ui/core/ShortcutHintsMixin", "sap/ui/core/theming/Parameters"
 
-], function(OverflowToolbarButton, MLibrary, MenuButton, CoreLibrary, Device, ShortcutHintsMixin, ThemeParameters) {
+], function(OverflowToolbarButton, MLibrary, OverflowToolbarMenuButton, CoreLibrary, Device, ShortcutHintsMixin, ThemeParameters) {
 	"use strict";
 
 	var HasPopup = CoreLibrary.aria.HasPopup;
@@ -69,9 +69,10 @@ sap.ui.define([
 			if (!oRb) {
 				this._loadResourceBundle();
 			}
-			var sButtonType = ThemeParameters.get({name: "_sap_ui_mdc_table_Table_ExportButtonType"});
-			var oMenuButton = new MenuButton(sIdPrefix + "-export", {
+			var sButtonType = ThemeParameters.get({name: "_sap_ui_mdc_Table_ExportButtonType"});
+			var oMenuButton = new OverflowToolbarMenuButton(sIdPrefix + "-export", {
 				icon: "sap-icon://excel-attachment",
+				text: oRb.getText("table.QUICK_EXPORT"),
 				tooltip: oRb.getText("table.EXPORT_BUTTON_TEXT"),
 				type: MLibrary.ButtonType[sButtonType],
 				buttonMode: MLibrary.MenuButtonMode.Split,
@@ -107,129 +108,30 @@ sap.ui.define([
 
 			return oMenuButton;
 		},
+		createExpandCollapseAllButton: function (sIdPrefix, aEventInfo, bIsExpand) {
+			if (!oRb) {
+				this._loadResourceBundle();
+			}
+
+			var sId = bIsExpand ? sIdPrefix + "-expandAll" : sIdPrefix + "-collapseAll",
+				sText = bIsExpand ? oRb.getText("table.EXPAND_ALL") : oRb.getText("table.COLLAPSE_ALL");
+
+			var oButton = this._createButton(sId, {
+				icon: bIsExpand ? "sap-icon://expand-all" : "sap-icon://collapse-all",
+				text: sText,
+				press: aEventInfo,
+				tooltip: sText
+			});
+
+			return oButton;
+		},
 		_createButton: function(sId, mSettings) {
 			return new OverflowToolbarButton(sId, mSettings);
 		},
 		_loadResourceBundle: function() {
 			oRb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.mdc");
-		},
-		showPanel: function(oControl, sP13nType, aProperties) {
-			TableSettings["showUI" + sP13nType](oControl, aProperties);
-		},
-
-		showUIColumns: function(oControl) {
-			if (oControl.getInbuiltFilter()) {
-				oControl.getInbuiltFilter().setVisibleFields(null);
-			}
-			oControl.getEngine().uimanager.show(oControl, oControl.getActiveP13nModes());
-		},
-
-		showUIFilter: function(oControl, aProperties) {
-			var aPropertyNames = (aProperties || []).map(function(oProperty) {
-				return oProperty.name;
-			});
-			if (oControl.getInbuiltFilter()) {
-				oControl.getInbuiltFilter().setVisibleFields(aPropertyNames);
-			}
-			oControl.getEngine().uimanager.show(oControl, "Filter");
-		},
-
-		/**
-		 * Adds sorting to a column by calling <code>createChanges</code> in the <code>Engine</code>.
-		 *
-		 * @param {object} oControl The control for which the sorting is used
-		 * @param {string} sProperty The property for which the sorting is used
-		 * @param {sap.ui.core.SortOrder} sSortOrder Whether to sort in descending or ascending order
-		 * @param {boolean} [bRemoveAllExisting=true] Set to remove the previous sorters
-		 */
-		createSort: function(oControl, sProperty, sSortOrder, bRemoveAllExisting) {
-			oControl.getEngine().createChanges({
-				control: oControl,
-				key: "Sort",
-				state: [{
-					selected: true,
-					name: sProperty,
-					descending: sSortOrder === CoreLibrary.SortOrder.Descending,
-					sorted: sSortOrder !== CoreLibrary.SortOrder.None
-				}],
-				applyAbsolute: bRemoveAllExisting
-			});
-
-		},
-
-		createGroup: function (oControl, sProperty) {
-			var oGroupLevels = {
-				grouped: true,
-				name: sProperty
-			};
-			var aGroup = [oGroupLevels];
-			oControl.getCurrentState().groupLevels.some(function(oProp) {
-				if (oProp.name == sProperty) {
-					aGroup[0].grouped = false;
-				}
-			});
-
-			oControl.getEngine().createChanges({
-				control: oControl,
-				key: "Group",
-				state: aGroup,
-				applyAbsolute: oControl._bMobileTable
-			});
-		},
-
-		createAggregation: function(oControl, sProperty) {
-			var oAggregations = {
-				name: sProperty,
-				aggregated: true
-			};
-
-			var aAggregate = [oAggregations];
-			if (oControl.getCurrentState().aggregations[sProperty]) {
-				oAggregations.aggregated = false;
-			}
-
-			oControl.getEngine().createChanges({
-				control: oControl,
-				key: "Aggregate",
-				state: aAggregate,
-				applyAbsolute: false
-			});
-		},
-
-		createColumnWidth: function(oControl, sProperty, sWidth) {
-			var oColumnWidth = {
-				name: sProperty,
-				width: sWidth
-			};
-
-			var aColumnWidth = [oColumnWidth];
-
-			oControl.getEngine().createChanges({
-				control: oControl,
-				key: "ColumnWidth",
-				state: aColumnWidth,
-				applyAbsolute: false
-			});
-		},
-
-		moveColumn: function(oControl, iDraggedIndex, iNewIndex) {
-			//in case the user might enable different d&d options, this function should not create a move change with similar index
-			if (iDraggedIndex != iNewIndex){
-				this._moveItem(oControl, iDraggedIndex, iNewIndex, "moveColumn");
-			}
-		},
-		_moveItem: function(oControl, iDraggedIndex, iNewIndex, sMoveOperation) {
-
-			var aVisibleFields = oControl.getCurrentState(oControl).items || [];
-			var oMovedField = aVisibleFields[iDraggedIndex];
-
-			oControl.getEngine().createChanges({
-				control: oControl,
-				key: "Column",
-				state: [{name: oMovedField.name, position: iNewIndex}]
-			});
-
 		}
 	};
+
 	return TableSettings;
 });

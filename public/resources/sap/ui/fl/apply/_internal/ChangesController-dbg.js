@@ -1,14 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/ui/fl/FlexControllerFactory",
+	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
 	"sap/ui/fl/Utils"
 ], function(
 	OldFlexControllerFactory,
+	ManifestUtils,
 	FlexUtils
 ) {
 	"use strict";
@@ -24,23 +26,11 @@ sap.ui.define([
 			if (typeof vSelectorOrName === "string") {
 				return OldFlexControllerFactory.create(vSelectorOrName);
 			}
+			if (typeof vSelectorOrName.appId === "string") {
+				return OldFlexControllerFactory.create(vSelectorOrName.appId);
+			}
 			var oManagedObject = vSelectorOrName.appComponent || vSelectorOrName;
 			return OldFlexControllerFactory.createForControl(oManagedObject);
-		},
-
-		/**
-		 * Returns the FlexController of the app component where the App Descriptor changes are saved
-		 *
-		 * @param {sap.ui.fl.Selector} vSelector - Selector object or app component for which the descriptor controller should be instantiated
-		 * @returns {sap.ui.fl.FlexController} Returns FlexController Instance of Component for app descriptor changes
-		 */
-		getDescriptorFlexControllerInstance: function(vSelector) {
-			if (typeof vSelector.appId === "string") {
-				return OldFlexControllerFactory.create(vSelector.appId);
-			}
-			var oAppComponent = vSelector.appComponent || vSelector;
-			var oAppDescriptorComponent = FlexUtils.getAppDescriptorComponentObjectForControl(oAppComponent);
-			return OldFlexControllerFactory.create(oAppDescriptorComponent.name);
 		},
 
 		/**

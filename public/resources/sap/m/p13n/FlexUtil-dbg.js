@@ -1,11 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 ], function () {
 	"use strict";
+
+	var pWriteAPI;
 
 	var FlexUtil = {
 
@@ -105,55 +107,46 @@ sap.ui.define([
 			return oConditionChange;
 		},
 
+		_requireWriteAPI: function() {
+			if (!pWriteAPI) {
+				pWriteAPI = new Promise(function (resolve, reject) {
+					sap.ui.require([
+						"sap/ui/fl/write/api/ControlPersonalizationWriteAPI"
+					], function (ControlPersonalizationWriteAPI) {
+						resolve(ControlPersonalizationWriteAPI);
+					});
+				});
+			}
+			return pWriteAPI;
+		},
+
 		handleChanges: function (aChanges, bIgnoreVM, bUseStaticArea) {
-			return new Promise(function (resolve, reject) {
-				sap.ui.require([
-					"sap/ui/fl/write/api/ControlPersonalizationWriteAPI"
-				], function (ControlPersonalizationWriteAPI) {
-					ControlPersonalizationWriteAPI.add({
-						changes: aChanges,
-						ignoreVariantManagement: bIgnoreVM,
-						useStaticArea: bUseStaticArea
-					}).then(function (aDirtyChanges) {
-						resolve(aDirtyChanges);
-					}, reject);
+			return FlexUtil._requireWriteAPI().then(function(ControlPersonalizationWriteAPI){
+				return ControlPersonalizationWriteAPI.add({
+					changes: aChanges,
+					ignoreVariantManagement: bIgnoreVM,
+					useStaticArea: bUseStaticArea
 				});
 			});
 		},
 
 		saveChanges: function (oControl, aDirtyChanges) {
-			return new Promise(function (resolve, reject) {
-				sap.ui.require([
-					"sap/ui/fl/write/api/ControlPersonalizationWriteAPI"
-				], function (ControlPersonalizationWriteAPI) {
-					ControlPersonalizationWriteAPI.save({
-						selector: oControl, changes: aDirtyChanges
-					}).then(resolve);
+			return FlexUtil._requireWriteAPI().then(function(ControlPersonalizationWriteAPI){
+				return ControlPersonalizationWriteAPI.save({
+					selector: oControl, changes: aDirtyChanges
 				});
 			});
 		},
 
 		restore: function(mPropertyBag) {
-			return new Promise(function (resolve, reject) {
-				sap.ui.require([
-					"sap/ui/fl/write/api/ControlPersonalizationWriteAPI"
-				], function (ControlPersonalizationWriteAPI) {
-					ControlPersonalizationWriteAPI.restore(mPropertyBag).then(function () {
-						resolve();
-					}, reject);
-				});
+			return FlexUtil._requireWriteAPI().then(function(ControlPersonalizationWriteAPI){
+				return ControlPersonalizationWriteAPI.restore(mPropertyBag);
 			});
 		},
 
 		reset: function(mPropertyBag) {
-			return new Promise(function (resolve, reject) {
-				sap.ui.require([
-					"sap/ui/fl/write/api/ControlPersonalizationWriteAPI"
-				], function (ControlPersonalizationWriteAPI) {
-					ControlPersonalizationWriteAPI.reset(mPropertyBag).then(function () {
-						resolve();
-					}, reject);
-				});
+			return FlexUtil._requireWriteAPI().then(function(ControlPersonalizationWriteAPI){
+				return ControlPersonalizationWriteAPI.reset(mPropertyBag);
 			});
 		}
 	};

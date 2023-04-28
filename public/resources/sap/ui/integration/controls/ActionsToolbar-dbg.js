@@ -1,6 +1,6 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
@@ -76,7 +76,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -190,6 +190,7 @@ sap.ui.define([
 	};
 
 	ActionsToolbar.prototype._getToolbar = function () {
+		var oResourceBundle = Core.getLibraryResourceBundle("sap.ui.integration");
 		var oToolbar = this.getAggregation('_toolbar');
 		if (!oToolbar) {
 			oToolbar = new Button({
@@ -197,6 +198,7 @@ sap.ui.define([
 				icon: 'sap-icon://overflow',
 				type: ButtonType.Transparent,
 				ariaHasPopup: HasPopup.Menu,
+				tooltip: oResourceBundle.getText("CARD_ACTIONS_OVERFLOW_BUTTON_TOOLTIP"),
 				press: function (oEvent) {
 					this._open();
 				}.bind(this)

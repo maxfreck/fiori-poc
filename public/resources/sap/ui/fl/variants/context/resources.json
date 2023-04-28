@@ -4,7 +4,7 @@
 		{
 			"name": "Component-dbg.js",
 			"module": "sap/ui/fl/variants/context/Component.js",
-			"size": 3274,
+			"size": 3208,
 			"isDebug": true,
 			"required": [
 				"sap/m/library.js",
@@ -18,7 +18,7 @@
 		{
 			"name": "Component.js",
 			"module": "sap/ui/fl/variants/context/Component.js",
-			"size": 1174,
+			"size": 1134,
 			"required": [
 				"sap/m/library.js",
 				"sap/ui/core/UIComponent.js",
@@ -30,13 +30,13 @@
 		},
 		{
 			"name": "Component.js.map",
-			"size": 1349,
+			"size": 1323,
 			"isDebug": true
 		},
 		{
 			"name": "controller/ContextVisibility-dbg.controller.js",
 			"module": "sap/ui/fl/variants/context/controller/ContextVisibility.controller.js",
-			"size": 7054,
+			"size": 7074,
 			"isDebug": true,
 			"required": [
 				"sap/base/util/restricted/_isEqual.js",
@@ -49,7 +49,7 @@
 		{
 			"name": "controller/ContextVisibility.controller.js",
 			"module": "sap/ui/fl/variants/context/controller/ContextVisibility.controller.js",
-			"size": 3725,
+			"size": 3728,
 			"required": [
 				"sap/base/util/restricted/_isEqual.js",
 				"sap/ui/core/Fragment.js",
@@ -60,7 +60,7 @@
 		},
 		{
 			"name": "controller/ContextVisibility.controller.js.map",
-			"size": 4737,
+			"size": 4744,
 			"isDebug": true
 		},
 		{

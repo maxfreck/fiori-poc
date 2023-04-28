@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,7 +13,7 @@ sap.ui.define(["sap/ui/fl/Utils", "sap/ui/thirdparty/jquery"], function(Utils, j
 	 * @constructor
 	 * @alias sap.ui.fl.support.apps.contentbrowser.lrepConnector.LRepConnector
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @experimental Since 1.45
 	 */
 	var LrepConnector = {};
@@ -58,7 +58,7 @@ sap.ui.define(["sap/ui/fl/Utils", "sap/ui/thirdparty/jquery"], function(Utils, j
 	 * @param {string} sContent - Content of the file saved to the layered repository
 	 * @param {string} sTransportId - ID of an ABAP transport or ATO_NOTIFICATION
 	 * @param {string} sPackageName - Name of an ABAP package
-	 * @param [boolean] bSupport - Save file with support mode for activated version
+	 * @param {boolean} [bSupport] - Save file with support mode for activated version
 	 * @returns {Promise} Promise of the SAVE content request to the back end
 	 * @public
 	 */
@@ -89,7 +89,7 @@ sap.ui.define(["sap/ui/fl/Utils", "sap/ui/thirdparty/jquery"], function(Utils, j
 	 * @param {string} sFileName - Name of the file
 	 * @param {string} sFileType - Type of the file
 	 * @param {string} sTransportId - ID of the ABAP transport or ATO_NOTIFICATION
-	 * @param [boolean] bSupport - Delete file with support mode for activated version
+	 * @param {boolean} [bSupport] - Delete file with support mode for activated version
 	 * @returns {Promise} Promise of DELETE content request to the back end
 	 * @public
 	 */

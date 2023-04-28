@@ -1,14 +1,15 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	'sap/base/util/merge',
 	'sap/base/Log',
 	'sap/ui/mdc/condition/FilterOperatorUtil',
-	'sap/ui/mdc/flexibility/Util'
-], function(merge, Log, FilterOperatorUtil, Util) {
+	'sap/ui/mdc/flexibility/Util',
+	"sap/ui/fl/changeHandler/condenser/Classification"
+], function(merge, Log, FilterOperatorUtil, Util, Classification) {
 	"use strict";
 
 	/**
@@ -37,20 +38,10 @@ sap.ui.define([
 		});
 	};
 
-	var fDetermineFilterControl = function(oControl) {
-		var oController = oControl && oControl.getEngine ? oControl.getEngine().getController(oControl, "Filter") : null;
-		return oController ? oController.getFilterControl() : null;
-	};
-
 	var fAddCondition = function(oChange, oControl, mPropertyBag, sChangeReason) {
 
-		var oFilterControl = fDetermineFilterControl(oControl);
 		var bIsRevert = (sChangeReason === Util.REVERT);
 		var oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
-
-		if (oFilterControl && oFilterControl.applyConditionsAfterChangesApplied) {
-			oFilterControl.applyConditionsAfterChangesApplied(oControl);
-		}
 
 		var mConditionsData, aConditions = null, oModifier = mPropertyBag.modifier;
 
@@ -115,13 +106,8 @@ sap.ui.define([
 
 	var fRemoveCondition = function(oChange, oControl, mPropertyBag, sChangeReason) {
 
-		var oFilterControl = fDetermineFilterControl(oControl);
 		var bIsRevert = (sChangeReason === Util.REVERT);
 		var oChangeContent = bIsRevert ? oChange.getRevertData() : oChange.getContent();
-
-		if (oFilterControl && oFilterControl.applyConditionsAfterChangesApplied) {
-			oFilterControl.applyConditionsAfterChangesApplied(oControl);
-		}
 
 		var mConditionsData, aConditions, nDelIndex = -1, oModifier = mPropertyBag.modifier;
 
@@ -183,16 +169,27 @@ sap.ui.define([
 		});
 	};
 
+	var fGetCondenserInfoCondition = function(oChange, mPropertyBag) {
+		var oContent = oChange.getContent();
+		return {
+			classification: Classification.Reverse,
+			affectedControl: oChange.getSelector(),
+			uniqueKey: oContent.name + '_' + JSON.stringify(oContent.condition)
+		};
+	};
+
 	var ConditionFlex = {};
 
 	ConditionFlex.addCondition = Util.createChangeHandler({
 		apply: fAddCondition,
-		revert: fRemoveCondition
+		revert: fRemoveCondition,
+		getCondenserInfo: fGetCondenserInfoCondition
 	});
 
 	ConditionFlex.removeCondition = Util.createChangeHandler({
 		apply: fRemoveCondition,
-		revert: fAddCondition
+		revert: fAddCondition,
+		getCondenserInfo: fGetCondenserInfoCondition
 	});
 
 	return ConditionFlex;

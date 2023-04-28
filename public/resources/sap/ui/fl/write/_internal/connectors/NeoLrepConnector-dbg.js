@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,7 @@ sap.ui.define([
 	 *
 	 * @namespace sap.ui.fl.write._internal.connectors.NeoLrepConnector
 	 * @since 1.81
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal.Storage
 	 */
@@ -61,6 +61,12 @@ sap.ui.define([
 		contextBasedAdaptation: {
 			create: function() {
 				return Promise.reject("contextBasedAdaptation.create is not implemented");
+			},
+			reorder: function() {
+				return Promise.reject("contextBasedAdaptation.reorder is not implemented");
+			},
+			load: function() {
+				return Promise.reject("contextBasedAdaptation.load is not implemented");
 			}
 		},
 		loadFeatures: function (mPropertyBag) {

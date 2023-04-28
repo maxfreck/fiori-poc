@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*eslint-disable max-len */
@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/base/util/deepExtend",
 	"sap/base/util/each",
-	"sap/base/util/includes",
 	"sap/base/util/isEmptyObject",
 	"sap/ui/model/ChangeReason",
 	"sap/ui/model/Context",
@@ -24,7 +23,7 @@ sap.ui.define([
 	"sap/ui/model/odata/CountMode",
 	"sap/ui/model/odata/ODataUtils",
 	"sap/ui/model/odata/OperationMode"
-], function(assert, Log, deepExtend, each, includes, isEmptyObject, ChangeReason, Context, Filter,
+], function(assert, Log, deepExtend, each, isEmptyObject, ChangeReason, Context, Filter,
 		FilterProcessor, FilterType, Sorter, SorterProcessor, TreeBinding, TreeBindingUtils,
 		CountMode, ODataUtils, OperationMode) {
 	"use strict";
@@ -94,7 +93,7 @@ sap.ui.define([
 	 * @extends sap.ui.model.TreeBinding
 	 * @hideconstructor
 	 * @public
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 */
 	var ODataTreeBinding = TreeBinding.extend("sap.ui.model.odata.v2.ODataTreeBinding", /** @lends sap.ui.model.odata.v2.ODataTreeBinding.prototype */ {
 
@@ -121,10 +120,14 @@ sap.ui.define([
 
 			this.mNormalizeCache = {};
 
+			vFilters = vFilters || [];
 			// The ODataTreeBinding expects there to be only an array in this.aApplicationFilters later on.
 			// Wrap the given application filters inside an array if necessary
 			if (vFilters instanceof Filter) {
 				vFilters = [vFilters];
+			}
+			if (vFilters.length > 1) {
+				vFilters = [FilterProcessor.groupFilters(vFilters)];
 			}
 			this.aApplicationFilters = vFilters;
 
@@ -1557,7 +1560,7 @@ sap.ui.define([
 
 		for (sNodeKey in this.oKeys) {
 			for (sChangedEntityKey in mChangedEntities) {
-				if (includes(this.oKeys[sNodeKey], sChangedEntityKey)) {
+				if (this.oKeys[sNodeKey].includes(sChangedEntityKey)) {
 					return true;
 				}
 			}
@@ -1631,6 +1634,9 @@ sap.ui.define([
 		if (sFilterType === FilterType.Control) {
 			this.aFilters = aFilters;
 		} else {
+			if (aFilters.length > 1) {
+				aFilters = [FilterProcessor.groupFilters(aFilters)];
+			}
 			this.aApplicationFilters = aFilters;
 		}
 

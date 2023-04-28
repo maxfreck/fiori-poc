@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -97,7 +97,7 @@ function(
 		 * @implements sap.ui.core.IFormContent
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @public
@@ -1556,7 +1556,7 @@ function(
 		 * Default value is <code>0</code>.
 		 *
 		 * @param {float} fNewValue new value for property <code>value</code>.
-		 * @param {object} mOptions The options object
+		 * @param {{snapValue: boolean}|object} mOptions The options object
 		 * @returns {this} <code>this</code> to allow method chaining.
 		 * @public
 		 */

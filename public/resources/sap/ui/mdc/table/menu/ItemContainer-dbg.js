@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -27,6 +27,10 @@ sap.ui.define([
 	ItemContainer.prototype.initializeItems = function() {
 		var oTable = this.getTable();
 		this.removeAllItems();
+
+		if (oTable._isP13nButtonHidden()) {
+			return Promise.resolve();
+		}
 
 		if (oTable.isSortingEnabled()) {
 			this.addItem(new Item({key: "Sort", icon: "sap-icon://sort"}));

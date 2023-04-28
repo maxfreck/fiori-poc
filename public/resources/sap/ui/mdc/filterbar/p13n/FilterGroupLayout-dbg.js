@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -41,6 +41,10 @@ sap.ui.define(['sap/ui/core/Control'
 	FilterGroupLayout.prototype.setFilterField = function (oFilterField) {
 		this._oFilterField = oFilterField;
 		this._sFieldPath = oFilterField.getFieldPath();
+	};
+
+	FilterGroupLayout.prototype.getIdForLabel = function () {
+		return this._oFilterField && this._oFilterField.getIdForLabel();
 	};
 
 	FilterGroupLayout.prototype.getAccessibilityInfo = function () {

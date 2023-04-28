@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -37,7 +37,6 @@ sap.ui.define([
 	"sap/m/FormattedText",
 	"sap/m/MessageStrip",
 	"sap/m/ToolbarSpacer",
-	"sap/base/util/includes",
 	"sap/ui/model/resource/ResourceModel",
 	"./Manifest",
 	"./Merger",
@@ -81,7 +80,6 @@ sap.ui.define([
 	FormattedText,
 	MessageStrip,
 	Separator,
-	includes,
 	ResourceModel,
 	EditorManifest,
 	Merger,
@@ -139,7 +137,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @since 1.94
 	 * @private
@@ -190,7 +188,7 @@ sap.ui.define([
 				},
 				previewPosition:{
 					type: "string",
-					defaultValue: "right" // value can be "top", "bottom", "left", "right"
+					defaultValue: "right" // value can be "top", "bottom", "left", "right" or "separate"
 				},
 				width: {
 					type: "sap.ui.core.CSSSize",
@@ -237,14 +235,12 @@ sap.ui.define([
 				var oPreview = oControl.getAggregation("_preview");
 				var bShowPreview = oControl.getMode() !== "translation" && oControl.hasPreview();
 				var sPreviewPosition = oControl.getPreviewPosition();
-				if (bShowPreview
-					&& (sPreviewPosition === "top" || sPreviewPosition === "bottom")) {
+				if (bShowPreview && (sPreviewPosition === "top" || sPreviewPosition === "bottom")) {
 					oRm.openStart("div", oControl);
 					oRm.openEnd();
 					//render the additional content if alignment of it is "top"
 					if (oControl.isReady() && sPreviewPosition === "top") {
 						oRm.renderControl(oPreview);
-						oRm.close("div");
 					}
 				}
 				if (bShowPreview && sPreviewPosition === "left") {
@@ -253,10 +249,8 @@ sap.ui.define([
 					oRm.openEnd();
 					if (oControl.isReady()){
 						oRm.renderControl(oPreview);
-						oRm.close("div");
 					}
-				} else if (bShowPreview
-					&& (sPreviewPosition === "bottom" || sPreviewPosition === "top")) {
+				} else if (bShowPreview && (sPreviewPosition === "top" || sPreviewPosition === "bottom")) {
 					oRm.openStart("div");
 					oRm.class("sapUiIntegrationEditor");
 					oRm.openEnd();
@@ -364,6 +358,9 @@ sap.ui.define([
 							if (oControl.getMode() !== "translation") {
 								if (oItem.isA("sap.ui.integration.editor.fields.GroupField")) {
 									var oGroupControl = oItem.getAggregation("_field");
+									if (!oGroupControl) {
+										continue;
+									}
 									if (oSubGroup) {
 										//add current col fields to previous sub panel, then empty the col fields list
 										addColFieldsOfSubGroup();
@@ -861,9 +858,11 @@ sap.ui.define([
 					}
 				}
 				oRm.close("div");
-				//render the additional content if alignment of it is "right"
-				if (oControl.isReady() && bShowPreview && sPreviewPosition === "bottom") {
-					oRm.renderControl(oPreview);
+				if (bShowPreview && (sPreviewPosition === "top" || sPreviewPosition === "bottom")) {
+					//render the additional content if alignment of it is "bottom"
+					if (sPreviewPosition === "bottom") {
+						oRm.renderControl(oPreview);
+					}
 					oRm.close("div");
 				}
 			}
@@ -893,7 +892,7 @@ sap.ui.define([
 		 * @experimental since 1.94
 		 * @public
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @borrows sap.ui.integration.editor.Editor#getParameters as getParameters
 		 * @borrows sap.ui.integration.editor.Editor#resolveDestination as resolveDestination
 		 * @borrows sap.ui.integration.editor.Editor#request as request
@@ -941,6 +940,17 @@ sap.ui.define([
 			return true;
 		}
 		return false;
+	};
+
+	Editor.prototype.getSeparatePreview = function() {
+		var sPreviewPosition = this.getPreviewPosition();
+		if (!this.isReady() || sPreviewPosition !== "separate") {
+			return null;
+		}
+		if (!this._oPreview) {
+			this._oPreview = this.getAggregation("_preview");
+		}
+		return this._oPreview;
 	};
 
 	Editor.prototype.flattenData = function(oData, s, a, path) {
@@ -1045,11 +1055,7 @@ sap.ui.define([
 				this._manifestModel = new JSONModel(oManifestJson);
 				this._isManifestReady = true;
 				this.fireManifestReady();
-				var vI18n = this._oEditorManifest.get("/sap.app/i18n");
-				var sResourceBundleURL = this.getBaseUrl() + vI18n;
-				if (vI18n && EditorResourceBundles.getResourceBundleURL() !== sResourceBundleURL) {
-					EditorResourceBundles.setResourceBundleURL(sResourceBundleURL);
-				}
+				this._initResourceBundlesForMultiTranslation();
 				//use the translations
 				this._loadDefaultTranslations();
 				//add a context model
@@ -1061,6 +1067,30 @@ sap.ui.define([
 					this._initInternal();
 				}.bind(this));
 			}.bind(this));
+	};
+
+	/**
+	 * Init the Resource Bundles for Multi Translation
+	 */
+	Editor.prototype._initResourceBundlesForMultiTranslation = function () {
+		var vI18n = this._oEditorManifest.get("/sap.app/i18n");
+		var sResourceBundleURL;
+		var aSupportedLocales;
+		if (typeof vI18n === "string") {
+			sResourceBundleURL = this.getBaseUrl() + vI18n;
+		} else if (typeof vI18n === "object") {
+			if (vI18n.bundleUrl) {
+				sResourceBundleURL = this.getBaseUrl() + vI18n.bundleUrl;
+			}
+			if (vI18n.supportedLocales) {
+				aSupportedLocales = vI18n.supportedLocales;
+			}
+		}
+		this._oEditorResourceBundles = new EditorResourceBundles({
+			url: sResourceBundleURL,
+			languages: Editor._oLanguages,
+			supportedLocales: aSupportedLocales
+		});
 	};
 
 	/**
@@ -1153,6 +1183,8 @@ sap.ui.define([
 	};
 
 	Editor.prototype.initDestinations = function (vHost) {
+		this._destinationsModel = new JSONModel({});
+		this.setModel(this._destinationsModel, "destinations");
 		var oHostInstance = this.getHostInstance();
 
 		if (vHost && !oHostInstance) {
@@ -1273,10 +1305,10 @@ sap.ui.define([
 			this._loadDefaultTranslations();
 		}
 		this.setProperty("language", sValue, bSuppress);
-		if (!Editor._languages[this._language]) {
+		if (!Editor._oLanguages[this._language]) {
 			this._language = this._language.split("-")[0];
 		}
-		if (!Editor._languages[this._language]) {
+		if (!Editor._oLanguages[this._language]) {
 			Log.warning("The language: " + sValue + " is currently unknown, some UI controls might show " + sValue + " instead of the language name.");
 		}
 		return this;
@@ -1499,6 +1531,10 @@ sap.ui.define([
 								case "group":
 									break;
 								case "object":
+									if (oItem.value && oItem.value !== "" && typeof oItem.value === "object") {
+										mResult[oItem.manifestpath] = oItem.value;
+									}
+									break;
 								case "object[]":
 									if (Array.isArray(oItem.value)) {
 										var aValue = deepClone(oItem.value, 500);
@@ -1570,7 +1606,7 @@ sap.ui.define([
 							});
 							// delete translation texts if uuid not included in value list
 							for (var uuid in mResult.texts[language][key]) {
-								if (!includes(aUUIDs, uuid)) {
+								if (!aUUIDs.includes(uuid)) {
 									delete mResult.texts[language][key][uuid];
 								}
 							}
@@ -2008,6 +2044,9 @@ sap.ui.define([
 				},
 				context: {
 					path: "context>/"
+				},
+				destinations: {
+					path: "destinations>/"
 				}
 			},
 			visible: oConfig.visible
@@ -2072,6 +2111,7 @@ sap.ui.define([
 		if (oConfig.layout) {
 			oField._layout = oConfig.layout;
 		}
+		oField._oEditorResourceBundles = this._oEditorResourceBundles;
 		oField.setAssociation("_messageStrip", MessageStripId);
 		return oField;
 	};
@@ -2103,7 +2143,7 @@ sap.ui.define([
 	 * TODO: Track changes and call update of the additional content
 	 */
 	Editor.prototype._updatePreview = function () {
-		var oPreview = this.getAggregation("_preview");
+		var oPreview = this.getAggregation("_preview") || this._oPreview;
 		if (oPreview && oPreview.update) {
 			oPreview.update();
 		}
@@ -2219,7 +2259,7 @@ sap.ui.define([
 					if (Array.isArray(oResult)) {
 						for (var n in oResult) {
 							var sKey = oField.getKeyFromItem(oResult[n]);
-							if (Array.isArray(oFieldConfig.value) && oFieldConfig.value.length > 0 && includes(oFieldConfig.value, sKey)) {
+							if (Array.isArray(oFieldConfig.value) && oFieldConfig.value.length > 0 && oFieldConfig.value.includes(sKey)) {
 								oResult[n].Selected = this._oResourceBundle.getText("EDITOR_ITEM_SELECTED");
 							} else {
 								oResult[n].Selected = this._oResourceBundle.getText("EDITOR_ITEM_UNSELECTED");
@@ -2230,7 +2270,7 @@ sap.ui.define([
 				} else if (Array.isArray(oData)) {
 					for (var n in oData) {
 						var sKey = oField.getKeyFromItem(oData[n]);
-						if (Array.isArray(oFieldConfig.value) && oFieldConfig.value.length > 0 && includes(oFieldConfig.value, sKey)) {
+						if (Array.isArray(oFieldConfig.value) && oFieldConfig.value.length > 0 && oFieldConfig.value.includes(sKey)) {
 							oData[n].Selected = this._oResourceBundle.getText("EDITOR_ITEM_SELECTED");
 						} else {
 							oData[n].Selected = this._oResourceBundle.getText("EDITOR_ITEM_UNSELECTED");
@@ -2248,36 +2288,53 @@ sap.ui.define([
 			}
 			this._settingsModel.setProperty(oConfig._settingspath + "/_loading", false);
 			oField._hideValueState(true, true);
-		}.bind(this)).catch(function (oError) {
-			var sError = this._oResourceBundle.getText("EDITOR_BAD_REQUEST");
-			if (Array.isArray(oError) && oError.length > 0) {
-				sError = oError[0];
-				var jqXHR = oError[1];
-				if (jqXHR) {
-					var oErrorInResponse;
-					if (jqXHR.responseJSON) {
-						oErrorInResponse = jqXHR.responseJSON.error;
-					} else if (jqXHR.responseText) {
-						if (Utils.isJson(jqXHR.responseText)) {
-							oErrorInResponse = JSON.parse(jqXHR.responseText).error;
-						} else {
-							sError = jqXHR.responseText;
-						}
+		}.bind(this))
+		.catch(function (oError) {
+			var oErrorPromise = new Promise(function (resolve) {
+				var sError = this._oResourceBundle.getText("EDITOR_BAD_REQUEST");
+				if (Array.isArray(oError) && oError.length > 0) {
+					sError = oError[0];
+					var oResponse = oError[1];
+					if (oResponse) {
+						var oErrorInResponse;
+						oResponse.text().then(function (sResponseText) {
+							if (Utils.isJson(sResponseText)) {
+								oErrorInResponse = JSON.parse(sResponseText).error;
+							} else {
+								sError = sResponseText;
+							}
+
+							if (oErrorInResponse) {
+								sError = (oErrorInResponse.code || oErrorInResponse.errorCode || oResponse.status) + ": " + oErrorInResponse.message;
+							}
+
+							resolve(sError);
+						});
+						return;
+					} else {
+						resolve(sError);
+						return;
 					}
-					if (oErrorInResponse) {
-						sError = (oErrorInResponse.code || oErrorInResponse.errorCode || jqXHR.status) + ": " + oErrorInResponse.message;
-					}
+				} else if (typeof (oError) === "string") {
+					sError = oError;
+					resolve(sError);
+					return;
+				} else {
+					resolve(sError);
+					return;
 				}
-			} else if (typeof (oError) === "string") {
-				sError = oError;
-			}
-			var oValueModel = oField.getModel();
-			oValueModel.firePropertyChange();
-			if (oConfig.type === "object" || oConfig.type === "object[]") {
-				oField.mergeValueWithRequestResult();
-			}
-			this._settingsModel.setProperty(oConfig._settingspath + "/_loading", false);
-			oField._showValueState("error", sError, true);
+			}.bind(this));
+
+			return oErrorPromise.then(function (sError) {
+				var oValueModel = oField.getModel();
+				oValueModel.firePropertyChange();
+				if (oConfig.type === "object" || oConfig.type === "object[]") {
+					oField.mergeValueWithRequestResult();
+				}
+				this._settingsModel.setProperty(oConfig._settingspath + "/_loading", false);
+				oField._showValueState("error", sError, true);
+			}.bind(this));
+
 		}.bind(this));
 	};
 
@@ -2336,26 +2393,27 @@ sap.ui.define([
 			var sError = this._oResourceBundle.getText("EDITOR_BAD_REQUEST");
 			if (Array.isArray(oError) && oError.length > 0) {
 				sError = oError[0];
-				var jqXHR = oError[1];
-				if (jqXHR) {
+				var oResponse = oError[1];
+				if (oResponse) {
 					var oErrorInResponse;
-					if (jqXHR.responseJSON) {
-						oErrorInResponse = jqXHR.responseJSON.error;
-					} else if (jqXHR.responseText) {
-						if (Utils.isJson(jqXHR.responseText)) {
-							oErrorInResponse = JSON.parse(jqXHR.responseText).error;
+					oResponse.text().then(function (sResponseText) {
+						if (Utils.isJson(sResponseText)) {
+							oErrorInResponse = JSON.parse(sResponseText).error;
 						} else {
-							sError = jqXHR.responseText;
+							sError = sResponseText;
 						}
-					}
-					if (oErrorInResponse) {
-						sError = (oErrorInResponse.code || oErrorInResponse.errorCode || jqXHR.status) + ": " + oErrorInResponse.message;
-					}
+
+						if (oErrorInResponse) {
+							sError = (oErrorInResponse.code || oErrorInResponse.errorCode || oResponse.status) + ": " + oErrorInResponse.message;
+						}
+
+						Log.error("Request extension data failed, " + sError);
+					});
 				}
 			} else if (typeof (oError) === "string") {
 				sError = oError;
+				Log.error("Request extension data failed, " + sError);
 			}
-			Log.error("Request extension data failed, " + sError);
 		}.bind(this));
 	};
 
@@ -2586,10 +2644,10 @@ sap.ui.define([
 			origLangFieldConfig.editable = false;
 			origLangFieldConfig.required = false;
 			//if has value transaltions, get value via language setting in core
-			if (!Editor._languages[sLanguage] && sLanguage.indexOf("-") > -1) {
+			if (!Editor._oLanguages[sLanguage] && sLanguage.indexOf("-") > -1) {
 				sLanguage = sLanguage.substring(0, sLanguage.indexOf("-"));
 			}
-			if (Editor._languages[sLanguage]) {
+			if (Editor._oLanguages[sLanguage]) {
 				var sTranslateText = this.getTranslationValueInTexts(sLanguage, oConfig.manifestpath);
 				if (sTranslateText) {
 					origLangFieldConfig.value = sTranslateText;
@@ -2693,7 +2751,6 @@ sap.ui.define([
 	 * Returns the current language specific text for a given key or "" if no translation for the key exists
 	 */
 	Editor.prototype._getCurrentLanguageSpecificText = function (sKey) {
-		var sLanguage = this._language;
 		if (this._oTranslationBundle) {
 			var sText = this._oTranslationBundle.getText(sKey, [], true);
 			if (sText === undefined) {
@@ -2701,33 +2758,67 @@ sap.ui.define([
 			}
 			return sText;
 		}
+		var sLanguage = this._language;
 		if (!sLanguage) {
 			return "";
 		}
-		var vI18n = this._oEditorManifest.get("/sap.app/i18n");
+		var vI18n = this._oEditorManifest.get("/sap.app/i18n"),
+			sResourceBundleURL,
+			aSupportedLocales;
 		if (!vI18n) {
 			return "";
 		}
 		if (typeof vI18n === "string") {
+			sResourceBundleURL = this.getBaseUrl() + vI18n;
+		} else if (typeof vI18n === "object") {
+			if (vI18n.bundleUrl) {
+				sResourceBundleURL = this.getBaseUrl() + vI18n.bundleUrl;
+			}
+			if (vI18n.supportedLocales && Array.isArray(vI18n.supportedLocales)) {
+				aSupportedLocales = vI18n.supportedLocales;
+				for (var i = 0; i < aSupportedLocales.length; i++) {
+					aSupportedLocales[i] = aSupportedLocales[i].replaceAll('_', '-');
+				}
+			}
+		}
+		if (sResourceBundleURL) {
 			var aFallbacks = [sLanguage];
 			if (sLanguage.indexOf("-") > -1) {
 				aFallbacks.push(sLanguage.substring(0, sLanguage.indexOf("-")));
 			}
 			//add en into fallbacks
-			if (!includes(aFallbacks, "en")) {
+			if (!aFallbacks.includes("en")) {
 				aFallbacks.push("en");
 			}
+			aFallbacks = this._filterSupportedFallbackLanguages(aFallbacks, aSupportedLocales);
 			// load the ResourceBundle relative to the manifest
 			this._oTranslationBundle = ResourceBundle.create({
-				url: this.getBaseUrl() + vI18n,
+				url: sResourceBundleURL,
 				async: false,
-				locale: sLanguage,
+				locale: aFallbacks[0],
 				supportedLocales: aFallbacks,
 				fallbackLocale: "en"
 			});
-
 			return this._getCurrentLanguageSpecificText(sKey);
+		} else {
+			return "";
 		}
+	};
+
+	/**
+	 * Filter the supported fallback languages
+	 */
+	Editor.prototype._filterSupportedFallbackLanguages = function (aFallbacks, aSupportedLocales) {
+		if (Array.isArray(aSupportedLocales)) {
+			var aSupportedFallbacks = [];
+			for (var i = 0; i < aFallbacks.length; i++) {
+				if (aSupportedLocales.includes(aFallbacks[i])) {
+					aSupportedFallbacks.push(aFallbacks[i]);
+				}
+			}
+			aFallbacks = aSupportedFallbacks;
+		}
+		return aFallbacks;
 	};
 
 	/**
@@ -2785,7 +2876,7 @@ sap.ui.define([
 					translatable: true,
 					expandable: false,
 					expanded: true,
-					label: this._oResourceBundle.getText("EDITOR_ORIGINALLANG") + ": " + Editor._languages[sLanguage]
+					label: this._oResourceBundle.getText("EDITOR_ORIGINALLANG") + ": " + Editor._oLanguages[sLanguage]
 				});
 			}
 			for (var n in aItems) {
@@ -2951,20 +3042,14 @@ sap.ui.define([
 			this.setProperty("width", editorWidth);
 			document.body.style.setProperty("--sapUiIntegrationEditorFormWidth", editorWidth);
 		}
-		//add additional content
-		if (this.getMode() !== "translation") {
-			this._initPreview().then(function() {
-				Promise.all(this._aFieldReadyPromise).then(function () {
-					this._ready = true;
-					this.fireReady();
-				}.bind(this));
-			}.bind(this));
-		} else {
-			Promise.all(this._aFieldReadyPromise).then(function () {
-				this._ready = true;
-				this.fireReady();
-			}.bind(this));
+		//add preview
+		if (this.getMode() !== "translation" && this.getPreviewPosition() !== "separate") {
+			this._initPreview();
 		}
+		Promise.all(this._aFieldReadyPromise).then(function () {
+			this._ready = true;
+			this.fireReady();
+		}.bind(this));
 	};
 
 	Editor.prototype.setHeight = function(sValue) {
@@ -3003,6 +3088,9 @@ sap.ui.define([
 		this._beforeManifestModel = null;
 		this._oInitialManifestModel = null;
 		this._settingsModel = null;
+		this._destinationsModel = null;
+		document.body.style.removeProperty("--sapUiIntegrationEditorFormWidth");
+		document.body.style.removeProperty("--sapUiIntegrationEditorFormHeight");
 		Control.prototype.destroy.apply(this, arguments);
 	};
 
@@ -3010,9 +3098,6 @@ sap.ui.define([
 	 * Initializes the additional content
 	 */
 	Editor.prototype._initPreview = function () {
-		return new Promise(function (resolve, reject) {
-			resolve();
-		});
 	};
 
 	/**
@@ -3208,19 +3293,17 @@ sap.ui.define([
 				if (typeof oItems[n + ".destination"].label === "undefined") {
 					oItems[n + ".destination"].label = n;
 				}
-				if (oHost) {
-					oItems[n + ".destination"]._loading = true;
-				}
 			});
 			var getDestinationsDone = false;
 			if (oHost) {
+				this._destinationsModel.setProperty("/_loading", true);
+				this._destinationsModel.checkUpdate(true);
 				this.getHostInstance().getDestinations().then(function (a) {
 					getDestinationsDone = true;
-					Object.keys(oConfiguration.destinations).forEach(function (n) {
-						oItems[n + ".destination"]._values = a;
-						oItems[n + ".destination"]._loading = false;
-						this._settingsModel.checkUpdate(true);
-					}.bind(this));
+					this._destinationsModel.setProperty("/_values", a);
+					this._destinationsModel.setProperty("/_loading", false);
+					this._destinationsModel.setSizeLimit(a.length);
+					this._destinationsModel.checkUpdate(true);
 				}.bind(this)).catch(function () {
 					//Fix DIGITALWORKPLACE-4359, retry once for the timeout issue
 					return this.getHostInstance().getDestinations();
@@ -3228,16 +3311,13 @@ sap.ui.define([
 					if (getDestinationsDone) {
 						return;
 					}
-					Object.keys(oConfiguration.destinations).forEach(function (n) {
-						oItems[n + ".destination"]._values = b;
-						oItems[n + ".destination"]._loading = false;
-						this._settingsModel.checkUpdate(true);
-					}.bind(this));
+					this._destinationsModel.setProperty("/_values", b);
+					this._destinationsModel.setProperty("/_loading", false);
+					this._destinationsModel.setSizeLimit(b.length);
+					this._destinationsModel.checkUpdate(true);
 				}.bind(this)).catch(function (e) {
-					Object.keys(oConfiguration.destinations).forEach(function (n) {
-						oItems[n + ".destination"]._loading = false;
-						this._settingsModel.checkUpdate(true);
-					}.bind(this));
+					this._destinationsModel.setProperty("/_loading", false);
+					this._destinationsModel.checkUpdate(true);
 					Log.error("Can not get destinations list from '" + oHost.getId() + "'.");
 				}.bind(this));
 			}
@@ -3345,7 +3425,7 @@ sap.ui.define([
 		}
 	};
 	//map of language strings in their actual language representation, initialized in Editor.init
-	Editor._languages = {};
+	Editor._oLanguages = {};
 
 	//theming from parameters to css valiables if css variables are not turned on
 	//find out if css vars are turned on
@@ -3394,7 +3474,7 @@ sap.ui.define([
 			failOnError: false,
 			async: true
 		}).then(function (o) {
-			Editor._languages = o;
+			Editor._oLanguages = o;
 		});
 	};
 

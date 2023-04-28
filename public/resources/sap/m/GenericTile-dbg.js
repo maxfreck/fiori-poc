@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -81,7 +81,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.34.0
 	 *
 	 * @public
@@ -215,7 +215,7 @@ sap.ui.define([
 				 * @since 1.96
 				 * @experimental Since 1.96
 				*/
-				tileIcon: {type: "sap.ui.core.URI", multiple: false},
+				tileIcon: {type: "sap.ui.core.URI"},
 				/**
 				 * Background color of the GenericTile. Only applicable for IconMode.
 				 * @since 1.96
@@ -239,7 +239,16 @@ sap.ui.define([
 				 * @experimental Since 1.106
 				 * @since 1.106
 				 */
-				 renderOnThemeChange: {type: "boolean", group: "Misc", defaultValue: false}
+				 renderOnThemeChange: {type: "boolean", group: "Misc", defaultValue: false},
+				/**
+				 * Show Badge Information associated with a Tile. Limited to 3 characters.
+				 * When enabled, the badge information is displayed inside a folder icon.
+				 * Display limited only for tile in IconMode in TwoByHalf frameType.
+				 * Characters currently trimmed to 3.
+				 * @experimental Since 1.113
+				 * @since 1.113
+				 */
+				tileBadge: { type: "string", group: "Misc", defaultValue: "" }
 			},
 			defaultAggregation: "tileContent",
 			aggregations: {
@@ -373,12 +382,23 @@ sap.ui.define([
 		this._oInvisibleText = new InvisibleText(this.getId() + "-ariaText");
 		this.setAggregation("_invisibleText", this._oInvisibleText, true);
 
-		this._oWarningIcon = new Icon(this.getId() + "-warn-icon", {
-			src: "sap-icon://notification",
+		this._oErrorIcon = new Icon(this.getId() + "-warn-icon", {
+			src: "sap-icon://error",
 			size: "1.375rem"
 		});
 
-		this._oWarningIcon.addStyleClass("sapMGTFtrFldIcnMrk");
+		this._oErrorIcon.addStyleClass("sapMGTFtrFldIcnMrk");
+		 //If parameter is not available synchronously it will be available through callback
+
+		var sErrorIconColor = Parameters.get({
+			name: "sapNegativeTextColor",
+			callback: function(sErrorIconColor) {
+				this._oErrorIcon.setColor(sErrorIconColor);
+			}.bind(this)
+        });
+        if (sErrorIconColor) {
+            this._oErrorIcon.setColor(sErrorIconColor);
+        }
 
 		this._oBusy = new HTML(this.getId() + "-overlay");
 		this._oBusy.setBusyIndicatorDelay(0);
@@ -566,7 +586,7 @@ sap.ui.define([
 		//stop any currently running queue
 		this._clearAnimationUpdateQueue();
 
-		this._oWarningIcon.destroy();
+		this._oErrorIcon.destroy();
 		if (this._oImage) {
 			this._oImage.destroy();
 		}
@@ -610,14 +630,10 @@ sap.ui.define([
 			this._sGenericTileResizeListenerId = null;
 		}
 
-		//sets the extra width of 0.5rem when the grid container has 1rem gap for the TwoByxxxx tiles
+		//Applies new dimensions for the GenericTile if it is inscribed inside a GridContainer
 		var oGetParent = this.getParent();
 		if (oGetParent && oGetParent.isA("sap.f.GridContainer")){
-			this._applyExtraWidth();
-		}
-
-		if (oGetParent && oGetParent.getParent() && oGetParent.getParent().isA("sap.f.GridContainer") && oGetParent.isA("sap.m.SlideTile")){
-			this._applyExtraWidth(oGetParent.getParent(), true);
+			this._applyNewDim();
 		}
 
 		Device.media.detachHandler(this._handleMediaChange, this, DEVICE_SET);
@@ -708,6 +724,11 @@ sap.ui.define([
 			this.getDomRef().setAttribute("aria-describedby",this.getAggregation("_invisibleText").getId());
 		}
 		this.onDragComplete();
+
+		//Removes the focus on the GenericTile if the parent is SlideTile
+		if (this.getDomRef() && this.getParent() && this.getParent().isA("sap.m.SlideTile")) {
+			this.getDomRef().setAttribute("tabindex","-1");
+		}
 	};
 	/**
 	 * Increases the height of the TileContent when the header-text has one line
@@ -839,6 +860,10 @@ sap.ui.define([
 	 */
 	GenericTile.prototype._setupResizeClassHandler = function () {
 		var fnCheckMedia = function () {
+			var oParent = this.getParent();
+			if (oParent && oParent.isA("sap.f.GridContainer")) {
+				this._applyNewDim();
+			}
 			if (this.getSizeBehavior() === TileSizeBehavior.Small || window.matchMedia("(max-width: 374px)").matches || this._isSmallStretchTile()) {
 				this.$().addClass("sapMTileSmallPhone");
 				if (this._isSmallStretchTile()) {
@@ -1183,8 +1208,8 @@ sap.ui.define([
 	GenericTile.prototype.ontap = function (event) {
 		if (!_isInnerTileButtonPressed(event, this)) {
 			var oParams;
-
-			if (this._bTilePress && this.getState() !== LoadState.Disabled) {
+			// The ActionMore button in IconMode tile would be fired irrespective of the pressEnabled property
+			if ((this._bTilePress || this._isActionMoreButtonVisibleIconMode(event)) && this.getState() !== LoadState.Disabled) {
 				this.$().trigger("focus");
 				oParams = this._getEventParams(event);
 				if (!(this.isInActionRemoveScope() && oParams.action === GenericTile._Action.Press)) {
@@ -1239,6 +1264,11 @@ sap.ui.define([
 			}
 		}
     };
+	GenericTile.prototype.onsaptabprevious = function() {
+		if (this._isIconMode() && this.getFrameType() === FrameType.TwoByHalf) {
+			this._oMoreIcon.removeStyleClass("sapMGTVisible");
+		}
+	};
 	GenericTile.prototype.onkeyup = function (event) {
 		if (!_isInnerTileButtonPressed(event, this)) {
 			var currentKey = keyPressed[event.keyCode];    //disable navigation to other tiles when one tile is selected
@@ -1271,7 +1301,8 @@ sap.ui.define([
 
 			}
 
-			if (!preventPress && bFirePress) {
+			// The ActionMore button in IconMode tile would be fired irrespective of the pressEnabled property
+			if ((!preventPress && bFirePress && (this._bTilePress || this._isActionMoreButtonVisibleIconMode(event)))) {
 				this.firePress(oParams);
 				event.preventDefault();
 			}
@@ -1628,6 +1659,17 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns true if the tile is in action scope,IconMode and in TwoByHalf frameType
+	 *
+	 * @param {sap.ui.base.Event} oEvent which was fired
+	 * @return {boolean} true if the tile is in action scope,IconMode and in TwoByHalf frameType
+	 * @private
+	 */
+	 GenericTile.prototype._isActionMoreButtonVisibleIconMode = function (oEvent)  {
+		return (this.getScope() === GenericTileScope.ActionMore || this.getScope() === GenericTileScope.Actions) && this._isIconMode() && this.getFrameType() === FrameType.TwoByHalf && oEvent.target.id.indexOf("-action-more") > -1;
+	};
+
+	/**
 	 * Generates text for failed state.
 	 * To avoid multiple calls e.g. in every _getAriaAndTooltipText call, this is done in onBeforeRendering.
 	 *
@@ -1840,7 +1882,7 @@ sap.ui.define([
 			useIconTooltip: false,
 			src: oIcon
 		});
-		if (!this._oIcon){
+		if (!this._oIcon) {
 			this._oIcon = IconPool.createControlByURI({
 				height: this.getFrameType() === FrameType.OneByOne ? "2rem" : "1.25rem",
 				width: this.getFrameType() === FrameType.OneByOne ? "2rem" : "1.25rem",
@@ -1865,23 +1907,20 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns true if Current Tile is in IconMode, FrameType is OneByOne or TwoByHalf, backgroundColor, TileIcon Properties are set.
+	 * Checks if Current Tile is in IconMode, FrameType is OneByOne or TwoByHalf, backgroundColor, TileIcon Properties are set.
+	 * @returns {boolean} - indicates whether icon mode is supported or not.
 	 */
 	GenericTile.prototype._isIconMode = function () {
-		if (this.getMode() === GenericTileMode.IconMode
-			&& (this.getFrameType() === FrameType.OneByOne || this.getFrameType() === FrameType.TwoByHalf)){
-				if (this.getTileIcon() && this.getBackgroundColor()) {
-					return true;
-				} else {
-					if (!this.getIconLoaded()) {
-						return true;
-					} else {
-						return false;
-					}
-				}
-		} else {
-			return false;
-		}
+		var sMode = this.getMode(),
+			sFrameType = this.getFrameType(),
+			sTileIcon = this.getTileIcon(),
+			sBackgroundColor = this.getBackgroundColor(),
+			bIsIconLoaded = this.getIconLoaded();
+
+		this._sTileBadge = sFrameType === FrameType.TwoByHalf && this.getTileBadge().trim().substring(0, 3);
+		return sMode === GenericTileMode.IconMode &&
+			(sFrameType === FrameType.OneByOne || sFrameType === FrameType.TwoByHalf) &&
+			((sTileIcon && sBackgroundColor) || (this._sTileBadge && sBackgroundColor) || !bIsIconLoaded);
 	};
 
 	/**
@@ -1894,22 +1933,17 @@ GenericTile.prototype._isNavigateActionEnabled = function() {
 	};
 
 	/**
-	 * An extra width of 0.5rem would be applied when the gap is 1rem(16px) in the grid container for the TwoByOne and TwoByHalf tiles
+	 * Applies new dimensions for the GenericTile if it is inscribed inside a GridContainer
+	 * @param {sap.f.GridContainer} oSlideTileParentContainer The GridContainer where SlideTile is inscribed
 	 * @private
 	 */
-	GenericTile.prototype._applyExtraWidth = function(oGetParent, bTrue) {
-		var sGap;
-		if (bTrue == true){
-			sGap = oGetParent.getActiveLayoutSettings().getGap();
-		} else {
-		sGap = this.getParent().getActiveLayoutSettings().getGap();
-		}
-		var bisLargeTile = this.getFrameType() === FrameType.TwoByHalf || this.getFrameType() === FrameType.TwoByOne,
-		bisGap16px = sGap === "16px" || sGap === "1rem";
-		if (bisGap16px && bisLargeTile){
-			this.addStyleClass("sapMGTWidthForGridContainer");
-		} else if (!bisGap16px && this.hasStyleClass("sapMGTWidthForGridContainer")){
-			this.removeStyleClass("sapMGTWidthForGridContainer");
+	GenericTile.prototype._applyNewDim = function(oSlideTileParentContainer) {
+		var sGap = (oSlideTileParentContainer) ? oSlideTileParentContainer.getActiveLayoutSettings().getGap() : this.getParent().getActiveLayoutSettings().getGap();
+		var bisGap16px = sGap === "16px" || sGap === "1rem";
+		if (bisGap16px){
+			this.addStyleClass("sapMGTGridContainerOneRemGap");
+		} else if (!bisGap16px && this.hasStyleClass("sapMGTGridContainerOneRemGap")){
+			this.removeStyleClass("sapMGTGridContainerOneRemGap");
 		}
 	};
 	/**
@@ -1952,14 +1986,14 @@ GenericTile.prototype._isNavigateActionEnabled = function() {
 		bIsNavigateActionPressed = false;
 
 		if (oTile._isActionMode()) {
-			var oActionsContainerNode = document.querySelector("#" + oTile.getId() + "-actionButtons");
-			bIsActionButtonPressed = oActionsContainerNode && oActionsContainerNode !== event.target &&  oActionsContainerNode.contains(event.target);
-		}
+            var oActionsContainerNode = document.querySelector('[id="'  + oTile.getId() + "-actionButtons" + '"]');
+            bIsActionButtonPressed = oActionsContainerNode && oActionsContainerNode !== event.target &&  oActionsContainerNode.contains(event.target);
+        }
 
-		if (oTile._isNavigateActionEnabled()) {
-			var oNavigateActionContainerNode = document.querySelector("#" + oTile.getId() + "-navigateActionContainer");
-			bIsNavigateActionPressed = oNavigateActionContainerNode && oNavigateActionContainerNode !== event.target &&  oNavigateActionContainerNode.contains(event.target);
-		}
+        if (oTile._isNavigateActionEnabled()) {
+            var oNavigateActionContainerNode = document.querySelector('[id="'  + oTile.getId() + "-navigateActionContainer" + '"]');
+            bIsNavigateActionPressed = oNavigateActionContainerNode && oNavigateActionContainerNode !== event.target &&  oNavigateActionContainerNode.contains(event.target);
+        }
 		return bIsActionButtonPressed || bIsNavigateActionPressed;
 	}
 

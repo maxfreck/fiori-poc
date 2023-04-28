@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,7 +33,7 @@ sap.ui.define([
 		 * @extends sap.m.StandardListItem
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @private
@@ -112,6 +112,27 @@ sap.ui.define([
 				sAnnouncement += ". ".concat(sAdditionalTextLocation, ". ", sAdditionalTextDescription);
 			}
 			return sAnnouncement;
+		};
+
+		/**
+		 * Returns item's title dom ref
+		 *
+		 * @returns {HTMLElement} Dom Ref of the list item's title
+		 * @public
+		 */
+		MessageListItem.prototype.getTitleRef = function () {
+			var bActiveTitle = this.getActiveTitle();
+			var sDescription = this.getDescription();
+
+			if (bActiveTitle) {
+				return this.getDomRef().querySelector("a");
+			}
+
+			if (sDescription) {
+				return this.getDomRef().querySelector(".sapMSLITitle");
+			}
+
+			return this.getDomRef().querySelector(".sapMSLITitleOnly");
 		};
 
 		return MessageListItem;

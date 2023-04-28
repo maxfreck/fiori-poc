@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/base/security/URLListValidator"], function(URLListValidator) {
@@ -185,7 +185,7 @@ sap.ui.define(["sap/base/security/URLListValidator"], function(URLListValidator)
 	 *
 	 * </pre>
 	 *
-	 * When a allowlist has been configured using {@link #add and @link #delete},
+	 * When an allowlist has been configured using {@link #add} and {@link #delete},
 	 * any URL that passes the syntactic checks above, additionally will be tested against
 	 * the content of the allowlist.
 	 *

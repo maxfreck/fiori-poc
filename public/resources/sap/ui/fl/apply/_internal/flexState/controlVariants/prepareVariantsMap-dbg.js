@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,8 +14,9 @@ sap.ui.define([
 	"sap/base/Log",
 	"sap/ui/fl/apply/_internal/controlVariants/Utils",
 	"sap/ui/fl/apply/_internal/flexObjects/FlexObjectFactory",
-	"sap/ui/fl/Change",
-	"sap/ui/fl/LayerUtils"
+	"sap/ui/fl/apply/_internal/flexObjects/States",
+	"sap/ui/fl/LayerUtils",
+	"sap/ui/fl/registry/Settings"
 ], function(
 	each,
 	includes,
@@ -26,8 +27,9 @@ sap.ui.define([
 	Log,
 	VariantsApplyUtil,
 	FlexObjectFactory,
-	Change,
-	LayerUtils
+	States,
+	LayerUtils,
+	Settings
 ) {
 	"use strict";
 
@@ -50,8 +52,8 @@ sap.ui.define([
 	function addVariantDependentControlChanges(oVariantsMap, aVariantDependentChanges, sReference) {
 		var oVariantsMapClone = merge({}, oVariantsMap);
 		aVariantDependentChanges.forEach(function(oChange) {
-			var oChangeInstance = new Change(oChange);
-			oChangeInstance.setState(Change.states.PERSISTED);
+			var oChangeInstance = FlexObjectFactory.createFromFileContent(oChange);
+			oChangeInstance.setState(States.LifecycleState.PERSISTED);
 			var oVariantEntry = oVariantsMapClone[oChange.variantReference];
 			oVariantEntry = oVariantEntry || createStandardVariant(oChange.variantReference, sReference);
 			oVariantEntry.controlChanges.push(oChangeInstance);
@@ -124,6 +126,23 @@ sap.ui.define([
 		return oReferencedVariant;
 	}
 
+	// add missing user id (for variants created on the same session)
+	function addMissingUser(oVariantsMap) {
+		var oVariantsMapClone = merge({}, oVariantsMap);
+		values(oVariantsMapClone).forEach(function(oVariantEntry) {
+			var mSupportInformation = oVariantEntry.instance.getSupportInformation();
+			if (!mSupportInformation.user) {
+				var sUserId = Settings.getInstanceOrUndef() && Settings.getInstanceOrUndef().getUserId();
+				if (sUserId) {
+					mSupportInformation.user = sUserId;
+					oVariantEntry.instance.setSupportInformation(mSupportInformation);
+				}
+			}
+		});
+
+		return oVariantsMapClone;
+	}
+
 	// prepares initial map for variants
 	function getVariantsMap(oStorageResponse, sReference) {
 		var oVariantsMap = {};
@@ -133,6 +152,7 @@ sap.ui.define([
 		oVariantsMap = addVariantChanges(oVariantsMap, oStorageResponse.variantChanges, sReference);
 		oVariantsMap = filterInvisibleVariants(oVariantsMap);
 		oVariantsMap = resolveReferences(oVariantsMap, sReference);
+		oVariantsMap = addMissingUser(oVariantsMap);
 
 		return oVariantsMap;
 	}
@@ -300,7 +320,7 @@ sap.ui.define([
 
 	function getActiveChange(aChanges) {
 		if (aChanges.length > 0) {
-			return new Change(aChanges[aChanges.length - 1]);
+			return FlexObjectFactory.createFromFileContent(aChanges[aChanges.length - 1]);
 		}
 		return false;
 	}

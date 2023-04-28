@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -44,7 +44,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.util.BaseFactory
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -59,6 +59,7 @@ sap.ui.define([
 		}
 
 		var oCard = this._oCard,
+			sId = oCard.getId() + "-header",
 			bIsInDialog = oCard.getOpener(),
 			oBindingInfo,
 			oHeader;
@@ -71,10 +72,10 @@ sap.ui.define([
 
 		switch (mConfiguration.type) {
 			case "Numeric":
-				oHeader = new NumericHeader(mConfiguration, oToolbar);
+				oHeader = new NumericHeader(sId, mConfiguration, oToolbar);
 				break;
 			default:
-				oHeader = new Header(mConfiguration, oToolbar, oCard._oIconFormatter);
+				oHeader = new Header(sId, mConfiguration, oToolbar, oCard._oIconFormatter);
 				break;
 		}
 

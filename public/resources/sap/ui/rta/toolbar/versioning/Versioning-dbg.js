@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -36,7 +36,7 @@ sap.ui.define([
 	 * @class
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -131,7 +131,7 @@ sap.ui.define([
 		return new GroupHeaderListItem({
 			title: oGroup.key ? this.oTextResources.getText("TIT_VERSION_HISTORY_PUBLISHED") : this.oTextResources.getText("TIT_VERSION_HISTORY_UNPUBLISHED"),
 			upperCase: false,
-			visible: this.getToolbar().getModel("controls").getProperty("/publishVisible")
+			visible: this.getToolbar().getModel("versions").getProperty("/publishVersionVisible")
 		}).addStyleClass("sapUiRtaVersionHistoryGrouping").addStyleClass("sapUiRtaVersionHistory");
 	}
 
@@ -214,7 +214,7 @@ sap.ui.define([
 		return this._oVersionHistoryDialogPromise.then(function(oVersionsDialog) {
 			if (!oVersionsDialog.isOpen()) {
 				oVersionsDialog.openBy(oVersionButton);
-				if (this.getToolbar().getModel("controls").getProperty("/publishVisible")) {
+				if (this.getToolbar().getModel("versions").getProperty("/publishVersionVisible")) {
 					var oList = this.getToolbar().getControl("versionHistoryDialog--versionList");
 					var oSorter = new Sorter({
 						path: "isPublished",

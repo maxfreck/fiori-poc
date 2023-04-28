@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,7 +26,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -247,13 +247,12 @@ sap.ui.define([
 
 	/*
 	 * Enhance Aria properties of fields to set aria-labelledby to FormElements label if not set otherwise
-	 * Set aria-describedby to the title of the container, but only for the first field in the container
 	 * This function is called during rendering.
 	 */
 	FormElement.prototype.enhanceAccessibilityState = function(oElement, mAriaProps) {
 
 		var oLabel = this.getLabelControl();
-		if (oLabel && oLabel != oElement) {
+		if (oLabel && oLabel != oElement && oElement.getMetadata().getAllAssociations().ariaLabelledBy) { // as for SPAN (sap.m.Text) and other tags aria-labbeledby is not supported, add it only to controls that support it.
 
 			var sLabelledBy = mAriaProps["labelledby"];
 			if (!sLabelledBy) {

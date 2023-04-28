@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -72,8 +72,6 @@ sap.ui.define([
 			aControls.push(oInput1);
 			aControls = this._addUnitControl(oContentFactory, aControls, sId, Input, InvisibleText);
 
-			oContentFactory.setBoundProperty("value");
-
 			return aControls;
 		},
 		createEditMultiValue: function(oContentFactory, aControlClasses, sId) {
@@ -83,6 +81,7 @@ sap.ui.define([
 			var Input = aControlClasses[1];
 			var InvisibleText = aControlClasses[3];
 			var oConditionType = oContentFactory.getConditionType();
+			var oConditionsType = oContentFactory.getConditionsType();
 			this._adjustDataTypeForUnit(oContentFactory);
 
 			var aControls = [];
@@ -107,6 +106,7 @@ sap.ui.define([
 
 			var sInvisibleTextId = InvisibleText.getStaticId("sap.ui.mdc", "field.NUMBER");
 			var oMultiInput = new MultiInput(sId, {
+				value: { path: "$field>/conditions", type: oConditionsType }, // only for parsing
 				placeholder: "{$field>/placeholder}",
 				textAlign: "{$field>/textAlign}",
 				textDirection: "{$field>/textDirection}",
@@ -130,8 +130,6 @@ sap.ui.define([
 			oContentFactory.setAriaLabelledBy(oMultiInput);
 			aControls.push(oMultiInput);
 			aControls = this._addUnitControl(oContentFactory, aControls, sId, Input, InvisibleText);
-
-			oContentFactory.setBoundProperty("value");
 
 			return aControls;
 		},
@@ -187,32 +185,23 @@ sap.ui.define([
 		},
 		_adjustDataTypeForUnit: function(oContentFactory) {
 			var oField = oContentFactory.getField();
+			var TypeUtil = oField.getTypeUtil();
 			var oType = oContentFactory.retrieveDataType();
-			var sName = oType.getMetadata().getName();
 			var oFormatOptions = oType.getFormatOptions();
-			var oConstraints = isEmptyObject(oType.getConstraints()) ? undefined : oType.getConstraints();
 			var bShowMeasure = !oFormatOptions || !oFormatOptions.hasOwnProperty("showMeasure") || oFormatOptions.showMeasure;
 			var bShowNumber = !oFormatOptions || !oFormatOptions.hasOwnProperty("showNumber") || oFormatOptions.showNumber;
 
 			// if measure and number needs to be shown -> create new type
 			if (bShowMeasure && bShowNumber) {
 				// Type for number
-				oFormatOptions = merge({}, oFormatOptions); // do not manipulate original object
-				oFormatOptions.showMeasure = false;
-				oFormatOptions.showNumber = true;
-				oFormatOptions.strictParsing = true; // do not allow to enter unit in number field
-				var TypeClass = ObjectPath.get(sName);
+				var oNewType = TypeUtil.getUnitTypeInstance(oType, true, false);
 				oContentFactory.setUnitOriginalType(oContentFactory.getDataType());
-				oContentFactory.setDataType(new TypeClass(oFormatOptions, oConstraints));
+				oContentFactory.setDataType(oNewType);
 				oField.getControlDelegate().initializeInternalUnitType(oField.getPayload(), oContentFactory.getDataType(), oContentFactory.getFieldTypeInitialization());
 
 				// type for unit
-				oFormatOptions = merge({}, oFormatOptions); // do not manipulate original object
-				oFormatOptions.showMeasure = true;
-				oFormatOptions.showNumber = false;
-				oFormatOptions.strictParsing = true; // do not allow to enter number in unit field
-				TypeClass = ObjectPath.get(sName);
-				oContentFactory.setUnitType(new TypeClass(oFormatOptions, oConstraints));
+				oNewType = TypeUtil.getUnitTypeInstance(oType, false, true);
+				oContentFactory.setUnitType(oNewType);
 				oField.getControlDelegate().initializeInternalUnitType(oField.getPayload(), oContentFactory.getUnitType(), oContentFactory.getFieldTypeInitialization());
 
 				oContentFactory.updateConditionType();

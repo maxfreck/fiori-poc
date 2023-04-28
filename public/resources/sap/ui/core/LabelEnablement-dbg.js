@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -136,7 +136,7 @@ sap.ui.define(['../base/ManagedObject', "sap/base/assert"],
 	 * @see sap.ui.core.LabelEnablement#enrich
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @protected
 	 * @alias sap.ui.core.LabelEnablement
 	 * @namespace
@@ -251,7 +251,7 @@ sap.ui.define(['../base/ManagedObject', "sap/base/assert"],
 	 * <b>What does this function do?</b>
 	 *
 	 * A mechanism is added that ensures that a bidirectional reference between the label and its labeled control is established:
-	 * The label references the labeled control via the HTML 'for' attribute (@see sap.ui.core.LabelEnablement#writeLabelForAttribute).
+	 * The label references the labeled control via the HTML 'for' attribute (see {@link sap.ui.core.LabelEnablement#writeLabelForAttribute}).
 	 * If the labeled control supports the aria-labelledby attribute, a reference to the label is added automatically.
 	 *
 	 * In addition an alternative to apply a 'for' reference without influencing the labelFor association of the API is applied (e.g. used by Form).
@@ -300,6 +300,14 @@ sap.ui.define(['../base/ManagedObject', "sap/base/assert"],
 		oControl.getLabelForRendering = function() {
 			var sId = this.getLabelFor() || this._sAlternativeId;
 			var oControl = toControl(sId);
+			var oLabelForControl;
+
+			if (oControl && oControl.getIdForLabel && oControl.getIdForLabel()) {
+				oLabelForControl = sap.ui.getCore().byId(oControl.getIdForLabel());
+				if (oLabelForControl) {
+					oControl = oLabelForControl;
+				}
+			}
 
 			return isLabelableControl(oControl) ? sId : "";
 		};

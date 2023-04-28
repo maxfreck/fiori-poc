@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -21,7 +21,7 @@ sap.ui.define([
 	 * @extends sap.ui.rta.command.BaseCommand
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -75,7 +75,7 @@ sap.ui.define([
 
 	/**
 	 * Retrieves the prepared change for e.g. undo execution.
-	 * @return {sap.ui.fl.Change} Returns change after being created and stored
+	 * @return {sap.ui.fl.apply._internal.flexObjects.UIChange} Returns change after being created and stored
 	 */
 	AppDescriptorCommand.prototype.getPreparedChange = function () {
 		return this._oPreparedChange;

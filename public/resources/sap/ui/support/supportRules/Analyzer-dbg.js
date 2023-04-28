@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,15 +14,18 @@ sap.ui.define(["sap/base/Log", "sap/ui/support/supportRules/IssueManager","sap/u
 		"use strict";
 
 		/**
-		 * @classdesc
+		 * @class
+		 *
 		 * <h3>Overview</h3>
 		 * Analyzer class that runs tasks. A Task runs a function for every entry in its object array.
 		 * The Analyzer counts the task objects and calculates the percentages.
+		 *
 		 * <h3>Usage</h3>
 		 * With the start, restart, stop and pause methods the analyzer can be controlled.
 		 * While running it asynchronously, it selects objects from the list of each task and completes them.
+		 *
 		 * @private
-		 * @class sap.ui.support.Analyzer
+		 * @alias sap.ui.support.Analyzer
 		 */
 		var Analyzer = function () {
 			this.dStartedAt = null;
@@ -61,8 +64,8 @@ sap.ui.define(["sap/base/Log", "sap/ui/support/supportRules/IssueManager","sap/u
 		 *
 		 * @public
 		 * @param {array} aRules Selected rules for execution
-		 * @param {object} oCoreFacade Metadata, Models, UI areas and Components of the Core object
-		 * @param {object} oExecutionScope selected execution scope from user in UI
+		 * @param {sap.ui.support.CoreFacade} oCoreFacade Metadata, Models, UI areas and Components of the Core object
+		 * @param {sap.ui.support.ExecutionScope} oExecutionScope selected execution scope from user in UI
 		 * @returns {Promise} When all rules are analyzed
 		 */
 		Analyzer.prototype.start = function (aRules, oCoreFacade, oExecutionScope) {

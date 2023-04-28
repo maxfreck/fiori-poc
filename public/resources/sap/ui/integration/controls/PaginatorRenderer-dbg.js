@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -97,7 +97,6 @@ sap.ui.define([
 	PaginatorRenderer._renderArrow = function (oRm, oControl, sDirection) {
 		oRm.openStart("div")
 			.class("sapMCrsl" + capitalize(sDirection.slice(0, 4)))
-			.attr("title", oResourceBundle.getText("PAGINGBUTTON_" + sDirection.toUpperCase()))
 			.openEnd();
 
 		oRm.openStart("div")

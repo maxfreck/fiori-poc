@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([], function () {
@@ -18,15 +18,19 @@ sap.ui.define([], function () {
 	var ChartSettings = {
 
 		showPanel: function (oControl, sP13nType, oSource, aProperties) {
-			ChartSettings["showUI" + sP13nType](oControl, oSource);
+			return ChartSettings["showUI" + sP13nType](oControl, oSource);
 		},
 
 		showUIChart: function (oControl, oSource) {
-			oControl.getEngine().uimanager.show(oControl, "Item");
+			return oControl.getEngine().uimanager.show(oControl, "Item");
 		},
 
 		showUISort: function(oControl, oSource){
-			oControl.getEngine().uimanager.show(oControl, "Sort");
+			return oControl.getEngine().uimanager.show(oControl, "Sort");
+		},
+
+		showUIFilter: function(oControl, oSource){
+			return oControl.getEngine().uimanager.show(oControl, "Filter");
 		}
 
 	};

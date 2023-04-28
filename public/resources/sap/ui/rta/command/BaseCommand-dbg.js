@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/base/ManagedObject"], function(ManagedObject) {
@@ -13,7 +13,7 @@ sap.ui.define(["sap/ui/base/ManagedObject"], function(ManagedObject) {
 	 * @extends sap.ui.base.ManagedObject
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -31,6 +31,14 @@ sap.ui.define(["sap/ui/base/ManagedObject"], function(ManagedObject) {
 				},
 				runtimeOnly: {
 					type: "boolean"
+				},
+				/**
+				 * decides if the command execution is relevant for persistency which
+				 * enables or disables the save option
+				 */
+				relevantForSave: {
+					type: "boolean",
+					defaultValue: true
 				}
 			},
 			associations: {

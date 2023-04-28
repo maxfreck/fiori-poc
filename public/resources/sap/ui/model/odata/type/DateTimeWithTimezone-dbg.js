@@ -1,21 +1,21 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
+	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/_Helper",
 	"sap/ui/model/CompositeType",
 	"sap/ui/model/FormatException",
 	"sap/ui/model/ParseException"
-], function (DateFormat, _Helper, CompositeType, FormatException, ParseException) {
+], function (UI5Date, DateFormat, _Helper, CompositeType, FormatException, ParseException) {
 	"use strict";
 
 	var sDateOrTimeRequired = "For type 'object', at least one of the format options 'showDate' or"
-			+ " 'showTime' must be enabled",
-		oDemoDateTime = new Date(Date.UTC(new Date().getFullYear(), 11, 31, 23, 59, 58));
+			+ " 'showTime' must be enabled";
 
 	/*
 	 * Returns the formatter. Creates it lazily.
@@ -56,11 +56,14 @@ sap.ui.define([
 	 * part. For this, the timestamp part has to be provided in the UTC time zone. When using this
 	 * type with the {@link sap.ui.model.odata.v2.ODataModel}, you need to set the parameter
 	 * <code>useUndefinedIfUnresolved</code> for both parts.
+	 *
+	 * For more information and some examples how to use this class, see
+	 * {@link topic:6c9e61dc157a40c19460660ece8368bc Dates, Times, Timestamps, and Time Zones}.
 	 * @extends sap.ui.model.CompositeType
 	 * @public
 	 * @see {sap.ui.model.odata.v2.ODataModel#bindProperty}
 	 * @since 1.99.0
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 */
 	var DateTimeWithTimezone = CompositeType.extend("sap.ui.model.odata.type.DateTimeWithTimezone",
 		{
@@ -100,7 +103,9 @@ sap.ui.define([
 	 * @private
 	 */
 	DateTimeWithTimezone.prototype._getErrorMessage = function () {
-		var sMessageKey = !this.bShowDate && !this.bShowTime
+		// no need to use UI5Date.getInstance as only the UTC timestamp is used
+		var oDemoDateTime = new Date(Date.UTC(UI5Date.getInstance().getFullYear(), 11, 31, 23, 59, 58)),
+			sMessageKey = !this.bShowDate && !this.bShowTime
 				? "EnterDateTimeTimezone"
 				: "EnterDateTime";
 

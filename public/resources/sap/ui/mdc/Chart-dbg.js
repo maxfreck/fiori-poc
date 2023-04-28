@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,10 +8,7 @@ sap.ui.define([
         "sap/ui/core/Core",
         "sap/ui/mdc/Control",
         "./chart/ChartSettings",
-        "sap/ui/mdc/util/loadModules",
         "./ChartRenderer",
-        "sap/ui/mdc/library",
-        "sap/m/Text",
         "sap/base/Log",
         "./chart/ChartToolbar",
         "./chart/PropertyHelper",
@@ -24,17 +21,17 @@ sap.ui.define([
         "sap/ui/base/ManagedObjectObserver",
         "sap/ui/mdc/chart/DrillBreadcrumbs",
         "sap/ui/mdc/actiontoolbar/ActionToolbarAction",
-        "sap/ui/thirdparty/jquery",
-        "sap/ui/core/library"
+        "sap/ui/core/library",
+        "sap/ui/events/KeyCodes",
+        "sap/ui/mdc/util/InfoBar",
+        "sap/ui/core/format/ListFormat",
+        "sap/ui/mdc/enum/ProcessingStrategy"
     ],
     function (
         Core,
         Control,
         ChartSettings,
-        loadModules,
         ChartRenderer,
-        MDCLib,
-        Text,
         Log,
         ChartToolbar,
         PropertyHelper,
@@ -47,8 +44,11 @@ sap.ui.define([
         ManagedObjectObserver,
         Breadcrumbs,
         ActionToolbarAction,
-        jQuery,
-        coreLibrary
+        coreLibrary,
+        KeyCodes,
+        InfoBar,
+        ListFormat,
+        ProcessingStrategy
     ) {
         "use strict";
 
@@ -60,15 +60,18 @@ sap.ui.define([
          *
          * @param {string} [sId] ID for the new control, generated automatically if no id is given
          * @param {object} [mSettings] Initial settings for the new control
+         *
          * @class The Chart control creates a chart based on metadata and the configuration specified.
          * @extends sap.ui.mdc.Control
          * @author SAP SE
-         * @version 1.108.2
+         * @version 1.113.0
          * @constructor
-         * @experimental As of version ...
+         *
+         * @experimental As of version 1.88
          * @private
          * @ui5-restricted sap.fe
          * @MDC_PUBLIC_CANDIDATE
+         *
          * @since 1.88
          * @alias sap.ui.mdc.Chart
          */
@@ -82,6 +85,7 @@ sap.ui.define([
                 ],
                 defaultAggregation: "items",
                 properties: {
+
                     /**
 					 * Defines the width of the chart.
 					 */
@@ -91,6 +95,7 @@ sap.ui.define([
 						defaultValue: "100%",
 						invalidate: true
 					},
+
 					/**
 					 * Defines the height of the chart.
 					 */
@@ -100,6 +105,7 @@ sap.ui.define([
 						defaultValue: "100%",
 						invalidate: true
 					},
+
                     /**
                      * Defines the module path of the metadata delegate.
                      */
@@ -110,6 +116,7 @@ sap.ui.define([
                             name: "sap/ui/mdc/ChartDelegate"
                         }
                     },
+
                     /**
                      * Specifies header text that is shown in chart
                      */
@@ -118,14 +125,16 @@ sap.ui.define([
                         group: "Misc",
                         defaultValue: null
                     },
+
                     /**
                      * Defines the no data text shown in the chart.
                      * @since 1.88
                      */
                     noDataText: {
                         type: "string",
-                        defaultValue: "No data"
+                        defaultValue: "No data" //TODO WHy do we have a not translated default value?
                     },
+
                     /**
                      * Specifies the personalization options available for the chart.<br>
                      * <b>Note:</b> The order of the provided options does not influence the arrangement of the icons on the UI.
@@ -147,6 +156,7 @@ sap.ui.define([
                         group: "Misc",
                         defaultValue: true
                     },
+
                     /**
                      * Specifies which actions should not be available in the chart's toolbar.
                      *
@@ -156,6 +166,7 @@ sap.ui.define([
                         type: "sap.ui.mdc.ChartToolbarActionType[]",
                         defaultValue: []
                     },
+
                     //TODO: Do we really need this? Should be avoided.
                     /**
                      * The minimal width
@@ -166,6 +177,7 @@ sap.ui.define([
                         defaultValue: "240px",
                         invalidate: true
                     },
+
                     //TODO: Do we really need this? Should be avoided.
                     /**
                      * The minimal height
@@ -176,6 +188,7 @@ sap.ui.define([
                         defaultValue: "400px",
                         invalidate: true
                     },
+
                     /**
                      * Defines the sort conditions.
                      *
@@ -186,6 +199,7 @@ sap.ui.define([
                     sortConditions: {
                         type: "object"
                     },
+
                     /**
                      * Defines the filter conditions.
                      *
@@ -193,12 +207,13 @@ sap.ui.define([
                      *
                      * @since 1.99
                      */
-                     filterConditions: {
+                    filterConditions: {
                         type: "object",
                         defaultValue: {}
                     },
+
                     /**
-                     * Controls the visibility of the chart tooltip. If set to <code>true</code>, an instance of {@link sap.viz.ui5.controls.VizTooltip} is created and shown when hovering over a data point.
+                     * Controls the visibility of the chart tooltip. If set to <code>true</code>, a call of the delegate.setChartTooltipVisibility will be triggered and can be used to make the Char tooltip visible.
                      *
                      * @since 1.88
                      */
@@ -207,6 +222,7 @@ sap.ui.define([
                         group: "Misc",
                         defaultValue: true
                     },
+
                     /**
                      * If set to <code>true</code>, the chart is automatically bound after initialization.
                      * If set to <code>false</code>, the chart is bound after the first call to <code>rebind</code>.
@@ -225,6 +241,7 @@ sap.ui.define([
                         group: "Misc",
                         defaultValue: "column"
                     },
+
                     /**
                      * Enables the Details button in the chart toolbar.
                      */
@@ -233,10 +250,11 @@ sap.ui.define([
                         group: "Misc",
                         defaultValue: true
                     },
+
                     /**
                      * Specifies the chart metadata.<br>
                      * <b>Note</b>: This property must not be bound.<br>
-                     * <b>Note</b>: This property is used exclusively for SAPUI5 flexibility/ Fiori Elements. Do not use it otherwise.
+                     * <b>Note</b>: This property is used exclusively for SAPUI5 flexibility/sap.fe. Do not use it otherwise.
                      *
                      * @since 1.99
                      */
@@ -244,6 +262,7 @@ sap.ui.define([
                         type: "object",
                         defaultValue: []
                     },
+
                     /**
                     * Semantic level of the header.
                     * For more information, see {@link sap.m.Title#setLevel}.
@@ -254,6 +273,18 @@ sap.ui.define([
                         type: "sap.ui.core.TitleLevel",
                         group: "Appearance",
                         defaultValue: TitleLevel.Auto
+                    },
+
+                    /**
+                     * Determines whether the header text is shown in the chart. Regardless of its value, the given header text is used to label the chart
+                     * correctly for accessibility purposes.
+                     *
+                     * @since 1.111
+                     */
+                    headerVisible : {
+                        type: "boolean",
+                        group: "Misc",
+                        defaultValue: true
                     }
                 },
                 aggregations: {
@@ -295,6 +326,11 @@ sap.ui.define([
                     selectionDetailsActions: {
                         type: "sap.ui.mdc.chart.SelectionDetailsActions",
                         multiple: false
+                    },
+                    _infoToolbar: {
+                        type: "sap.ui.mdc.util.InfoBar",
+                        multiple: false,
+                        visibility: "hidden"
                     },
                     /**
                      * Reference to a {@link sap.ui.fl.variants.VariantManagement} control for the chart.
@@ -396,7 +432,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          */
         Chart.prototype.setP13nMode = function(aMode) {
             var aSortedKeys = null;
@@ -440,10 +476,10 @@ sap.ui.define([
             };
 
             var mRegistryOptions = {
-                Item: ChartItemController,
-                Sort: SortController,
-                Filter: FilterController,
-                Type: ChartTypeController
+                Item: new ChartItemController({control: this}),
+                Sort: new SortController({control: this}),
+                Filter: new FilterController({control: this}),
+                Type: new ChartTypeController({control: this})
             };
 
             if (aMode && aMode.length > 0) {
@@ -455,7 +491,7 @@ sap.ui.define([
                     }
                 });
 
-                this.getEngine().registerAdaptation(this, oRegisterConfig);
+                this.getEngine().register(this, oRegisterConfig);
             }
 
         };
@@ -468,6 +504,8 @@ sap.ui.define([
                 oP13nFilter.setFilterConditions(mConditions);
             }
 
+            this._updateInfoToolbar();
+
             return this;
         };
 
@@ -477,7 +515,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          */
         Chart.prototype.getConditions = function() {
             //may only return conditions if the inner FilterBar has already been initialized
@@ -556,6 +594,11 @@ sap.ui.define([
                 }
 
                 this.setAggregation("_innerChart", oInnerChart);
+
+                if (this.getP13nMode().includes("Filter")){
+                    this._initInfoToolbar();
+                }
+
                 this._bInnerChartReady = true;
                 this._fnResolveInitialized();
                 this.invalidate();
@@ -566,6 +609,73 @@ sap.ui.define([
 
             //independent from fetchProperties
             this._getToolbar().createToolbarContent(this);
+        };
+
+        Chart.prototype._initInfoToolbar = function() {
+            this.setAggregation("_infoToolbar", new InfoBar(this.getId() + "--infoToolbar", {
+                infoText: this._getFilterInfoText(),
+                press: function() {
+                    this.finalizePropertyHelper().then(function(){
+                       return ChartSettings.showPanel(this, "Filter");
+                    }.bind(this)).then(function(oP13nDialog) {
+
+                        oP13nDialog.attachEventOnce("afterClose", function() {
+
+                            var aConditions = this.getFilterConditions();
+                            var bNoConditions = !Object.keys(aConditions).find(function(oKey) {
+                                return aConditions[oKey] && aConditions[oKey].length > 0;
+                            });
+
+                            if (bNoConditions && this.getAggregation("_toolbar")) {
+                                this.getAggregation("_toolbar").getSettingsButton().focus();
+                            }
+
+                        }.bind(this));
+                    }.bind(this));
+                }.bind(this),
+                removeAllFilters: function(oEvent) {
+                    //this will only reset to the last variant and not clear all filters. this.getEngine().reset(this, ["Filter"]);
+                    this.getEngine().createChanges({
+                        control: this,
+                        key: "Filter",
+                        state: {},
+                        applyAbsolute: ProcessingStrategy.FullReplace
+                    });
+                    //Focus handling, setting the focus back tothe settoing button
+                    this._getToolbar().getSettingsButton().focus();
+                }.bind(this)
+            }));
+
+            if (this.getDomRef()) {
+                this.getDomRef().setAttribute("aria-labelledby", this.getAggregation("_infoToolbar").getACCTextId());
+            }
+        };
+
+        Chart.prototype._updateInfoToolbar = function() {
+            if (this.getP13nMode().includes("Filter") && this.getAggregation("_infoToolbar")){
+                this.getAggregation("_infoToolbar").setInfoText(this._getFilterInfoText());
+            }
+        };
+
+        Chart.prototype._getFilterInfoText = function() {
+            if (this.getInbuiltFilter()) {
+                var sText;
+                var aFilterNames = this._getLabelsFromFilterConditions();
+                var oListFormat = ListFormat.getInstance();
+
+                if (aFilterNames.length > 0) {
+
+                    if (aFilterNames.length > 1) {
+                        sText = MDCRb.getText("chart.MULTIPLE_FILTERS_ACTIVE", [aFilterNames.length, oListFormat.format(aFilterNames)]);
+                    } else {
+                        sText = MDCRb.getText("chart.ONE_FILTER_ACTIVE", aFilterNames[0]);
+                    }
+                }
+
+                return sText;
+            }
+
+            return undefined;
         };
 
         /**
@@ -630,7 +740,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          */
         Chart.prototype.isFilteringEnabled = function () {
             return this.getP13nMode().indexOf("Filter") > -1;
@@ -887,7 +997,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements, sap.ui.mdc
+         * @ui5-restricted sap.fe, sap.ui.mdc
          */
         Chart.prototype.setLegendVisible = function (bVisible) {
             this.setProperty("legendVisible", bVisible);
@@ -930,6 +1040,7 @@ sap.ui.define([
         /**
          * shows the drill-down popover for selection a dimension to drill down to.
          * @param {sap.m.Button} oDrillBtn reference to the drill down button for loacation of the popover
+         * @returns {Promise} show dril stack promise
          *
          * @experimental
          * @private
@@ -938,6 +1049,7 @@ sap.ui.define([
         Chart.prototype._showDrillDown = function (oDrillBtn) {
             if (!this.oDrillPopover) {
                 if (DrillStackHandler) {
+
                     this.oDrillPopover = DrillStackHandler.createDrillDownPopover(this);
                     this.oDrillPopover.attachAfterClose(function(){
                         delete this.oDrillPopover;
@@ -951,6 +1063,7 @@ sap.ui.define([
                         "sap/ui/mdc/chart/DrillStackHandler"
                     ], function (DrillStackHandlerLoaded) {
                         DrillStackHandler = DrillStackHandlerLoaded;
+
                         this.oDrillPopover = DrillStackHandler.createDrillDownPopover(this);
                         this.oDrillPopover.attachAfterClose(function(){
                             delete this.oDrillPopover;
@@ -962,6 +1075,8 @@ sap.ui.define([
                             });
                     }.bind(this));
                 }.bind(this));
+            } else if (this.oDrillPopover) {
+                this.oDrillPopover.close();
             }
         };
 
@@ -985,7 +1100,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          *
          */
         Chart.prototype.getChartTypeInfo = function () {
@@ -1017,7 +1132,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          */
         Chart.prototype.getAvailableChartTypes = function () {
             return this.getControlDelegate().getAvailableChartTypes(this);
@@ -1049,7 +1164,7 @@ sap.ui.define([
          *
          * @experimental
          * @private
-         * @ui5-restricted Fiori Elements
+         * @ui5-restricted sap.fe
          */
         Chart.prototype.setNoData = function(oControl) {
             this.setAggregation("noData", oControl);
@@ -1062,6 +1177,14 @@ sap.ui.define([
                 //This error merely happens as the setter is calle don init of the MDC CHart from framework side.
             }
 
+            return this;
+        };
+
+        Chart.prototype.setHeaderVisible = function(bVisible) {
+            this.setProperty("headerVisible", bVisible, true);
+            if (this.getAggregation("_toolbar")) {
+                this.getAggregation("_toolbar").setHeaderVisible(bVisible);
+            }
             return this;
         };
 
@@ -1168,23 +1291,6 @@ sap.ui.define([
             return this.getSortConditions() ? this.getSortConditions().sorters : [];
         };
 
-        /**
-         * Returns the fetched properties from the delegate
-         *
-         * @private
-         */
-        Chart.prototype._getPropertyData = function () {
-
-            if (!this.aFetchedProperties) {
-                //retrieve the data
-                this.aFetchedProperties = this.getControlDelegate().fetchProperties(this);
-            } else {
-                //take the already instantiated data
-                return this.aFetchedProperties;
-            }
-
-        };
-
         Chart.prototype._getTypeBtnActive = function(){
             return !!this._typeBtnActive;
         };
@@ -1208,20 +1314,41 @@ sap.ui.define([
         };
 
         /**
-		 * Callback for when fuilters changed
-		 * Activates the overlay on the MDC chart
-		 *
-		 * @param oEvent filter changed event
-		 *
-		 * @experimental
-		 * @private
-		 * @ui5-restricted Fiori Elements, sap.ui.mdc
-		 */
+         * Callback for when filters changed
+         * Activates the overlay on the MDC chart
+         *
+         * @param oEvent filter changed event
+         *
+         * @experimental
+         * @private
+         * @ui5-restricted sap.fe, sap.ui.mdc
+         */
 		Chart.prototype._onFiltersChanged = function(oEvent) {
 			if (this._bInnerChartReady && this.getControlDelegate() && this.getControlDelegate().getInnerChartBound(this) && oEvent.getParameter("conditionsBased")) {
 				this._renderOverlay(true);
 			}
 		};
+
+        var fCheckIfRebindIsRequired = function(aAffectedP13nControllers) {
+            var bRebindRequired = false;
+            if (
+                aAffectedP13nControllers && (
+                    aAffectedP13nControllers.indexOf("Sort") > -1 ||
+                    aAffectedP13nControllers.indexOf("Item") > -1 ||
+                    aAffectedP13nControllers.indexOf("Filter") > -1
+                )
+            ) {
+                bRebindRequired = true;
+            }
+
+            return bRebindRequired;
+        };
+
+        Chart.prototype._onModifications = function(aAffectedP13nControllers) {
+            if (fCheckIfRebindIsRequired(aAffectedP13nControllers)) {
+                this.rebind();
+            }
+        };
 
         Chart.prototype.setVariant = function(oControl) {
             this.setAggregation("variant", oControl);
@@ -1236,13 +1363,13 @@ sap.ui.define([
         };
 
         /**
-		 * Adds/Removes the overlay shown above the inner chart.
-		 * @param {boolean} bShow true to show overlay, false to hide
-		 *
-		 * @experimental
-		 * @private
-		 * @ui5-restricted Fiori Elements, sap.ui.mdc
-		 */
+         * Adds/Removes the overlay shown above the inner chart.
+         * @param {boolean} bShow true to show overlay, false to hide
+         *
+         * @experimental
+         * @private
+         * @ui5-restricted sap.fe, sap.ui.mdc
+         */
 		Chart.prototype._renderOverlay = function(bShow) {
 			try {
                 this.getControlDelegate().showOverlay(this, bShow);
@@ -1285,6 +1412,31 @@ sap.ui.define([
 
             this.setProperty("headerLevel", sHeaderLevel);
             return this;
+        };
+
+        Chart.prototype.getVariant = function() {
+            var oToolbar = this.getAggregation("_toolbar");
+            return oToolbar  ? oToolbar._getVariantReference() : this.getAggregation("variant");
+        };
+
+        Chart.prototype.onkeydown = function(oEvent) {
+            if (oEvent.isMarked()) {
+                return;
+            }
+
+            if ((oEvent.metaKey || oEvent.ctrlKey) && oEvent.which === KeyCodes.COMMA) {
+                // CTRL (or Cmd) + COMMA key combination to open the table personalisation dialog
+                var oSettingsBtn = this._getToolbar()._oSettingsBtn;
+                if (oSettingsBtn && oSettingsBtn.getVisible() && oSettingsBtn.getEnabled()) {
+                    oSettingsBtn.firePress();
+
+                    // Mark the event to ensure that parent handlers (e.g. FLP) can skip their processing if needed. Also prevent potential browser defaults
+                    // (e.g. Cmd+, opens browser settings on Mac).
+                    oEvent.setMarked();
+                    oEvent.preventDefault();
+                }
+            }
+
         };
 
         return Chart;

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -537,9 +537,9 @@ sap.ui.define([
 	 *
 	 * @class
 	 * @private
-	 * @name sap.ui.core.Popup.Layer
+	 * @alias sap.ui.core.Popup.Layer
 	*/
-	BaseObject.extend("sap.ui.core.Popup.Layer", {
+	var Layer = BaseObject.extend("sap.ui.core.Popup.Layer", {
 		constructor: function() {
 			var sDomString = this.getDomString();
 			this._$Ref = jQuery(sDomString).appendTo(sap.ui.getCore().getStaticAreaRef());
@@ -547,16 +547,14 @@ sap.ui.define([
 	});
 
 	/**
-	* Initializes the popup layer by adding z-index and visibility to the popup layer
-	* and insert the popup directly after the given <code>oRef</code> element
-	*
-	* @param {jQuery} oRef The element as a jQuery object
-	* @param {int} iZIndex The z-index value
-	* @private
-	* @name sap.ui.core.Popup.Layer#init
-	* @function
-	*/
-	Popup.Layer.prototype.init = function(oRef, iZIndex) {
+	 * Initializes the popup layer by adding z-index and visibility to the popup layer
+	 * and insert the popup directly after the given <code>oRef</code> element
+	 *
+	 * @param {jQuery} oRef The element as a jQuery object
+	 * @param {int} iZIndex The z-index value
+	 * @private
+	 */
+	Layer.prototype.init = function(oRef, iZIndex) {
 		this._$Ref.css({
 			"visibility" : "visible",
 			"z-index" : iZIndex
@@ -571,10 +569,8 @@ sap.ui.define([
 	 * @param {jQuery} oRef The element as a jQuery object
 	 * @param {int} iZIndex The z-index value
 	 * @protected
-	 * @name sap.ui.core.Popup.Layer#update
-	 * @function
-	*/
-	Popup.Layer.prototype.update = function(/** jQuery */oRef, iZIndex){
+	 */
+	Layer.prototype.update = function(/** jQuery */oRef, iZIndex){
 		if (oRef.length) {
 			var oRect = oRef.rect();
 			this._$Ref.css({
@@ -615,10 +611,8 @@ sap.ui.define([
 	 * Resets the popup layer by hidding and assigning to the static area
 	 *
 	 * @private
-	 * @name sap.ui.core.Popup.Layer#reset
-	 * @function
 	 */
-	Popup.Layer.prototype.reset = function(){
+	Layer.prototype.reset = function(){
 		if (this._$Ref.length) {
 			this._$Ref[0].style.display = "none";
 			this._$Ref[0].style.visibility = "hidden";
@@ -632,10 +626,8 @@ sap.ui.define([
 	 *
 	 * @abstract
 	 * @returns {string} The DOM string
-	 * @name sap.ui.core.Popup.Layer#getDomString
-	 * @function
 	 */
-	Popup.Layer.prototype.getDomString = function(){
+	Layer.prototype.getDomString = function(){
 		Log.error("sap.ui.core.Popup.Layer: getDomString function must be overwritten!");
 
 		return "";
@@ -650,15 +642,15 @@ sap.ui.define([
 	/**
 	* @class
 	* @private
-	* @name sap.ui.core.Popup.ShieldLayer
+	* @alias sap.ui.core.Popup.ShieldLayer
 	*/
-	Popup.Layer.extend("sap.ui.core.Popup.ShieldLayer", {
+	var ShieldLayer = Layer.extend("sap.ui.core.Popup.ShieldLayer", {
 		constructor: function() {
-			Popup.Layer.apply(this);
+			Layer.apply(this);
 		}
 	});
 
-	Popup.ShieldLayer.prototype.getDomString = function(){
+	ShieldLayer.prototype.getDomString = function(){
 		return "<div class=\"sapUiPopupShield\" id=\"sap-ui-shieldlayer-" + uid() + "\"></div>";
 	};
 
@@ -667,7 +659,7 @@ sap.ui.define([
 	* @type sap.ui.base.ObjectPool
 	* @private
 	*/
-	Popup.prototype.oShieldLayerPool = new ObjectPool(Popup.ShieldLayer);
+	Popup.prototype.oShieldLayerPool = new ObjectPool(ShieldLayer);
 	//End of ShieldLayer
 
 	// Begin of Popup-Stacking facilities
@@ -787,6 +779,7 @@ sap.ui.define([
 	 * @param {sap.ui.core.Collision} [collision='flip'] defines how the position of an element should be adjusted in case it overflows the within area in some direction.
 	 * @param {string | sap.ui.core.Element | Element | Window} [within=Window] defines the area the popup should be placed in. This affects the collision detection.
 	 * @param {boolean | function | null} [followOf=false] defines whether the popup should follow the dock reference when the reference changes its position.
+	 * @ui5-omissible-params iDuration
 	 * @public
 	 */
 	Popup.prototype.open = function(iDuration, my, at, of, offset, collision, within, followOf) {

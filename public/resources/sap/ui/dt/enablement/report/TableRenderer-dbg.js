@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,7 +10,7 @@ sap.ui.define(function() {
 
 	/**
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @namespace
 	 */
 	var TableRenderer = {
@@ -26,7 +26,7 @@ sap.ui.define(function() {
 	TableRenderer.render = function(rm, oTable) {
 		rm.openStart("div", oTable);
 		rm.class("sapUiDtTableReport");
-		rm.openEnd(">");
+		rm.openEnd();
 
 		rm.renderControl(oTable._getTable());
 

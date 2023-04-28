@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 sap.ui.define([
@@ -14,7 +14,8 @@ sap.ui.define([
 	'sap/base/util/deepEqual',
 	'./Condition',
 	'sap/ui/mdc/enum/ConditionValidated',
-	'sap/base/strings/escapeRegExp'
+	'sap/base/strings/escapeRegExp',
+	"sap/ui/mdc/enum/OperatorOverwrite"
 ], function(
 		BaseObject,
 		Filter,
@@ -26,9 +27,16 @@ sap.ui.define([
 		deepEqual,
 		Condition,
 		ConditionValidated,
-		escapeRegExp
+		escapeRegExp,
+		OperatorOverwrite
 	) {
 		"use strict";
+
+		var fnSerializeForComparison = function (oObject) {
+			return JSON.stringify(oObject, function (sKey, vValue) {
+				return vValue === undefined ? '[undefined]' : vValue;
+			});
+		};
 
 		// translation utils
 		var oMessageBundle = sap.ui.getCore().getLibraryResourceBundle("sap.ui.mdc");
@@ -61,7 +69,7 @@ sap.ui.define([
 		 *                 If set to <code>Operator.ValueType.Static</code> a simple string type is used to display static text.<br>
 		 *                 If set to a name of a data type an instance of this data type will be used.<br>
 		 *                 If set to an object with the properties <code>name</code>, <code>formatOptions</code> and <code>constraints</code>
-		 *                 an instance of the corresponding data type will be used. The type given via <code>name</code> must be required by the application.<br>
+		 *                 an instance of the corresponding data type will be used. The type given via <code>name</code> must be loaded by the application.<br>
 		 * @param {string[]} [oConfiguration.paramTypes] Array of type parameters regexp
 		 * @param {string} [oConfiguration.longText] String representation of the operator as a long text.<br>
 		 *                If longText is not given , it is looked up in the resource bundle of the <code>sap.ui.mdc</code> library by the key
@@ -84,7 +92,7 @@ sap.ui.define([
 		 * @param {string} [oConfiguration.additionalInfo] additionalInfo text for the operator. Will be shown in the operator suggest as second column. If not used (undefined) the Include or Exclude information of the operator is used.
 		 * @constructor
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @private
 		 * @ui5-restricted sap.fe
 		 * @MDC_PUBLIC_CANDIDATE
@@ -105,6 +113,8 @@ sap.ui.define([
 				if (!oConfiguration.filterOperator && !oConfiguration.getModelFilter) {
 					throw new Error("Operator configuration for " + oConfiguration.name + " needs a default filter operator from sap.ui.model.FilterOperator or the function getModelFilter");
 				}
+
+				this._enableOverwrites(oConfiguration);
 
 				// map given properties
 				// TODO: for compatibility reasons just put to this.name... but is a API getName better at the end?
@@ -165,33 +175,6 @@ sap.ui.define([
 					}
 				}
 
-				if (oConfiguration.format) {
-					this.format = oConfiguration.format;
-				}
-				if (oConfiguration.parse) {
-					this.parse = oConfiguration.parse;
-				}
-				if (oConfiguration.validate) {
-					this.validate = oConfiguration.validate;
-				}
-				if (oConfiguration.getModelFilter) {
-					this.getModelFilter = oConfiguration.getModelFilter;
-				}
-				if (oConfiguration.isEmpty) {
-					this.isEmpty = oConfiguration.isEmpty;
-				}
-				if (oConfiguration.createControl) {
-					this.createControl = oConfiguration.createControl; // TODO move default implementation from DefineConditionPanel to here
-				}
-				if (oConfiguration.getCheckValue) {
-					this.getCheckValue = oConfiguration.getCheckValue;
-				}
-				if (oConfiguration.getValues) {
-					this.getValues = oConfiguration.getValues;
-				}
-				if (oConfiguration.checkValidated) {
-					this.checkValidated = oConfiguration.checkValidated;
-				}
 				if (oConfiguration.additionalInfo !== undefined) {
 					this.additionalInfo = oConfiguration.additionalInfo;
 				}
@@ -207,6 +190,10 @@ sap.ui.define([
 						this.group.text = oMessageBundle.getText("VALUEHELP.OPERATOR.GROUP" + this.group.id);
 					}
 				}
+			},
+			destroy: function () {
+				this._oMethodOverwrites = null;
+				BaseObject.protoype.destroy.apply(this, arguments);
 			}
 		});
 
@@ -263,25 +250,35 @@ sap.ui.define([
 
 		}
 
-		// TODO: better API to get longtext (is it really type dependent?)
 		/**
-		 * Gets the text for an operator name.
+		 * Gets the long text for an operator.
 		 *
-		 * @param {string} sKey Text key
-		 * @param {string} sType Name of type
+ 		 * This function can be overwritten see <code>overwrite("getLongText", ...)</code>
+		 *
+ 		 * @param {sap.ui.mdc.enum.BaseType} sBaseType Basic type
 		 * @returns {string} text
 		 *
 		 * @private
+		 * @since 1.113
 		 * @ui5-restricted sap.ui.mdc.field.DefineConditionPanel
 		 */
-		Operator.prototype.getTypeText = function(sKey, sType) { // for DefineConditionPanel Select items
+		Operator.prototype.getLongText = function(sBaseType) {
+			var sTxtKey = this.textKey || "operators." + this.name + ".longText";
+			var sLongText = _getText(sTxtKey, sBaseType.toLowerCase());
 
-			return _getText(sKey, sType);
+			if (sLongText === sTxtKey) {
+				// when the returned text is the key, a type dependent longText does not exist and we use the default (custom) longText for the operator
+				sLongText = this.longText;
+			}
+
+			return sLongText;
 
 		};
 
 		/**
 		 * Creates a filter object for a condition.
+		 *
+		 * This function can be overwritten see <code>overwrite("getModelFilter", ...)</code>
 		 *
 		 * @param {sap.ui.mdc.condition.ConditionObject} oCondition Condition
 		 * @param {string} sFieldPath Path of filter
@@ -344,6 +341,7 @@ sap.ui.define([
 
 		};
 
+
 		/**
 		 * Checks if a condition is empty.
 		 *
@@ -403,6 +401,9 @@ sap.ui.define([
 						vValue = oType ? oType.parseValue("", "string") : ""; // for empty value use initial value of type
 					}
 					var sReplace = this._formatValue(vValue, oType, aCompositeTypes);
+					if (typeof sReplace === "string") {
+						sReplace = sReplace.replace(/\$/g, '$$$'); // as "$$" has a special handling in replace, it will be transformed into "$"
+					}
 					// the regexp will replace placeholder like $0, 0$ and {0}
 					sTokenText = sTokenText.replace(new RegExp("\\$" + i + "|" + i + "\\$" + "|" + "\\{" + i + "\\}", "g"), sReplace);
 				}
@@ -855,8 +856,8 @@ sap.ui.define([
 					oCheckValue2.validated = oCondition2.validated;
 				}
 
-				var sCheckValue1 = JSON.stringify(oCheckValue1);
-				var sCheckValue2 = JSON.stringify(oCheckValue2);
+				var sCheckValue1 = fnSerializeForComparison(oCheckValue1);
+				var sCheckValue2 = fnSerializeForComparison(oCheckValue2);
 
 				if (sCheckValue1 === sCheckValue2) {
 					bEqual = true;
@@ -881,6 +882,41 @@ sap.ui.define([
 
 			oCondition.validated = ConditionValidated.NotValidated;
 
+		};
+
+		Operator.prototype._enableOverwrites = function (oConfiguration) {
+			this._oMethodOverwrites = {};
+			["format", "parse", "validate", "getModelFilter", "isEmpty", "createControl", "getCheckValue", "getValues", "checkValidated", "getLongText"].forEach(function (sMethodName) {
+				Object.defineProperty(this, sMethodName, {
+					get: function( ) {
+						return (this._oMethodOverwrites && this._oMethodOverwrites[sMethodName]) || Object.getPrototypeOf(this)[sMethodName];
+					}
+				});
+				if (oConfiguration && oConfiguration[sMethodName]) {
+					this._oMethodOverwrites[sMethodName] = oConfiguration[sMethodName];
+				}
+			}.bind(this));
+		};
+
+		var aAllowedOverwrites = Object.values(OperatorOverwrite);
+		/**
+		 * Sets an overwrite function for some of the <code>operator</code> functions.
+		 *
+		 * @param {sap.ui.mdc.enum.OperatorOverwrite} sMethodName name of the function which will be overwritten
+		 * @param {function} fnOverwrite new callback function
+		 * @returns {function} the original function
+		 * @private
+		 * @ui5-restricted sap.fe
+		 * @MDC_PUBLIC_CANDIDATE
+		 * @since: 1.113.0
+		 */
+		Operator.prototype.overwrite = function (sMethodName, fnOverwrite) {
+			if (aAllowedOverwrites.indexOf(sMethodName) >= 0) {
+				var fnPrevious = this[sMethodName];
+				this._oMethodOverwrites[sMethodName] = fnOverwrite;
+				return fnPrevious.bind(this);
+			}
+			throw "Operator: Illegal overwrite detected. Please see sap.ui.mdc.enum.OperatorOverwrite";
 		};
 
 		return Operator;

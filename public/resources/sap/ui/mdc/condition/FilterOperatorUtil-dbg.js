@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 sap.ui.define([
@@ -8,7 +8,6 @@ sap.ui.define([
 	'sap/ui/model/Filter',
 	'sap/ui/model/ValidateException',
 	'sap/base/Log',
-	'sap/base/util/merge',
 	'sap/ui/mdc/enum/FieldDisplay',
 	'./Operator',
 	'./RangeOperator',
@@ -27,7 +26,6 @@ function(
 		Filter,
 		ValidateException,
 		Log,
-		merge,
 		FieldDisplay,
 		Operator,
 		RangeOperator,
@@ -54,7 +52,7 @@ function(
 		 *
 		 * @namespace
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @since 1.73.0
 		 * @alias sap.ui.mdc.condition.FilterOperatorUtil
 		 *
@@ -66,6 +64,16 @@ function(
 		var FilterOperatorUtil = {
 
 				_mOperators: {
+					/**
+					 * @class
+					 * "Equal to" operator
+					 * @name sap.ui.mdc.condition.operators.EQ
+					 * @since 1.73.0
+					 * @private
+					 * @experimental As of version 1.73
+					 * @ui5-restricted sap.fe
+					 * @MDC_PUBLIC_CANDIDATE
+					 */
 					equal: new Operator({
 						name: "EQ",
 						alias: {Date: "DATE", DateTime: "DATETIME"},
@@ -108,6 +116,9 @@ function(
 								if (sReplace === null) {
 									sTokenText = null; // some types (like Unit) return null if no value is given, in this case stop formating and return null
 									break;
+								}
+								if (typeof sReplace === "string") {
+									sReplace = sReplace.replace(/\$/g, '$$$'); // as "$$" has a special handling in replace, it will be transformed into "$"
 								}
 								sTokenText = sTokenText.replace(new RegExp("\\$" + i + "|" + i + "\\$" + "|" + "\\{" + i + "\\}", "g"), sReplace);
 							}
@@ -378,10 +389,6 @@ function(
 									isNullable = false;
 								}
 							}
-							//TODO Type specific handling of empty is missing. Empty is currently only available for type String
-							// if (oType == "date") {
-							// 	return new Filter(sFieldPath, oOperator.filterOperator, null});
-							// } else {
 							if (isNullable) {
 								return new Filter({ filters: [new Filter({path: sFieldPath, operator: ModelOperator.EQ, value1: ""}),
 															new Filter({path: sFieldPath, operator: ModelOperator.EQ, value1: null})],
@@ -389,7 +396,6 @@ function(
 							} else {
 								return new Filter({path: sFieldPath, operator: this.filterOperator, value1: ""});
 							}
-							// }
 						}
 					}),
 					notEmpty: new Operator({
@@ -410,10 +416,6 @@ function(
 									isNullable = false;
 								}
 							}
-							//TODO Type specific handling of empty is missing. Empty is currently only available for type String
-							// if (Type == "date") {
-							// 	return new Filter({ path: sFieldPath, operator: oOperator.filterOperator, value1: null });
-							// } else {
 							if (isNullable) {
 								return new Filter({ filters: [new Filter({path: sFieldPath, operator: ModelOperator.NE, value1: ""}),
 															new Filter({path: sFieldPath, operator: ModelOperator.NE, value1: null})],
@@ -421,7 +423,6 @@ function(
 							} else {
 								return new Filter({ path: sFieldPath, operator: this.filterOperator, value1: "" });
 							}
-							// }
 						}
 					}),
 					yesterday: new RangeOperator({
@@ -927,7 +928,44 @@ function(
 						calcRange: function() {
 							return UniversalDateUtils.ranges.dateToYear();
 						}
+					}),
+					lastMinutes: new RangeOperator({
+						name: "LASTMINUTES",
+						valueTypes: [{name: "sap.ui.model.type.Integer", formatOptions: {emptyString: null}, constraints: { minimum: 0 }}],
+						paramTypes: ["(\\d+)"],
+						additionalInfo: "",
+						calcRange: function(iDuration) {
+							return UniversalDateUtils.ranges.lastMinutes(iDuration);
+						}
+					}),
+					nextMinutes: new RangeOperator({
+						name: "NEXTMINUTES",
+						valueTypes: [{name: "sap.ui.model.type.Integer", formatOptions: {emptyString: null}, constraints: { minimum: 0 }}],
+						paramTypes: ["(\\d+)"],
+						additionalInfo: "",
+						calcRange: function(iDuration) {
+							return UniversalDateUtils.ranges.nextMinutes(iDuration);
+						}
+					}),
+					lastHours: new RangeOperator({
+						name: "LASTHOURS",
+						valueTypes: [{name: "sap.ui.model.type.Integer", formatOptions: {emptyString: null}, constraints: { minimum: 0 }}],
+						paramTypes: ["(\\d+)"],
+						additionalInfo: "",
+						calcRange: function(iDuration) {
+							return UniversalDateUtils.ranges.lastHours(iDuration);
+						}
+					}),
+					nextHours: new RangeOperator({
+						name: "NEXTHOURS",
+						valueTypes: [{name: "sap.ui.model.type.Integer", formatOptions: {emptyString: null}, constraints: { minimum: 0 }}],
+						paramTypes: ["(\\d+)"],
+						additionalInfo: "",
+						calcRange: function(iDuration) {
+							return UniversalDateUtils.ranges.nextHours(iDuration);
+						}
 					})
+
 				},
 
 				_mDefaultOpsForType: {}, // defines default operators for types
@@ -1144,7 +1182,7 @@ function(
 				 * @returns {string[]} an array with the supported filter operator names
 				 *
 				 * @private
-				 * @ui5-restricted ap.fe
+				 * @ui5-restricted sap.fe
 				 * @MDC_PUBLIC_CANDIDATE
 				 */
 				getOperatorsForType: function(sType) {
@@ -1237,7 +1275,7 @@ function(
 				 * @returns {sap.ui.mdc.condition.Operator} Operator object
 				 *
 				 * @private
-				 * @ui5-restricted sap.ui.mdc.Field, sap.ui.mdc.field.FieldBase, sap.ui.mdc.field.ConditionType, sap.ui.mdc.field.FieldHelpBase
+				 * @ui5-restricted sap.ui.mdc.Field, sap.ui.mdc.field.FieldBase, sap.ui.mdc.field.ConditionType, sap.ui.mdc.valuehelp.base.Content
 				 */
 				getEQOperator: function(aOperators) {
 
@@ -1261,7 +1299,7 @@ function(
 				 * @returns {boolean} true if only EQ is supported
 				 *
 				 * @private
-				 * @ui5-restricted sap.ui.mdc.field.FieldBase, sap.ui.mdc.field.FieldValueHelp, sap.ui.mdc.field.ConditionType
+				 * @ui5-restricted sap.ui.mdc.field.FieldBase, sap.ui.mdc.field.ConditionType
 				 */
 				onlyEQ: function(aOperators) {
 
@@ -1472,7 +1510,8 @@ function(
 				 * @param {sap.ui.mdc.enum.BaseType} [sBaseType] Basic type
 				 * @returns {sap.ui.mdc.condition.Operator|undefined} the operator object, or <code>undefined</code> if the operator with the requested name does not exist
 				 *
-				 * @protected
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
 				 * @since: 1.100.0
 				 */
 				 getOperatorForDynamicDateOption: function(sOption, sBaseType) {
@@ -1508,7 +1547,8 @@ function(
 				 * @param {object} oDynamicDateRangeKeys Keys for <code>DynamicDateOption</code>
 				 * @param {sap.ui.mdc.enum.BaseType} sBaseType Basic type
 				 * @returns {string} <code>DynamicDateOption</code>
-				 * @protected
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
 				 * @since: 1.100.0
 				 */
 				 getDynamicDateOptionForOperator: function(oOperator, oDynamicDateRangeKeys, sBaseType) {
@@ -1532,7 +1572,8 @@ function(
 				 * @param {sap.ui.mdc.condition.Operator} oOperator Condition to check
 				 * @param {sap.ui.mdc.enum.BaseType} sBaseType Basic type
 				 * @returns {string} <code>DynamicDateOption</code>
-				 * @protected
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
 				 * @since: 1.100.0
 				 */
 				 getCustomDynamicDateOptionForOperator: function(oOperator, sBaseType) {
@@ -1578,7 +1619,6 @@ function(
 				 FilterOperatorUtil._mOperators.lessEqual,
 				 FilterOperatorUtil._mOperators.greaterThan,
 				 FilterOperatorUtil._mOperators.greaterEqual,
-				//  FilterOperatorUtil._mOperators.empty,
 
 				 FilterOperatorUtil._mOperators.notEqual,
 				 FilterOperatorUtil._mOperators.notBetween,
@@ -1586,7 +1626,6 @@ function(
 				 FilterOperatorUtil._mOperators.notLessEqual,
 				 FilterOperatorUtil._mOperators.notGreaterThan,
 				 FilterOperatorUtil._mOperators.notGreaterEqual,
-				//  FilterOperatorUtil._mOperators.notEmpty,
 
 				 FilterOperatorUtil._mOperators.today,
 				 FilterOperatorUtil._mOperators.yesterday,
@@ -1654,6 +1693,11 @@ function(
 				 FilterOperatorUtil._mOperators.notLessEqual,
 				 FilterOperatorUtil._mOperators.notGreaterThan,
 				 FilterOperatorUtil._mOperators.notGreaterEqual,
+
+				 FilterOperatorUtil._mOperators.lastMinutes,
+				 FilterOperatorUtil._mOperators.nextMinutes,
+				 FilterOperatorUtil._mOperators.lastHours,
+				 FilterOperatorUtil._mOperators.nextHours,
 
 				 FilterOperatorUtil._mOperators.today,
 				 FilterOperatorUtil._mOperators.yesterday,

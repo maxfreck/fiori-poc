@@ -1,6 +1,6 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
@@ -27,7 +27,7 @@ sap.ui.define([
 	 * @alias sap.ui.fl.registry.ChangeHandlerStorage
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl
 	 *
@@ -157,7 +157,7 @@ sap.ui.define([
 	 * Retrieves the change handler for a certain change type and control. Also checks for instance specific change handlers.
 	 * If the passed layer does not match or no change handler is found the promise will be rejected.
 	 *
-	 * @param {string} sChangeType - Change type of a <code>sap.ui.fl.Change</code> change
+	 * @param {string} sChangeType - Change type of a <code>sap.ui.fl.apply._internal.flexObjects.FlexObject</code> change
 	 * @param {string} sControlType - Name of the ui5 control type i.e. sap.m.Button
 	 * @param {sap.ui.core.Control} oControl - Control instance for which the instance specific change handler will be retrieved
 	 * @param {sap.ui.core.util.reflection.BaseTreeModifier} oModifier - Control tree modifier

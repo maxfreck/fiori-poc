@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -32,8 +32,6 @@ sap.ui.define(['./library'],
          */
         ChartRenderer.render = function(oRm, oMDCChart) {
                 oRm.openStart("div", oMDCChart);
-                //TODO: Clarify why providing the control in openStart doesn't work on rerender
-                oRm.attr("id", oMDCChart.getId());
                 oRm.class(ChartRenderer.CSS_CLASS);
                 //oRm.class("sapUiFixFlex");
                 //oRm.style("overflow", "hidden");
@@ -42,9 +40,12 @@ sap.ui.define(['./library'],
                 oRm.style("min-height", oMDCChart.getMinHeight());
                 oRm.style("min-width", oMDCChart.getMinWidth());
                 oRm.openEnd();
-                this.renderToolbar(oRm, oMDCChart.getAggregation("_toolbar"));
+                    oRm.openStart("div");
+                    oRm.openEnd();
+                    this.renderToolbar(oRm, oMDCChart.getAggregation("_toolbar"));
+                    this.renderInfoToolbar(oRm, oMDCChart.getAggregation("_infoToolbar"));
+                    oRm.close("div");
                 this.renderBreadcrumbs(oRm, oMDCChart.getAggregation("_breadcrumbs"));
-                //this.renderInnerChart(oRm, oMDCChart._getInnerChart());
                 this.renderInnerStructure(oRm, oMDCChart.getAggregation("_innerChart"));
                 oRm.close("div");
         };
@@ -77,12 +78,12 @@ sap.ui.define(['./library'],
             }
         };
 
-        ChartRenderer.renderInnerChart = function(oRm, oInnerChart) {
-
-            if (oInnerChart) {
-                oRm.renderControl(oInnerChart);
+        ChartRenderer.renderInfoToolbar = function(oRm, oInfoToolbar) {
+            if (oInfoToolbar) {
+                oRm.renderControl(oInfoToolbar);
             }
         };
+
         ChartRenderer.renderInnerStructure = function (oRm, oInnerStructure){
             oRm.renderControl(oInnerStructure);
         };

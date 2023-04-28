@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -182,6 +182,12 @@ sap.ui.define([
 		contextBasedAdaptation: {
 			create: function() {
 				return Promise.reject("contextBasedAdaptation.create is not implemented");
+			},
+			reorder: function() {
+				return Promise.reject("contextBasedAdaptation.reorder is not implemented");
+			},
+			load: function() {
+				return Promise.reject("contextBasedAdaptation.load is not implemented");
 			}
 		},
 		versions: {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,10 +28,12 @@ sap.ui.define(["./ObjectImageHelper", "sap/ui/Device"], function (ObjectImageHel
 				&& oParent.getHeaderContent().length > 0 && oParent.getShowHeaderContent()) ||
 			(oParent.getShowHeaderContent() && oParent.getShowTitleInHeaderContent()));
 
-		oRm.openStart("div", oControl)
-			.class('sapUxAPObjectPageHeader')
-			.class('sapUxAPObjectPageHeaderDesign-' + oControl.getHeaderDesign())
-			.openEnd();
+		oRm.openStart("div", oControl).class('sapUxAPObjectPageHeader');
+		/**
+		 * @deprecated As of version 1.40.1
+		 */
+		oRm.class('sapUxAPObjectPageHeaderDesign-' + oControl.getHeaderDesign());
+		oRm.openEnd();
 
 		// if a navigationBar has been provided display it
 		if (oNavigationBar) {

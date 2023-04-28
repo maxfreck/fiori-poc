@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,7 +40,7 @@ sap.ui.define([
 		 * @implements sap.uxap.IHeaderContent
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @public
@@ -65,7 +65,8 @@ sap.ui.define([
 		 * @param bPinnable
 		 * @param sStableId
 		 */
-		ObjectPageDynamicHeaderContent.createInstance = function (aContent, bVisible, sContentDesign, bPinnable, sStableId) {
+		ObjectPageDynamicHeaderContent.createInstance = function (aContent, bVisible, sContentDesign /* not used */,  bPinnable, sStableId) {
+
 			return new ObjectPageDynamicHeaderContent({
 				content: aContent,
 				visible: bVisible,
@@ -101,6 +102,7 @@ sap.ui.define([
 		/**
 		 * Required by the {@link sap.uxap.IHeaderContent} interface.
 		 * @param sDesign
+		 * @deprecated As of version 1.40.1
 		 */
 		ObjectPageDynamicHeaderContent.prototype.setContentDesign = function (sDesign) {
 			// implementation not supported

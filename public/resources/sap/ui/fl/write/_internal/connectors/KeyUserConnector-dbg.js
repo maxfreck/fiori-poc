@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -32,7 +32,7 @@ sap.ui.define([
 	 *
 	 * @namespace sap.ui.fl.write._internal.connectors.KeyUserConnector
 	 * @since 1.70
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal.Storage
 	 */
@@ -83,7 +83,9 @@ sap.ui.define([
 			mPropertyBag.payload = JSON.stringify(mPropertyBag.flexObjects);
 			mPropertyBag.dataType = "json";
 			mPropertyBag.contentType = "application/json; charset=utf-8";
-			return WriteUtils.sendRequest(sContextsUrl, "POST", mPropertyBag);
+			return WriteUtils.sendRequest(sContextsUrl, "POST", mPropertyBag).then(function (oResult) {
+				return oResult.response;
+			});
 		},
 
 		/**

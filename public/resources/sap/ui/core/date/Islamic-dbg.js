@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -226,6 +226,7 @@ sap.ui.define(['./UniversalDate', '../CalendarType', 'sap/base/Log', './_Calenda
 		oCustomizationJSON.forEach(function (oEntry) {
 			if (oEntry.dateFormat === sDateFormat) {
 				var date = parseDate(oEntry.gregDate);
+				// no need to use UI5Date.getInstance as only the UTC timestamp is used
 				var iGregorianDate = new Date(Date.UTC(date.year, date.month - 1, date.day));
 				var iMillis = iGregorianDate.getTime();
 				var iIslamicMonthStartDays = (iMillis - ISLAMIC_MILLIS) / ONE_DAY;

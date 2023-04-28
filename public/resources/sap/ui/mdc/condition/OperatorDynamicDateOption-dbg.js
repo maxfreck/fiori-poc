@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -51,7 +51,7 @@ sap.ui.define([
 		 * @extends sap.m.DynamicDateOption
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @private
 		 * @ui5-restricted sap.ui.mdc
@@ -151,7 +151,8 @@ sap.ui.define([
 		OperatorDynamicDateOption.prototype.getText = function(oControl) {
 
 			var oOperator = this.getOperator();
-			return oOperator.longText;
+			var sBaseType = this.getBaseType();
+			return oOperator.getLongText(sBaseType);
 
 		};
 
@@ -262,8 +263,7 @@ sap.ui.define([
 						// TODO: DatePicker or Calendar?
 						// convert internal value to date
 						if (oValue && oValue.values[i]) {
-							oDate = DateUtil.typeToUniversalDate(oValue.values[i], oType, sBaseType);
-							oDate = DateUtil.utcToLocal(oDate);
+							oDate = DateUtil.typeToDate(oValue.values[i], oType, sBaseType);
 						}
 						var oFormatOptions = oType.getFormatOptions();
 
@@ -379,11 +379,10 @@ sap.ui.define([
 						if (!oInputControl.isValidValue()) {
 							throw new ParseException(); // to show error state
 						}
-						vValue = oInputControl.getDateValue();
+						vValue = oInputControl.getDateValue(); // returns local UI5Date
 						if (vValue) {
 							// parse to Types format
-							vValue = DateUtil.localToUtc(vValue);
-							vValue = DateUtil.universalDateToType(vValue, oType, sBaseType);
+							vValue = DateUtil.dateToType(vValue, oType, sBaseType);
 						}
 					} else {
 						vValue = oInputControl.getValue();
@@ -424,19 +423,17 @@ sap.ui.define([
 			var i = 0;
 
 			if (oOperator.isA("sap.ui.mdc.condition.RangeOperator")) {
-				aRange = oOperator._getRange(oValue && oValue.values, oType, sBaseType);
+				aRange = oOperator._getRange(oValue && oValue.values, oType, sBaseType); // aRange contains date in Type presentation
 				// convert to local date
 				for (i = 0; i < aRange.length; i++) {
-					aRange[i] = DateUtil.typeToUniversalDate(aRange[i], oType, sBaseType);
-					aRange[i] = DateUtil.utcToLocal(aRange[i]);
+					aRange[i] = DateUtil.typeToDate(aRange[i], oType, sBaseType);
 				}
+			} else if (oOperator.valueTypes.length === 0) {
+				aRange = [];
 			} else if (oOperator.valueTypes[0] === Operator.ValueType.Self) {
-				aRange = oValue.values;
-				for (i = 0; i < aRange.length; i++) {
-					if (aRange[i]) {
-						aRange[i] = DateUtil.typeToUniversalDate(aRange[i], oType, sBaseType);
-						aRange[i] = DateUtil.utcToLocal(aRange[i]);
-					}
+				aRange = [];
+				for (i = 0; i < oValue.values.length; i++) {
+					aRange.push(oValue.values[i] ? DateUtil.typeToDate(oValue.values[i], oType, sBaseType) : oValue.values[i]);
 				}
 				if (aRange.length === 1) {
 					// TODO: better solution for single dates
@@ -444,10 +441,9 @@ sap.ui.define([
 				}
 				// TODO How to convert GT or GE.....
 			} else if ([Operator.ValueType.Self, Operator.ValueType.Static].indexOf(oOperator.valueTypes[0]) === -1) {
-				// oType = oOperator._createLocalType(oOperator.valueTypes[0], this.type);
 				throw new Error("Cannot convert to date, use RangeOperator");
 			}
-			return aRange;
+			return aRange; // aRange contains local UI5Dates
 		};
 
 		OperatorDynamicDateOption.prototype.format = function(oValue) {

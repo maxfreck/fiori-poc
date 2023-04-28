@@ -1,14 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 /**
  * Provides methods for information retrieval from the core.
  */
-sap.ui.define(["sap/ui/core/Core", "sap/base/util/LoaderExtensions", 'sap/base/security/encodeXML', "sap/ui/core/Component", "sap/ui/core/Configuration", "sap/ui/core/theming/ThemeManager", "sap/ui/core/support/ToolsAPI", "sap/ui/thirdparty/URI"],
-	function (Core, LoaderExtensions, encodeXML, Component, Configuration, ThemeManager, ToolsAPI, URI) {
+sap.ui.define(["sap/ui/core/Core", "sap/ui/VersionInfo", "sap/base/util/LoaderExtensions", 'sap/base/security/encodeXML', "sap/ui/core/Component", "sap/ui/core/Configuration", "sap/ui/core/theming/ThemeManager", "sap/ui/core/support/ToolsAPI", "sap/ui/thirdparty/URI"],
+	function (Core, VersionInfo, LoaderExtensions, encodeXML, Component, Configuration, ThemeManager, ToolsAPI, URI) {
 	"use strict";
 
 	/**
@@ -143,17 +143,15 @@ sap.ui.define(["sap/ui/core/Core", "sap/base/util/LoaderExtensions", 'sap/base/s
 		}
 		oTechData.themePaths = aResults;
 
-		//add SAPUI5 version object
-		try {
+		return VersionInfo.load().then(function (oVersionInfo) {
+			// add SAPUI5 version object
 			oTechData.sapUi5Version = {
-				version: sap.ui.getVersionInfo(),
-				path: sap.ui.resource("", "sap-ui-version.json")
+				version: oVersionInfo,
+				path: sap.ui.require.toUrl("sap-ui-version.json")
 			};
-		} catch (ex) {
-			oTechData.sapUi5Version = null;
-		}
 
-		return oTechData;
+			return oTechData;
+		});
 	};
 
 	return DataCollector;

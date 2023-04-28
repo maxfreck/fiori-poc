@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,13 +42,12 @@ sap.ui.define(["./library"],
 	 * @private
 	 */
 	ActionTileContentRenderer._renderPriority = function(oRm, oControl) {
-		var sPriority = sap.ui.getCore().getLibraryResourceBundle("sap.m").getText("TEXT_CONTENT_PRIORITY"),
-			sPriorityText = oControl.getPriorityText();
+		var sPriorityText = oControl.getPriorityText();
 		oRm.openStart("div", oControl.getId() + "-priority-value");
 		oRm.class("sapMTilePriorityValue");
 		oRm.class(oControl.getPriority());
 		oRm.openEnd();
-		oRm.text(sPriorityText + " " + sPriority);
+		oRm.text(sPriorityText);
 		oRm.close("div");
 	};
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -236,6 +236,7 @@ sap.ui.define([
 			 *   index of part in case of the root formatter of a composite binding
 			 * @param {string} [sPath]
 			 *   a path, interpreted relative to <code>this.getPath(iPart)</code>
+			 * @ui5-omissible-params iPart
 			 * @returns {sap.ui.core.util.XMLPreprocessor.IContext}
 			 *   the context interface related to the indicated part
 			 * @throws {Error}

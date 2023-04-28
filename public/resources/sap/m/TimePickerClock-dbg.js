@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,6 +14,10 @@ sap.ui.define([
 	function(Control, Configuration, TimePickerClockRenderer, Device, jQuery) {
 		"use strict";
 
+		var ANIMATION_DURATION_MAX = 200,	// total animation duration, without the delay before firing the event
+			ANIMATION_DELAY_EVENT = 100,	// delay before firing the event
+			LONG_TOUCH_DURATION = 1000;		// duration for long-touch interaction
+
 		/**
 		 * Constructor for a new <code>TimePickerClock</code>.
 		 *
@@ -25,18 +29,13 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @private
 		 * @since 1.90
 		 * @alias sap.m.TimePickerClock
 		 */
-
-		var ANIMATION_DURATION_MAX = 200,	// total animation duration, without the delay before firing the event
-			ANIMATION_DELAY_EVENT = 100,	// delay before firing the event
-			LONG_TOUCH_DURATION = 1000;		// duration for long-touch interaction
-
 		var TimePickerClock = Control.extend("sap.m.TimePickerClock", /** @lends sap.m.TimePickerClock.prototype */ {
 			metadata: {
 				library: "sap.m",

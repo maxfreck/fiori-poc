@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -36,7 +36,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseListContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @experimental
@@ -107,7 +107,8 @@ sap.ui.define([
 				id: this.getId() + "-Timeline",
 				showHeaderBar: false,
 				enableScroll: false,
-				growingThreshold: 0
+				growingThreshold: 0,
+				ariaLabelledBy: this.getHeaderTitleId()
 			});
 			this.setAggregation("_content", oTimeline);
 		}
@@ -118,31 +119,31 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
-	TimelineContent.prototype.setConfiguration = function (oConfiguration) {
-		BaseListContent.prototype.setConfiguration.apply(this, arguments);
-		oConfiguration = this.getParsedConfiguration();
+	TimelineContent.prototype.applyConfiguration = function () {
+		BaseListContent.prototype.applyConfiguration.apply(this, arguments);
+
+		var oConfiguration = this.getParsedConfiguration();
 
 		if (!oConfiguration) {
-			return this;
+			return;
 		}
 
 		if (oConfiguration.items) {
 			this._setStaticItems(oConfiguration.items);
-			return this;
+			return;
 		}
 
 		if (oConfiguration.item) {
 			this._setItem(oConfiguration.item);
 		}
-
-		return this;
 	};
 
 	/**
 	 * Handler for when data is changed.
 	 */
 	TimelineContent.prototype.onDataChanged = function () {
-		this._handleNoItemsError(this.getParsedConfiguration().item);
+		BaseListContent.prototype.onDataChanged.apply(this, arguments);
+
 		this._checkHiddenNavigationItems(this.getParsedConfiguration().item);
 	};
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,13 +9,15 @@ sap.ui.define([
 	'sap/ui/model/ChangeReason',
 	'sap/ui/model/json/JSONPropertyBinding',
 	'sap/base/util/merge',
-	'sap/base/util/deepEqual'
+	'sap/base/util/deepEqual',
+	'sap/ui/core/date/UI5Date'
 ],
 	function(
 			ChangeReason,
 			JSONPropertyBinding,
 			merge,
-			deepEqual
+			deepEqual,
+			UI5Date
 		) {
 	"use strict";
 
@@ -89,7 +91,7 @@ sap.ui.define([
 		} else if (Array.isArray(oValue)) {
 			oCopy = merge([], oValue);
 		} else if (oValue instanceof Date) {
-			oCopy = new Date(oValue);
+			oCopy = UI5Date.getInstance(oValue);
 		} else if (typeof oValue === "object") {
 			oCopy = merge({}, oValue);
 		} else {

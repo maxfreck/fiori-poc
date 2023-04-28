@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,7 +20,7 @@ sap.ui.define(['./ColumnMenu', "sap/ui/unified/MenuRenderer", './utils/TableUtil
 	 * @extends sap.ui.table.ColumnMenu
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -29,8 +29,8 @@ sap.ui.define(['./ColumnMenu', "sap/ui/unified/MenuRenderer", './utils/TableUtil
 	 * @alias sap.ui.table.AnalyticalColumnMenu
 	 */
 	var AnalyticalColumnMenu = ColumnMenu.extend("sap.ui.table.AnalyticalColumnMenu", /** @lends sap.ui.table.AnalyticalColumnMenu.prototype */ {
-		metadata : {
-			library : "sap.ui.table"
+		metadata: {
+			library: "sap.ui.table"
 		},
 		renderer: MenuRenderer
 	});
@@ -108,7 +108,6 @@ sap.ui.define(['./ColumnMenu', "sap/ui/unified/MenuRenderer", './utils/TableUtil
 			this.addItem(this._oSumItem);
 		}
 	};
-
 
 	AnalyticalColumnMenu.prototype.open = function() {
 		ColumnMenu.prototype.open.apply(this, arguments);

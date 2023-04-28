@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,7 +26,9 @@ sap.ui.define([], function () {
 			sIllustratedMessageTitle = oIllustratedMessage._getTitle(),
 			sIllustratedMessageDescription = oIllustratedMessage._getDescription(),
 			aIllustratedMessageAdditionalContent = oIllustratedMessage.getAdditionalContent(),
-			bIllustratedMessageEnableVerticalResponsiveness = oIllustratedMessage.getEnableVerticalResponsiveness();
+			bIllustratedMessageEnableVerticalResponsiveness = oIllustratedMessage.getEnableVerticalResponsiveness(),
+			bRenderTitle = oIllustratedMessage._shouldRenderTitle(),
+			bRenderDescription = oIllustratedMessage._shouldRenderDescription();
 
 		// IllustratedMessage's Root DOM Element.
 		oRm.openStart("figure", oIllustratedMessage);
@@ -42,10 +44,16 @@ sap.ui.define([], function () {
 
 			oRm.renderControl(oIllustratedMessageIllustration);
 
-			oRm.openStart("figcaption").openEnd();
-				oRm.renderControl(sIllustratedMessageTitle);
-				oRm.renderControl(sIllustratedMessageDescription.addStyleClass("sapMIllustratedMessageDescription"));
-			oRm.close("figcaption");
+			if (bRenderTitle || bRenderDescription) {
+				oRm.openStart("figcaption").openEnd();
+					if (bRenderTitle) {
+						oRm.renderControl(sIllustratedMessageTitle);
+					}
+					if (bRenderDescription) {
+						oRm.renderControl(sIllustratedMessageDescription.addStyleClass("sapMIllustratedMessageDescription"));
+					}
+				oRm.close("figcaption");
+			}
 
 			oRm.close("div"); // main content container end
 

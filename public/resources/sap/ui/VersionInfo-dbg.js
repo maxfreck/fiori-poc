@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -288,6 +288,20 @@ sap.ui.define(['sap/base/util/LoaderExtensions'], function (LoaderExtensions) {
 		if (mKnownComponents) {
 			return mKnownComponents[sComponentName];
 		}
+	};
+
+	/**
+	 * Reset the cached version info data that is saved internally within this module.
+	 *
+	 * This function is intended to be used in unit tests where a custom version
+	 * info object is needed.
+	 *
+	 * @static
+	 * @private
+	 * @ui5-restricted sap.ui.core
+	 */
+	VersionInfo._reset = function() {
+		updateVersionInfo();
 	};
 
 	return VersionInfo;

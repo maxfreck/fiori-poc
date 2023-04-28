@@ -26,7 +26,7 @@
 		},
 		{
 			"name": "ToolHeader.less",
-			"size": 13908,
+			"size": 13939,
 			"designtime": true,
 			"theme": "sap_horizon"
 		},
@@ -43,19 +43,19 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 122108,
+			"size": 133965,
 			"designtime": true,
 			"theme": "sap_horizon"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 121746,
+			"size": 133603,
 			"designtime": true,
 			"theme": "sap_horizon"
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 30232,
+			"size": 31031,
 			"theme": "sap_horizon"
 		},
 		{
@@ -66,12 +66,12 @@
 		},
 		{
 			"name": "library.css",
-			"size": 30228,
+			"size": 31027,
 			"theme": "sap_horizon"
 		},
 		{
 			"name": "library.less",
-			"size": 17458,
+			"size": 17489,
 			"designtime": true,
 			"theme": "sap_horizon"
 		},
@@ -83,12 +83,12 @@
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 31745,
+			"size": 32516,
 			"theme": "sap_horizon"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 31741,
+			"size": 32512,
 			"theme": "sap_horizon"
 		},
 		{

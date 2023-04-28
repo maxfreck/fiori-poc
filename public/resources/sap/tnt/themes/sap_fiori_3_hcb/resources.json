@@ -43,19 +43,19 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 118970,
+			"size": 128101,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 118600,
+			"size": 127731,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 14994,
+			"size": 15293,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
@@ -66,7 +66,7 @@
 		},
 		{
 			"name": "library.css",
-			"size": 14991,
+			"size": 15290,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
@@ -83,12 +83,12 @@
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 15269,
+			"size": 15606,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 15266,
+			"size": 15603,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{

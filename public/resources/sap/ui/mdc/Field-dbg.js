@@ -1,13 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	'sap/ui/mdc/field/FieldBase',
 	'sap/ui/mdc/field/FieldBaseRenderer',
 	'sap/ui/mdc/enum/FieldDisplay',
-	'sap/ui/mdc/condition/FilterOperatorUtil',
 	'sap/ui/mdc/enum/BaseType',
 	'sap/base/util/deepEqual',
 	'sap/base/util/merge',
@@ -18,7 +17,6 @@ sap.ui.define([
 	FieldBase,
 	FieldBaseRenderer,
 	FieldDisplay,
-	FilterOperatorUtil,
 	BaseType,
 	deepEqual,
 	merge,
@@ -42,12 +40,12 @@ sap.ui.define([
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @alias sap.ui.mdc.Field
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.54.0
 	 * @experimental As of version 1.54
 	 *
@@ -68,7 +66,8 @@ sap.ui.define([
 				 */
 				value: {
 					type: "any",
-					defaultValue: null
+					defaultValue: null,
+					bindable: "bindable"
 				},
 
 				/**
@@ -79,7 +78,8 @@ sap.ui.define([
 				 */
 				additionalValue: {
 					type: "any",
-					defaultValue: null
+					defaultValue: null,
+					bindable: "bindable"
 				}
 			},
 			events: {
@@ -155,21 +155,24 @@ sap.ui.define([
 
 		if (sName === "value" && !oBindingInfo.formatter) { // not if a formatter is used, as this needs to be executed
 			oBindingInfo.targetType = "raw"; // provide internal value to inner control
-			var oDataType = this._oContentFactory.getDataType();
+			var oDataType = this._getContentFactory().getDataType();
 			if (oBindingInfo.type && (!oDataType ||
 				oDataType.getMetadata().getName() !== oBindingInfo.type.getMetadata().getName() ||
 				!deepEqual(oDataType.getFormatOptions(), oBindingInfo.type.getFormatOptions()) ||
 				!deepEqual(oDataType.getConstraints(), oBindingInfo.type.getConstraints()) ||
 				oDataType._bCreatedByOperator !== oBindingInfo.type._bCreatedByOperator)) {
-				this._oContentFactory.setDataType(oBindingInfo.type);
+				this._getContentFactory().setDataType(oBindingInfo.type);
+				this._getContentFactory().setDateOriginalType(undefined);
+				this._getContentFactory().setUnitOriginalType(undefined);
+				this._getContentFactory().setIsMeasure(false);
 				if (oBindingInfo.type.isA("sap.ui.model.CompositeType") && oBindingInfo.parts) {
 					var aTypes = [];
 					for (var i = 0; i < oBindingInfo.parts.length; i++) {
 						aTypes.push(oBindingInfo.parts[i].type);
 					}
-					this._oContentFactory.setCompositeTypes(aTypes);
+					this._getContentFactory().setCompositeTypes(aTypes);
 				}
-				this._oContentFactory.updateConditionType();
+				this._getContentFactory().updateConditionType();
 				this.invalidate(); // as new inner control might be needed
 			}
 		}
@@ -189,17 +192,17 @@ sap.ui.define([
 			if (Context.hasChanged(this._oBindingContext, oBindingContext)) {
 				// BindingContextChanged -> if parsing error trigger update to remove valueState and wrong input
 				this._oBindingContext = oBindingContext;
-				this._oContentFactory.updateConditionType();
-				if (this._bParseError || this.getFieldHelp()) { // In FieldHelp case InParameters might need an update
+				this._getContentFactory().updateConditionType();
+				if (this._isInvalidInput() || this.getFieldHelp()) { // In FieldHelp case InParameters might need an update
 					if (this._oManagedObjectModel) {
 						this._oManagedObjectModel.checkUpdate(true, true); // async. to reduce updates
 					}
-					this._bParseError = false;
+					this._resetInvalidInput();
 				}
 			}
 
-			if (!this._oContentFactory.getDataType()) {
-				this._oContentFactory.setDataType(oBinding.getType());
+			if (!this._getContentFactory().getDataType()) {
+				this._getContentFactory().setDataType(oBinding.getType());
 				this.invalidate(); // as new inner control might be needed
 			}
 		}
@@ -212,19 +215,19 @@ sap.ui.define([
 
 		var oBinding = this.getBinding("value");
 		if (oBinding) {
-			this._oContentFactory.setDataType(oBinding.getType());
+			this._getContentFactory().setDataType(oBinding.getType());
 		}
 
 	};
 
 	Field.prototype.setProperty = function(sPropertyName, oValue, bSuppressInvalidate) {
 
-		if (sPropertyName === "value" && this._bParseError && deepEqual(this.getValue(), this.validateProperty(sPropertyName, oValue))) {
+		if (sPropertyName === "value" && this._isInvalidInput() && deepEqual(this.getValue(), this.validateProperty(sPropertyName, oValue))) {
 			// in parse error and same value - no update on property - so remove error here
 			if (this._oManagedObjectModel) {
 				this._oManagedObjectModel.checkUpdate(true, true); // async. to reduce updates (additionalValue will follow)
 			}
-			this._bParseError = false;
+			this._resetInvalidInput();
 		}
 
 		return FieldBase.prototype.setProperty.apply(this, arguments);
@@ -353,7 +356,7 @@ sap.ui.define([
 
 	function _adjustValue(vValue, vOldValue) {
 
-		var sDataType = this._oContentFactory.getDataType() ? this._oContentFactory.getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
+		var sDataType = this._getContentFactory().getDataType() ? this._getContentFactory().getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
 
 		if (vValue && vOldValue && (sDataType === "sap.ui.model.odata.type.Unit" || sDataType === "sap.ui.model.odata.type.Currency")
 			&& !vValue[2] && vOldValue[2] !== undefined) {
@@ -385,7 +388,7 @@ sap.ui.define([
 	function _compareValues(vValue1, vValue2, bUpdateCheck) {
 
 		var bEqual = vValue1 === vValue2;
-		var sDataType = this._oContentFactory.getDataType() ? this._oContentFactory.getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
+		var sDataType = this._getContentFactory().getDataType() ? this._getContentFactory().getDataType().getMetadata().getName() : this.getDataType(); // as type must not exist now
 
 		if (!bEqual && this.getTypeUtil().getBaseType(sDataType) === BaseType.Unit && Array.isArray(vValue1) && Array.isArray(vValue2)) {
 			// in unit type the unit table is in there setting the value but not after parsing
@@ -424,13 +427,13 @@ sap.ui.define([
 			}
 
 			var oBinding = this.getBinding("value");
-			var oDataType = oBinding ? oBinding.getType() : this._oContentFactory.getDataType(); // use type from binding, not internal (might be a different one)
+			var oDataType = oBinding ? oBinding.getType() : this._getContentFactory().getDataType(); // use type from binding, not internal (might be a different one)
 			this._oTypeInitialization = this.getControlDelegate().initializeTypeFromBinding(this.getPayload(), oDataType, vValue);
 			this._bTypeInitialized = this._oTypeInitialization.bTypeInitialized;
-			if (this._bTypeInitialized && this._oContentFactory.getUnitOriginalType()) {
+			if (this._bTypeInitialized && this._getContentFactory().getUnitOriginalType()) {
 				// internal type already created, initialize it too
-				this.getControlDelegate().initializeInternalUnitType(this.getPayload(), this._oContentFactory.getDataType(), this._oTypeInitialization);
-				this.getControlDelegate().initializeInternalUnitType(this.getPayload(), this._oContentFactory.getUnitType(), this._oTypeInitialization);
+				this.getControlDelegate().initializeInternalUnitType(this.getPayload(), this._getContentFactory().getDataType(), this._oTypeInitialization);
+				this.getControlDelegate().initializeInternalUnitType(this.getPayload(), this._getContentFactory().getUnitType(), this._oTypeInitialization);
 			}
 		}
 
@@ -468,9 +471,9 @@ sap.ui.define([
 	Field.prototype._getResultForPromise = function(aConditions) {
 
 		var vValue;
-		if (aConditions.length === 0 && this._oContentFactory.getDataType()) {
+		if (aConditions.length === 0 && this._getContentFactory().getDataType()) {
 			// parse "" to get type specific initial value
-			vValue = this._oContentFactory.getDataType().parseValue("", "string", []); // we need the empty array when the type is Unit
+			vValue = this._getContentFactory().getDataType().parseValue("", "string", []); // we need the empty array when the type is Unit
 		} else if (aConditions.length === 1) {
 			vValue = aConditions[0].values[0];
 		}
@@ -544,12 +547,19 @@ sap.ui.define([
 
 	Field.prototype._checkCreateInternalContent = function() {
 
-		if (!this.bIsDestroyed && this._oContentFactory.getDataType() && !this._isPropertyInitial("editMode") && !this._isPropertyInitial("multipleLines")) {
+		if (!this.bIsDestroyed && this._getContentFactory().getDataType() && !this._isPropertyInitial("editMode") && !this._isPropertyInitial("multipleLines")) {
 			// If DataType is provided via Binding and EditMode is set the internal control can be created
 			// TODO: no control needed if just template for cloning
 			FieldBase.prototype._checkCreateInternalContent.apply(this, arguments);
 		}
 
+	};
+
+	Field.prototype.getOverflowToolbarConfig = function() {
+		var oConfig = FieldBase.prototype.getOverflowToolbarConfig.apply(this, arguments);
+		oConfig.propsUnrelatedToSize.push("value");
+		oConfig.propsUnrelatedToSize.push("additionalValue");
+		return oConfig;
 	};
 
 	/**
@@ -582,6 +592,41 @@ sap.ui.define([
 	 * @deprecated Not supported, use the <code>value</code> property and <code>additionalValue</code> property to bind the control.
 	 * @ui5-not-supported
 	 * @name sap.ui.mdc.Field#getConditions
+	 * @function
+	 */
+
+	/**
+	 * Binds property <code>conditions</code> to model data.
+	 *
+	 * See {@link sap.ui.base.ManagedObject#bindProperty ManagedObject.bindProperty} for a detailed description of the possible properties of oBindingInfo
+	 *
+	 * Do not use the <code>conditions</code> property,
+	 * use the <code>value</code> and <code>additionalValue</code> properties instead.
+	 *
+	 * @param {sap.ui.base.ManagedObject.PropertyBindingInfo} oBindingInfo The binding information
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @private
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 * @deprecated Not supported, use the <code>value</code> property and <code>additionalValue</code> property to bind the control.
+	 * @ui5-not-supported
+	 * @name sap.ui.mdc.Field#bindConditions
+	 * @function
+	 */
+
+	/**
+	 * Unbinds property <code>conditions</code> from model data.
+	 *
+	 * Do not use the <code>conditions</code> property,
+	 * use the <code>value</code> and <code>additionalValue</code> properties instead.
+	 *
+	 * @returns {this} Reference to <code>this</code> to allow method chaining
+	 * @private
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 * @deprecated Not supported, use the <code>value</code> property and <code>additionalValue</code> property to bind the control.
+	 * @ui5-not-supported
+	 * @name sap.ui.mdc.Field#unbindConditions
 	 * @function
 	 */
 

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -22,9 +22,12 @@ sap.ui.define([
 	"use strict";
 
 	function isFioriElementsApp(oComponent) {
-		var oManifest = oComponent.getManifest();
+		var mManifest = oComponent.getManifest();
 
-		return ObjectPath.get(["sap.ui.generic.app"], oManifest);
+		var isV4 = !!ObjectPath.get(["sap.ui5", "dependencies", "libs", "sap.fe.templates"], mManifest);
+		var isV2 = !!ObjectPath.get(["sap.ui.generic.app"], mManifest);
+		var isOVP = !!ObjectPath.get(["sap.ovp"], mManifest);
+		return isV2 || isV4 || isOVP;
 	}
 
 	function getFioriElementsExtensions(oComponent) {

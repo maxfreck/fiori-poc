@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -70,7 +70,7 @@ sap.ui.define([
 					 * Determines the design of the header - Light or Dark.
 					 * <b>Note: </b>This property is deprecated. It will continue to work in the Blue Crystal theme,
 					 * but it will not be taken into account for the Belize themes.
-					 * @deprecated Since version 1.40.1
+					 * @deprecated As of version 1.40.1
 					 */
 					contentDesign: {
 						type: "sap.uxap.ObjectPageHeaderDesign",
@@ -216,11 +216,10 @@ sap.ui.define([
 		 * @param bPinnable
 		 * @param sStableId
 		 */
-		ObjectPageHeaderContent.createInstance = function (aContent, bVisible, sContentDesign, bPinnable, sStableId) {
+		ObjectPageHeaderContent.createInstance = function (aContent, bVisible, sContentDesign /* not used */, bPinnable, sStableId) {
 			return new ObjectPageHeaderContent({
 				content: aContent,
 				visible: bVisible,
-				contentDesign: sContentDesign,
 				id: sStableId
 			});
 		};

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -23,7 +23,7 @@ sap.ui.define([
 		 *
 		 * @class
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @since 1.92.0
 		 * @experimental Since 1.92.0 The API might change. It is not intended for productive usage yet!
 		 * @alias sap.ui.webc.common.WebComponentMetadata

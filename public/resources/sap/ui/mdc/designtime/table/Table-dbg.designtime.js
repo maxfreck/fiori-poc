@@ -1,10 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	"sap/ui/mdc/p13n/Engine",
+	"sap/m/p13n/Engine",
 	"sap/ui/mdc/Table",
 	"../Util"
 ], function (Engine, Table, Util) {
@@ -19,7 +19,9 @@ sap.ui.define([
 				//RTA expects the settings to be returned as function
 				return {
 					handler: function (oControl, mPropertyBag) {
-						return Engine.getInstance().getRTASettingsActionHandler(oControl, mPropertyBag, oControl.getActiveP13nModes());
+						return oControl.finalizePropertyHelper().then(function(){
+							return Engine.getInstance().getRTASettingsActionHandler(oControl, mPropertyBag, oControl.getActiveP13nModes());
+						});
 					}
 				};
 			}

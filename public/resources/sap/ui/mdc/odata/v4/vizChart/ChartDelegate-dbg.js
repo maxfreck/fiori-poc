@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -104,8 +104,8 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
-	 */
+     * @ui5-restricted sap.fe, sap.ui.mdc
+     */
     ChartDelegate.addCondition = function(sPropertyName, oControl, mPropertyBag) {
 		//return this.getFilterDelegate().addCondition(sPropertyName, oControl, mPropertyBag);
         // will be activated, once mdc.Chart has the property propertyInfo.
@@ -123,8 +123,8 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
-	 */
+     * @ui5-restricted sap.fe, sap.ui.mdc
+     */
     ChartDelegate.removeCondition = function(sPropertyName, oControl, mPropertyBag) {
 		//return this.getFilterDelegate().removeCondition(sPropertyName, oControl, mPropertyBag);
         // will be activated, once mdc.Chart has the property propertyInfo.
@@ -252,7 +252,7 @@ sap.ui.define([
      * @param {int} iValue Value to zoom in
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.zoomIn = function (oMDCChart, iValue) {
         var oInnerChart = this._getChart(oMDCChart);
@@ -269,7 +269,7 @@ sap.ui.define([
      * @param {int} iValue Value to zoom in
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.zoomOut = function (oMDCChart, iValue) {
         var oInnerChart = this._getChart(oMDCChart);
@@ -286,7 +286,7 @@ sap.ui.define([
      * @returns {object} Current <code>ZoomState</code> of the inner chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getZoomState = function (oMDCChart) {
 
@@ -296,17 +296,14 @@ sap.ui.define([
 
     };
     /**
-     ** Returns the event handler for chartSelectionDetails as an object:
-     * {
-     *   "eventId": id of the selection event,
-     *   "listener": Reference to inner chart
-     *   }
+     * Returns the event handler for SelectionDetails as an object:
      *
      * @param {sap.ui.mdc.Chart} oMDCChart Reference to the MDC chart
-     * @returns {object} Event handler for chartSelectionDetails
+     * @returns {sap.ui.mdc.SelectionDetails} Event handler for SelectionDetails
+     *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getInnerChartSelectionHandler = function (oMDCChart) {
         return {eventId: "_selectionDetails", listener: this._getChart(oMDCChart)};
@@ -324,7 +321,7 @@ sap.ui.define([
      * @returns {array} Layout configuration for personalization panel
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getChartTypeLayoutConfig = function() {
 
@@ -381,7 +378,7 @@ sap.ui.define([
      * @returns {sap.core.Control} Adaptation UI to be used
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getAdaptionUI = function(oMDCChart) {
 
@@ -426,7 +423,7 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.setLegendVisible = function (oMDCChart, bVisible) {
         if (this._getChart(oMDCChart)) {
@@ -448,11 +445,12 @@ sap.ui.define([
      * @param {sap.ui.mdc.Chart.Item} oMDCItem MDC item to create a sorter for
      * @param {object} oSortProperty Sorting information
      * @returns {sap.ui.model.Sorter} Sorter for given item
+     *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
-    ChartDelegate.getSorterForItem = function (oMDCItem, oSortProperty) {
+    ChartDelegate._getSorterForItem = function (oMDCItem, oSortProperty) {
         //TODO: Check wether we really need this method.
         //TODO: Right now it is needed since the name of a property does not include the aggregation method -> leads to an error when calling back-end
         //TODO: In old chart, aggragation method was included in name since every method had their own Item
@@ -473,7 +471,7 @@ sap.ui.define([
      * @param {int} iIndex Index to insert into
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.insertItemToInnerChart = function (oMDCChart, oMDCChartItem, iIndex) {
         //TODO: Create Measures/Dimension only when required?
@@ -517,7 +515,7 @@ sap.ui.define([
      * @param {sap.ui.mdc.chart.Item} oMDCChartItem Item to remove from the inner chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.removeItemFromInnerChart = function (oMDCChart, oMDCChartItem) {
         if (oMDCChartItem.getType() === "groupable" && this._getChart(oMDCChart).getVisibleDimensions().includes(this.getInternalChartNameFromPropertyNameAndKind(oMDCChartItem.getName(), "groupable", oMDCChart))) {
@@ -567,7 +565,7 @@ sap.ui.define([
      * @returns {Promise} Promise that resolves with new MDC chart item as parameter
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.addItem = function (sPropertyName, oMDCChart, mPropertyBag, sRole) {
         if (oMDCChart.getModel) {
@@ -586,7 +584,7 @@ sap.ui.define([
      * @returns {Promise} Resolves once check is complete
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.checkAndUpdateMDCItems = function(oMDCChart) {
         return new Promise(function(resolve, reject){
@@ -625,7 +623,7 @@ sap.ui.define([
      * @returns {sap.ui.mdc.chart.Item} Created MDC Item
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._createMDCChartItem = function (sPropertyName, oMDCChart, sRole) {
 
@@ -648,7 +646,7 @@ sap.ui.define([
      * @returns {sap.ui.mdc.chart.Item} Created MDC Item
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._createMDCItemFromProperty = function(oPropertyInfo, idPrefix, sRole) {
 
@@ -684,7 +682,7 @@ sap.ui.define([
      * @returns {Promise} Resolved when inner chart is ready
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.initializeInnerChart = function (oMDCChart) {
 
@@ -711,16 +709,16 @@ sap.ui.define([
         }.bind(this));
     };
 
-    /**
-     * Creates initial content for the chart while metadata has not been retrieved yet.
-     * @param {sap.ui.mdc.chart} oMDCChart MDC chart
-     * @experimental
-     * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
-     */
-    ChartDelegate.createInitialChartContent = function(oMDCChart) {
-        //Not relevant for sap.chart.Chart
-    };
+    // /**
+    //  * Creates initial content for the chart while metadata has not been retrieved yet.
+    //  * @param {sap.ui.mdc.chart} oMDCChart MDC chart
+    //  * @experimental
+    //  * @private
+    //  * @ui5-restricted sap.fe, sap.ui.mdc
+    //  */
+    // ChartDelegate.createInitialChartContent = function(oMDCChart) {
+    //     //Not relevant for sap.chart.Chart
+    // };
 
     /**
      * Triggers invalidation on ChartImplContainer when external noData changed.
@@ -740,7 +738,7 @@ sap.ui.define([
      * @returns {Promise} Resolved once chart content has been created
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._createContentFromItems = function (oMDCChart) {
         return new Promise(function(resolve, reject){
@@ -866,7 +864,7 @@ sap.ui.define([
      * @returns {sap.ui.Control} Inner chart instance
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getInnerChart = function (oMDCChart) {
         return this._getChart(oMDCChart);
@@ -878,7 +876,7 @@ sap.ui.define([
      * @returns {Promise} resolved, once coloring is rpepared
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._prepareColoringForItem = function(oItem) {
         //COLORING
@@ -983,7 +981,7 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements
+     * @ui5-restricted sap.fe
      */
     ChartDelegate._updateColoring = function (oMDCChart, aVisibleDimensions, aVisibleMeasures) {
         var oTempColorings = jQuery.extend(true, {}, this._getState(oMDCChart).oColorings), k;
@@ -1039,7 +1037,7 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._updateSemanticalPattern = function (oMDCChart) {
 
@@ -1104,7 +1102,7 @@ sap.ui.define([
      * @throws Exception if inner chart is not yet ready
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getChartTypeInfo = function (oMDCChart) {
         if (!this._getChart(oMDCChart)) {
@@ -1133,7 +1131,7 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements
+     * @ui5-restricted sap.fe
      */
     ChartDelegate.getAvailableChartTypes = function (oMDCChart) {
         var aChartTypes = [];
@@ -1167,12 +1165,11 @@ sap.ui.define([
      * @returns {array} Array containing the drill stack
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getDrillStack = function (oMDCChart) {
         //TODO: Generify the return values here for other chart frameworks
-        var aDrillStack = [];
-        aDrillStack = Object.assign(aDrillStack, this._getChart(oMDCChart).getDrillStack());
+        var aDrillStack = Object.assign([], this._getChart(oMDCChart).getDrillStack());
 
         aDrillStack.forEach(function(oStackEntry) {
 			// loop over nested dimension arrays -> give them the correct name for filtering
@@ -1197,7 +1194,7 @@ sap.ui.define([
      * @returns {Promise} <code>Promise</code> containing an array of dimensions that are sorted
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getSortedDimensions = function (oMDCChart) {
         return new Promise(function (resolve, reject) {
@@ -1236,7 +1233,7 @@ sap.ui.define([
      * @returns {array} Array of MDC items that are drillable
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      *
      */
     ChartDelegate.getDrillableItems = function (oMDCChart) {
@@ -1253,7 +1250,7 @@ sap.ui.define([
      * @param {string} sChartType New chart type
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.setChartType = function (oMDCChart, sChartType) {
         this._getChart(oMDCChart).setChartType(sChartType);
@@ -1266,7 +1263,7 @@ sap.ui.define([
      * @returns {Promise} Resolved once inner chart has been created
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.createInnerChartContent = function (oMDCChart, fnCallbackDataLoaded) {
 
@@ -1335,7 +1332,7 @@ sap.ui.define([
      * @param {object} oBindingInfo Binding info object
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._performInitialBind = function(oMDCChart, oBindingInfo) {
         if (oMDCChart && oBindingInfo && this._getChart(oMDCChart)) {
@@ -1355,7 +1352,7 @@ sap.ui.define([
      * @param {sap.ui.mdc.Chart} oMDCChart Reference to the MDC chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.requestToolbarUpdate = function(oMDCChart) {
 
@@ -1374,7 +1371,7 @@ sap.ui.define([
      * @param {sap.ui.mdc.chart.Item} oMDCChartItem MDC chart item to be added to the inner chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.createInnerDimension = function (oMDCChart, oMDCChartItem) {
         //TODO: Check for Hierachy and Time
@@ -1387,13 +1384,13 @@ sap.ui.define([
 
     };
 
-     /**
+    /**
      * Creates and adds a measure for the inner chart for given MDC chart item.
      * @param {sap.ui.mdc.Chart} oMDCChart Reference to the MDC chart
      * @param {sap.ui.mdc.chart.Item} oMDCChartItem MDC chart item to be added to the inner chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.createInnerMeasure = function (oMDCChart, oMDCChartItem) {
 
@@ -1413,7 +1410,7 @@ sap.ui.define([
     /**
      *
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.innerDimensionFactory = function (oMDCChart, oMDCChartItem, oPropertyInfo) {
         var oDimension = new Dimension({
@@ -1441,10 +1438,10 @@ sap.ui.define([
         this._getChart(oMDCChart).addMeasure(oMeasure);
     };
 
-     /**
+    /**
      *
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.innerMeasureFactory = function(oMDCChart, oMDCChartItem, oPropertyInfo) {
         var aggregationMethod = oPropertyInfo.aggregationMethod;
@@ -1473,7 +1470,7 @@ sap.ui.define([
      * @returns {string} Name for inner chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._getAggregatedMeasureNameForProperty = function(oPoperty){
         return oPoperty.aggregationMethod + oPoperty.name;
@@ -1487,11 +1484,11 @@ sap.ui.define([
      * @deprecated as of 1.98; use rebind instead
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
-         ChartDelegate.rebindChart = function (oMDCChart, oBindingInfo) {
-            this.rebind(oMDCChart, oBindingInfo);
-        };
+    ChartDelegate.rebindChart = function (oMDCChart, oBindingInfo) {
+        this.rebind(oMDCChart, oBindingInfo);
+    };
 
     /**
      * Checks the binding of the chart and rebinds it if required.
@@ -1500,7 +1497,7 @@ sap.ui.define([
      * @param {object} oBindingInfo BindingInfo of the chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.rebind = function (oMDCChart, oBindingInfo) {
         if (oMDCChart && oBindingInfo && this._getChart(oMDCChart)) {
@@ -1552,7 +1549,7 @@ sap.ui.define([
      * @returns {object} BindingInfo object
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate._getBindingInfo = function (oMDCChart) {
 
@@ -1574,7 +1571,7 @@ sap.ui.define([
      * @returns {boolean} <code>true</code> if inner chart is bound; <code>false</code> if not
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getInnerChartBound = function (oMDCChart) {
         var oState = this._getState(oMDCChart);
@@ -1594,7 +1591,7 @@ sap.ui.define([
      * @param {Object} oBindingInfo BindingInfo of the chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.updateBindingInfo = function (oMDCChart, oBindingInfo) {
         var aFilters = createInnerFilters.call(this, oMDCChart).concat(createOuterFilters.call(this, oMDCChart));
@@ -1692,7 +1689,7 @@ sap.ui.define([
             }
 
             //TODO: Check for inResultDimensions
-            var oSorter = this.getSorterForItem(oMDCItem, oSortProp);
+            var oSorter = this._getSorterForItem(oMDCItem, oSortProp);
 
             if (aSorters) {
                 aSorters.push(oSorter);
@@ -1722,7 +1719,7 @@ sap.ui.define([
      * @returns {string} Internal id for the sap.chart.Chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getInternalChartNameFromPropertyNameAndKind = function(sName, sKind, oMDCChart) {
         return sName;
@@ -1736,7 +1733,7 @@ sap.ui.define([
      * @returns {object} Property object
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.getPropertyFromNameAndKind = function(sName, sKind, oMDCChart) {
         return oMDCChart.getPropertyHelper().getProperty(sName);
@@ -1748,7 +1745,7 @@ sap.ui.define([
      * @param {boolean}  bFlag <code>true</code> for visible, <code>false</code> for invisible
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.setChartTooltipVisibility = function (oMDCChart, bFlag) {
 
@@ -1779,21 +1776,22 @@ sap.ui.define([
     ChartDelegate._loadChart = function () {
 
         return new Promise(function (resolve) {
-            var aNotLoadedModulePaths = ['sap/chart/library', 'sap/chart/Chart', 'sap/chart/data/Dimension', 'sap/chart/data/HierarchyDimension', 'sap/chart/data/TimeDimension', 'sap/chart/data/Measure', 'sap/viz/ui5/controls/VizTooltip'];
+            var aNotLoadedModulePaths = ['sap/chart/library', 'sap/chart/Chart', 'sap/chart/data/Dimension', 'sap/chart/data/Measure', 'sap/viz/ui5/controls/VizTooltip'];
 
-            function onModulesLoadedSuccess(fnChartLibrary, fnChart, fnDimension, fnHierarchyDimension, fnTimeDimension, fnMeasure, fnVizTooltip) {
+            function onModulesLoadedSuccess(fnChartLibrary, fnChart, fnDimension, fnMeasure, fnVizTooltip) {
                 //ChartLibrary = fnChartLibrary;
                 Chart = fnChart;
                 Dimension = fnDimension;
-                //HierarchyDimension = fnHierarchyDimension;
-                //TimeDimension = fnTimeDimension;
                 Measure = fnMeasure;
                 VizTooltip = fnVizTooltip;
 
                 resolve();
             }
 
-            sap.ui.require(aNotLoadedModulePaths, onModulesLoadedSuccess);
+            Core.loadLibrary("sap.viz", {async: true}).then(function(){
+                sap.ui.require(aNotLoadedModulePaths, onModulesLoadedSuccess);
+            });
+
         });
 
     };
@@ -1814,7 +1812,7 @@ sap.ui.define([
      * @returns {string} Label which should be shown on the chart axis
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.formatText = function(sKey, SDesc) {
         return sKey;
@@ -1826,7 +1824,7 @@ sap.ui.define([
      * @param {string} sText Text that shows if no data is displayed in the chart
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.setNoDataText = function(oMDCChart, sText) {
         this._getChart(oMDCChart).setCustomMessages({
@@ -1841,7 +1839,7 @@ sap.ui.define([
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartDelegate.showOverlay = function(oMDCChart, bShow) {
         if (this._getInnerStructure(oMDCChart)) {

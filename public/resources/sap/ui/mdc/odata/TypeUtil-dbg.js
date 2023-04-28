@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -21,7 +21,7 @@ sap.ui.define([
 	 * @experimental As of version 1.79
 	 * @since 1.79.0
 	 * @alias sap.ui.mdc.odata.TypeUtil
-	 * @deprecated This module should not be used and will be removed in future versions!
+	 * @ui5-restricted sap.ui.mdc
 	 */
 	var TypeUtil = Object.assign({}, BaseTypeUtil, {
 
@@ -125,8 +125,8 @@ sap.ui.define([
 
 		internalizeValue: function (vValue, vType, oFormatOptions, oConstraints) {
 			var oTypeInstance = this._normalizeType(vType, oFormatOptions, oConstraints);
-			if (this.getBaseType(oTypeInstance) === BaseType.Numeric) {
-				if (typeof sValue !== "string" && (oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Int64" || oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Decimal")) {
+			if (this.getBaseTypeForType(oTypeInstance) === BaseType.Numeric) {
+				if (typeof vValue !== "string" && (oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Int64" || oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Decimal")) {
 					// INT64 and Decimal using string as internal value -> if for some reason a number comes in convert it to string
 					return vValue.toString(); // don't use type as this could have locale dependent parsing
 				}
@@ -136,7 +136,7 @@ sap.ui.define([
 
 		externalizeValue: function (vValue, vType, oFormatOptions, oConstraints) {
 			var oTypeInstance = this._normalizeType(vType, oFormatOptions, oConstraints);
-			if (this.getBaseType(oTypeInstance) === BaseType.Numeric) {
+			if (this.getBaseTypeForType(oTypeInstance) === BaseType.Numeric) {
 				if (typeof vValue !== "string" && (oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Int64" || oTypeInstance.getMetadata().getName() === "sap.ui.model.odata.type.Decimal")) {
 					// INT64 and Decimal parsed always to string, if for some reason a number comes in -> convert to string, but don't use type at this might have locale dependent formatting
 					return vValue.toString();

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -19,7 +19,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -32,9 +32,9 @@ sap.ui.define([
 			properties: {
 
 				/**
-				 * The maximum number of items set to the list.
+				 * The minimum number of items set to the list.
 				 */
-				maxItems: {
+				minItems: {
 					type : "int",
 					group : "Misc"
 				},
@@ -54,7 +54,7 @@ sap.ui.define([
 		renderer: {
 			apiVersion: 2,
 			render: function (oRm, oControl) {
-				var iMaxItems = oControl.getMaxItems(),
+				var iMinItems = oControl.getMinItems(),
 					oItem = oControl.getItem(),
 					// set title for screen reader
 					oResBundle = Core.getLibraryResourceBundle("sap.ui.core"),
@@ -74,7 +74,7 @@ sap.ui.define([
 
 				oRm.openEnd();
 
-				for (var i = 0; i < iMaxItems; i++) {
+				for (var i = 0; i < iMinItems; i++) {
 					oRm.openStart("div")
 						.class("sapFCardListPlaceholderItem")
 						.style("height", oControl.getItemHeight())

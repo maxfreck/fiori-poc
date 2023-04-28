@@ -25,13 +25,13 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 129797,
+			"size": 141747,
 			"designtime": true,
 			"theme": "sap_bluecrystal"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 129421,
+			"size": 141371,
 			"designtime": true,
 			"theme": "sap_bluecrystal"
 		},

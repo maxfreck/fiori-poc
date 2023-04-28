@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -16,8 +16,9 @@ sap.ui.define([
 	"sap/ui/core/library",
 	"sap/m/HBox",
 	"sap/m/library",
-	"sap/base/util/merge"
-], function(BasePanel, Label, deepEqual, CustomListItem, List, Panel, Toolbar,Text, Icon, coreLibrary, HBox, mLibrary, merge) {
+	"sap/base/util/merge",
+	"sap/m/Title"
+], function(BasePanel, Label, deepEqual, CustomListItem, List, Panel, Toolbar,Text, Icon, coreLibrary, HBox, mLibrary, merge, Title) {
 	"use strict";
 
 
@@ -47,6 +48,13 @@ sap.ui.define([
 		metadata: {
 			library: "sap.ui.mdc",
 			properties: {
+				/**
+				* This factory function must return a single control instance of an input based control to provide custom filter capabilities.
+				* This control is then going to be added in the <code>GroupView</code> layout.
+				*
+				 * <b>Note:</b>: The <code>getIdForLabel</code> method can be imlplemented on the returned control instance
+				 * to return a focusable children control to provide the <code>labelFor</code> reference for the associated text.
+				*/
 				itemFactory: {
 					type: "function"
 				}
@@ -133,10 +141,9 @@ sap.ui.define([
 			headerToolbar: [
 				new Toolbar({
 					content: [
-						new Label({
+						new Title({
 							wrapping: true,
-							text: "{" + this.P13N_MODEL + ">groupLabel}",
-							design: "Bold"
+							text: "{" + this.P13N_MODEL + ">groupLabel}"
 						})
 					]
 				})
@@ -184,7 +191,8 @@ sap.ui.define([
 				//Add Factory Control + setLabelFor association (acc announcements)
 				if (oField) {
 					oItem.addContent(oField);
-					oItem.getContent()[0].getItems()[0].setLabelFor(oField.getId());
+					var oLabel = oItem.getContent()[0].getItems()[0];
+					oLabel.setLabelFor(oField);
 				}
 
 				//Remove Icon

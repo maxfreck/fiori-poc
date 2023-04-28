@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,7 +14,9 @@ sap.ui.define([
 	'sap/ui/model/resource/ResourceModel',
 	'sap/ui/mdc/util/Common',
 	'sap/ui/mdc/enum/SelectType',
-	'sap/base/strings/formatMessage'
+	'sap/base/strings/formatMessage',
+	'sap/ui/core/library',
+	'sap/ui/core/InvisibleMessage'
 ], function(
 	Container,
 	DialogTab,
@@ -25,12 +27,21 @@ sap.ui.define([
 	ResourceModel,
 	Common,
 	SelectType,
-	formatMessage
+	formatMessage,
+	coreLibrary,
+	InvisibleMessage
 ) {
 	"use strict";
 
+	// translation utils
+	var oMessageBundle = sap.ui.getCore().getLibraryResourceBundle("sap.ui.mdc");
+	sap.ui.getCore().attachLocalizationChanged(function() {
+		oMessageBundle = sap.ui.getCore().getLibraryResourceBundle("sap.ui.mdc");
+	});
+
 	var MDialog, MLibrary, Button, ManagedObjectModel, IconTabBar, IconTabFilter;
 	var Panel, HBox, MultiInput, Token, Filter;
+	var InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
 
 	/**
 	 * Constructor for a new <code>Dialog</code> container.
@@ -39,11 +50,12 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 * @class Container for the {@link sap.ui.mdc.ValueHelp ValueHelp} element showing a dialog.
 	 * @extends sap.ui.mdc.valuehelp.base.Container
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.Dialog
@@ -74,7 +86,7 @@ sap.ui.define([
 				/**
 				 * Configuration for groups (collective search).
 				 */
-				groupConfig: {
+				groupConfig: { // TODO: explain in JS-Doc
 					type: "object",
 					defaultValue: {}
 				}
@@ -259,29 +271,59 @@ sap.ui.define([
 					};
 					oDialog.addStyleClass("sapMdcValueHelp");
 					oDialog.addStyleClass("sapMdcValueHelpTitle");
-					oDialog.addStyleClass("sapMdcValueHelpTitleShadow");
 
-					var oVBox = new VBox(this.getId() + "-Content", { fitContainer: true});
-					oVBox.addStyleClass("sapMdcValueHelpPanel");
-					oDialog.addContent(oVBox);
+					var oContentArea = new VBox(this.getId() + "-Content", { fitContainer: true});
+					oContentArea.addStyleClass("sapMdcValueHelpPanel");
+					oDialog.addContent(oContentArea);
 
-					var aPromises = [];
-					aPromises.push(this._getIconTabBar(oDialog));
+					return oDialog;
 
-					if (_isTokenizerRequired(this.getMaxConditions(), this.getContent())) {
-						aPromises.push(this._getTokenizerPanel());
-					}
-					return Promise.all(aPromises).then(function (aControls) {
-						aControls.forEach(function (oControl) {
-							oVBox.addItem(oControl);
-						});
-						return oDialog;
-					});
 				}.bind(this));
 			}.bind(this));
 		}
 
 		return oDialog;
+	};
+
+	Dialog.prototype._placeContent = function (oDialog) {
+
+		var oContentArea = oDialog.getContent()[0];
+		var aSelectableContents = this.getProperty("_selectableContents");
+
+		if (!aSelectableContents.length) { // no content assigned to dialog
+			return Promise.resolve(oDialog);
+		}
+
+		var bMultiContentMode = aSelectableContents.length > 1;
+
+		var aContentPromises = [];
+		if (bMultiContentMode) { // Multiple contents are displayed using an IconTabBar
+			aContentPromises.push(this._getIconTabBar(oDialog));
+		} else {
+			if (!this._oStandaloneTab) {
+				this._oStandaloneTab = new DialogTab(this.getId() + "-Standalone-DT", {content: {path: "/_selectableContents/0/displayContent", model: "$help"}, layoutData: new FlexItemData({growFactor: 1, minHeight: "0"})});
+			}
+			aContentPromises.push(this._oStandaloneTab);
+		}
+
+		if (_isTokenizerRequired(this.getMaxConditions(), this.getContent())) {
+			aContentPromises.push(this._getTokenizerPanel());
+		}
+
+		return Promise.all(aContentPromises).then(function (aControls) {
+			oContentArea.removeAllItems();
+			aControls.forEach(function (oControl) {
+				oContentArea.addItem(oControl);
+			});
+
+			if (bMultiContentMode) {
+				oDialog.addStyleClass("sapMdcValueHelpTitleShadow"); // make the Header border invisible
+			} else {
+				oDialog.removeStyleClass("sapMdcValueHelpTitleShadow"); // make the Header border visible
+			}
+
+			return oDialog;
+		});
 	};
 
 	Dialog.prototype._handleSelect = function (oEvent) {
@@ -427,7 +469,8 @@ sap.ui.define([
 								select: function (oEvent) {
 									this._handleContentSelectionChange(oEvent.getParameter("key"));
 								}.bind(this),
-								selectedItemKey: this.getSelectedContent().getId()
+								selectedItemKey: this.getSelectedContent().getId(),
+								maxWidth: Device.system.phone ? "5em" : "25rem"
 							}
 						);
 						this._oGroupSelect.setModel(this._oGroupSelectModel, "$select");
@@ -438,7 +481,7 @@ sap.ui.define([
 		}.bind(this));
 	};
 
-	Dialog.prototype._getIconTabBar = function (oDialog) {
+	Dialog.prototype._getIconTabBar = function () {
 		if (!this._oIconTabBar) {
 			return this._retrievePromise("IconTabBar", function (){
 				return loadModules([
@@ -455,32 +498,10 @@ sap.ui.define([
 							headerMode: IconTabHeaderMode.Inline,
 							select: this._onTabBarSelect.bind(this),
 							layoutData: new FlexItemData({growFactor: 1}),
-							selectedKey: "{path: '$help>/_selectedContentKey', mode: 'OneWay'}",
-							visible: {parts : ['$help>/_selectableContents'], formatter:
-								function(aContent) {
-									if (aContent && aContent.length == 1) {
-										oDialog.removeStyleClass("sapMdcValueHelpTitleShadow"); // make the Header border visible
-									} else {
-										oDialog.addStyleClass("sapMdcValueHelpTitleShadow"); // make the Header border invisible
-									}
-									return true;
-								}
-							}
+							selectedKey: "{path: '$help>/_selectedContentKey', mode: 'OneWay'}"
 						});
 						// this._oIconTabBar.setModel(this._oManagedObjectModel, "$help");
 						this._oIconTabBar.addStyleClass("sapUiNoContentPadding");
-						var oIconTabHeader = this._oIconTabBar._getIconTabHeader();
-						oIconTabHeader.bindProperty("visible", {parts : ['$help>/_selectableContents'], formatter:
-							function(aContent) {
-								if (aContent && aContent.length === 1) {
-									return false;
-								} else {
-									return true;
-								}
-							}
-						});
-
-
 						var oITF = new IconTabFilter(this.getId() + "-ITF", {
 							key: {path: "$help>id"},
 							content: new DialogTab(this.getId() + "-DT", {content: {path: "$help>displayContent"}}),
@@ -575,7 +596,7 @@ sap.ui.define([
 					var oFormatOptions = _getConditionFormatOptions.call(this);
 					this._oConditionType = new ConditionType(oFormatOptions);
 					this._oConditionType._bVHTokenizer = true; // just help for debugging
-					this.oTokenizer = new MultiInput(this.getId() + "-Tokenizer", {
+					this.oTokenMultiInput = new MultiInput(this.getId() + "-Tokenizer", {
 						width: "100%",
 						showValueHelp: false,
 						editable: true,
@@ -602,16 +623,16 @@ sap.ui.define([
 					// Overwrite the setValueVisible to make the input part not visible (transparent).
 					// Problem: you can still enter a value into the $input dom ref and this will be shown when you remove all tokens. this can be solved inside the afterRender handler.
 					// ACC issue: the screenreader is still reading this control as input field and that the user can enter a value - which is not correct.
-					this.oTokenizer._setValueVisible = function (bVisible) {
+					this.oTokenMultiInput._setValueVisible = function (bVisible) {
 						this.$("inner").css("opacity", "0");
 					};
 
-					var org = this.oTokenizer.onAfterRendering;
-					this.oTokenizer.onAfterRendering = function() {
-						org.apply(this.oTokenizer, arguments);
+					var org = this.oTokenMultiInput.onAfterRendering;
+					this.oTokenMultiInput.onAfterRendering = function() {
+						org.apply(this.oTokenMultiInput, arguments);
 
-						this.oTokenizer._setValueVisible();  // make the input always invisible
-						this.oTokenizer.setValue(""); // set the value to empty string
+						this.oTokenMultiInput._setValueVisible();  // make the input always invisible
+						this.oTokenMultiInput.setValue(""); // set the value to empty string
 					}.bind(this);
 
 					_bindTokenizer.call(this, true);
@@ -620,6 +641,7 @@ sap.ui.define([
 						press: function(oEvent) {
 							this.fireSelect({type: SelectType.Set, conditions: []});
 
+							this.oInvisibleMessage.announce(oMessageBundle.getText("valuehelp.REMOVEALLTOKEN_ANNOUNCE"), InvisibleMessageMode.Polite);
 						}.bind(this),
 						type: ButtonType.Transparent,
 						icon: "sap-icon://decline",
@@ -628,7 +650,7 @@ sap.ui.define([
 					});
 					this.oRemoveAllBtn.addStyleClass("sapUiTinyMarginBegin");
 
-					oHBox.addItem(this.oTokenizer);
+					oHBox.addItem(this.oTokenMultiInput);
 					oHBox.addItem(this.oRemoveAllBtn);
 					this.oTokenizerPanel.addContent(oHBox);
 
@@ -678,17 +700,17 @@ sap.ui.define([
 
 	function _bindTokenizer(bBind) {
 
-		if (this.oTokenizer) {
-			var oBindingInfo = this.oTokenizer.getBindingInfo("tokens");
+		if (this.oTokenMultiInput) {
+			var oBindingInfo = this.oTokenMultiInput.getBindingInfo("tokens");
 			if (bBind) {
 				if (!oBindingInfo) { // not bound -> create binding
 					var oFilter = new Filter({path:'isEmpty', operator:'NE', value1:true});
 					this._oConditionType.setFormatOptions(_getConditionFormatOptions.call(this)); // as config might be changed
 					var oTokenTemplate = new Token(this.getId() + "-Token", {text: {path: '$valueHelp>', type: this._oConditionType}});
-					this.oTokenizer.bindAggregation("tokens", {path: '/conditions', model: "$valueHelp", templateShareable: false, template: oTokenTemplate, filters: oFilter});
+					this.oTokenMultiInput.bindAggregation("tokens", {path: '/conditions', model: "$valueHelp", templateShareable: false, template: oTokenTemplate, filters: oFilter});
 				}
 			} else if (oBindingInfo) { // remove binding if dialog is closed to prevent updated on tokens if conditions are updated. (Suspend would not be enough, as every single binding on token would need to be suspended too.)
-				this.oTokenizer.unbindAggregation("tokens");
+				this.oTokenMultiInput.unbindAggregation("tokens");
 			}
 		}
 
@@ -703,6 +725,16 @@ sap.ui.define([
 
 			var fnRenderContent = function () {
 				this._renderSelectedContent(this._sInitialContentKey, function () {
+
+					var oCurrentContent = this.getContent().find(function (oContent) {
+						return oContent.getId() === this.getProperty("_selectedContentKey");
+					}.bind(this));
+
+					var oInitialFocusedControl = oCurrentContent.getInitialFocusedControl();
+					if (oInitialFocusedControl) {
+						oDialog.setInitialFocus(oInitialFocusedControl);
+					}
+
 					oDialog.open();
 					this.getContent().forEach(function (oContent) {
 						oContent.onContainerOpen();
@@ -719,7 +751,7 @@ sap.ui.define([
 					fnRenderContent();
 				});
 			} else {
-				if (this.oTokenizer) { // restore tokenizer binding to enable updates if open
+				if (this.oTokenMultiInput) { // restore tokenizer binding to enable updates if open
 					_bindTokenizer.call(this, true);
 				}
 				fnRenderContent();
@@ -736,25 +768,25 @@ sap.ui.define([
 			throw new Error("sap.ui.mdc.ValueHelp: No content found.");
 		}
 
-		var aNecessaryPromises = [oNextContent.getContent()];
+		var aNecessaryPromises = [oNextContent.getContent()]; // Content.getContent() initializes displayContent asynchonously
 		var sSelectedContentGroup = oNextContent.getGroup && oNextContent.getGroup();
 		var oGroupSelectPromise;
 		if (sSelectedContentGroup && _isValidContentGroup.call(this, sSelectedContentGroup)) {
 			oGroupSelectPromise = this._retrieveGroupSelect();
 			aNecessaryPromises.push(oGroupSelectPromise);
 		}
-		var bAlreadyShown = !this._mAlreadyShownContents[sNextContentId];
+		var bInitial = !this._mAlreadyShownContents[sNextContentId];
 
 		return Promise.all(aNecessaryPromises).then(function () {
 			this._bindContent(oNextContent);
 		}.bind(this)).then(function () {
-			return Promise.resolve(oNextContent.onBeforeShow(bAlreadyShown));
+			return Promise.resolve(oNextContent.onBeforeShow(bInitial));
 		}).then(function () {
 			this._mAlreadyShownContents[sNextContentId] = true;
 			this.setProperty("_selectedContentKey", sNextContentId);
 			this.setProperty("_selectableContents", this._getSelectableContents());
 			this._oManagedObjectModel.checkUpdate(true, false, function (oBinding) { // force update as bindings to $help>displayContent are not updated automatically in some cases
-				if (oBinding.getPath() === "displayContent") { // do not update other bindings as this might lead to rerendering of IconTabBar ot other unwanted updates.
+				if (oBinding.getPath().indexOf("displayContent") >= 0) { // do not update other bindings as this might lead to rerendering of IconTabBar ot other unwanted updates.
 					return true;
 				}
 			});
@@ -771,7 +803,7 @@ sap.ui.define([
 			}
 
 			return this._retrievePromise("open").then(function () {
-				oNextContent.onShow(bAlreadyShown);
+				oNextContent.onShow(bInitial);
 				return oNextContent;
 			});
 		}.bind(this));
@@ -782,7 +814,7 @@ sap.ui.define([
 		if (oContainer) {
 			oContainer.close();
 
-			if (this.oTokenizer) { // remove tokenizer binding to prevent updates if closed
+			if (this.oTokenMultiInput) { // remove tokenizer binding to prevent updates if closed
 				_bindTokenizer.call(this, false);
 			}
 		}
@@ -811,6 +843,12 @@ sap.ui.define([
 
 	};
 
+	Dialog.prototype.init = function () {
+		Container.prototype.init.apply(this, arguments);
+
+		this.oInvisibleMessage = InvisibleMessage.getInstance();
+	};
+
 	Dialog.prototype.exit = function () {
 		Common.cleanup(this, [
 			"_oManagedObjectModel",
@@ -818,12 +856,14 @@ sap.ui.define([
 			"oButtonOK",
 			"oButtonCancel",
 			"oTokenizerPanel",
-			"oTokenizer",
+			"oTokenMultiInput",
 			"_oIconTabBar",
 			"_oGroupSelect",
 			"_oGroupSelectModel",
 			"_sInitialContentKey",
-			"_mAlreadyShownContents"
+			"_mAlreadyShownContents",
+			"oInvisibleMessage",
+			"_oStandaloneTab"
 		]);
 
 		Container.prototype.exit.apply(this, arguments);

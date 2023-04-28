@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -380,7 +380,9 @@ sap.ui.define([
 			if (mModelProperty.hideFromReveal) {
 				return false;
 			}
-			_enhanceInvisibleElement(oInvisibleElement, mModelProperty);
+			if (bHasAddViaDelegate) {
+				_enhanceInvisibleElement(oInvisibleElement, mModelProperty);
+			}
 			return true;
 		}
 		// if model property is not found, it depends if the hidden field is a removed custom field (AddViaDelegate case) or a standard field.

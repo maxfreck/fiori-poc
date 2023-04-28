@@ -1,13 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"./BaseController",
-	"sap/ui/mdc/p13n/FlexUtil",
-    'sap/ui/mdc/p13n/modules/xConfigAPI',
+	"./SelectionController",
+	"sap/m/p13n/FlexUtil",
+    'sap/m/p13n/modules/xConfigAPI',
 	"sap/base/util/merge"
 ], function (BaseController, FlexUtil, xConfigAPI, merge) {
 	"use strict";
@@ -50,15 +50,15 @@ sap.ui.define([
         aChanges.forEach(function(oChange){
 			var oChangeContent = merge({}, oChange.changeSpecificData.content);
 			var oXSettings = {
-				name: oChangeContent.name,
+				key: oChangeContent.name,
 				controlMeta: {
-					aggregation: "columns",
-					property: "width"
+					aggregation: "columns"
 				},
+				property: "width",
 				value: oChangeContent.value
 			};
 
-			oState = xConfigAPI.createConfigObject(oControl, oXSettings, oState);
+			oState = xConfigAPI.createAggregationConfig(oControl, oXSettings, oState);
 
         });
 

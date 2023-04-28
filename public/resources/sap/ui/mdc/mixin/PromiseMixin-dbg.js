@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(
@@ -13,7 +13,7 @@ sap.ui.define(
 		 * Calling any of the enhanced methods after control exit will result in a no-op.
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @alias sap.ui.mdc.mixin.PromiseMixin
 		 * @namespace
 		 * @since 1.85.0
@@ -21,13 +21,13 @@ sap.ui.define(
 		 * @experimental
 		 * @ui5-restricted sap.ui.mdc
 		 *
-		 * @borrows sap.ui.mdc.util.PromiseCache.add as addPromise
-		 * @borrows sap.ui.mdc.util.PromiseCache.remove as removePromise
-		 * @borrows sap.ui.mdc.util.PromiseCache.resolve as resolvePromise
-		 * @borrows sap.ui.mdc.util.PromiseCache.reject as rejectPromise
-		 * @borrows sap.ui.mdc.util.PromiseCache.retrieve as retrievePromise
-		 * @borrows sap.ui.mdc.util.PromiseCache.retrieveMany as retrievePromises
-		*/
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.add as addPromise
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.remove as removePromise
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.resolve as resolvePromise
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.reject as rejectPromise
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.retrieve as retrievePromise
+		 * @borrows sap.ui.mdc.util.PromiseCache.prototype.retrieveMany as retrievePromises
+		 */
 		var PromiseMixin = {};
 		PromiseMixin.addPromise = function (sName, fnCreate) {
 			return this.promiseCache.add(sName, fnCreate);
@@ -50,7 +50,7 @@ sap.ui.define(
 		PromiseMixin.rejectPromise = function (sName, oValue) {
 			return this.promiseCache.reject(sName, oValue);
 		};
-		 /**
+		/**
 		 * Provides cleanup functionality for the controls promise cache
 		 *
 		 * @private

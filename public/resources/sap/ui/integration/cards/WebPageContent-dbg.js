@@ -1,14 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
+	"sap/m/IllustratedMessageType",
 	"./BaseContent",
 	"./WebPageContentRenderer",
 	"sap/ui/core/Core",
 	"sap/ui/integration/util/BindingHelper"
 ], function (
+	IllustratedMessageType,
 	BaseContent,
 	WebPageContentRenderer,
 	Core,
@@ -18,7 +20,6 @@ sap.ui.define([
 
 	var FRAME_LOADED = "_frameLoaded";
 	var LOAD_TIMEOUT = 15 * 1000; // wait maximum 15s for the frame to load
-	var oResourceBundle = Core.getLibraryResourceBundle("sap.ui.integration");
 
 	/**
 	 * Constructor for a new <code>WebPageContent</code>.
@@ -32,7 +33,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @experimental
@@ -108,15 +109,14 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
-	WebPageContent.prototype.setConfiguration = function (oConfiguration) {
-		BaseContent.prototype.setConfiguration.apply(this, arguments);
-		oConfiguration = this.getParsedConfiguration();
+	WebPageContent.prototype.applyConfiguration = function () {
+		var oConfiguration = this.getParsedConfiguration();
 
 		//workaround until actions refactor
 		this.fireEvent("_actionContentReady"); // todo
 
 		if (!oConfiguration) {
-			return this;
+			return;
 		}
 
 		var oSrcBinding = BindingHelper.formattedProperty(oConfiguration.src, function (sValue) {
@@ -138,26 +138,31 @@ sap.ui.define([
 		} else {
 			this.setMinHeight(oConfiguration.minHeight);
 		}
-
-		return this;
 	};
 
 	WebPageContent.prototype._checkSrc = function () {
-		var sCurrSrc = this.getSrc();
+		var oCard = this.getCardInstance(),
+			sCurrSrc = this.getSrc();
+
+		if (!oCard) {
+			return;
+		}
 
 		if (sCurrSrc === "") {
-			this.handleError(
-				"Src of WebPage content is empty",
-				oResourceBundle.getText("CARD_WEB_PAGE_EMPTY_URL_ERROR")
-			);
+			this.handleError({
+				type: IllustratedMessageType.ErrorScreen,
+				title: oCard.getTranslatedText("CARD_WEB_PAGE_EMPTY_URL_ERROR"),
+				description: oCard.getTranslatedText("CARD_ERROR_CONFIGURATION_DESCRIPTION")
+			});
 			return;
 		}
 
 		if (!sCurrSrc.startsWith("https://")) {
-			this.handleError(
-				"Please use a secure URL (https://)",
-				oResourceBundle.getText("CARD_WEB_PAGE_HTTPS_URL_ERROR")
-			);
+			this.handleError({
+				type: IllustratedMessageType.ErrorScreen,
+				title: oCard.getTranslatedText("CARD_WEB_PAGE_HTTPS_URL_ERROR"),
+				description: oCard.getTranslatedText("CARD_ERROR_REQUEST_ACCESS_DENIED_DESCRIPTION")
+			});
 			return;
 		}
 
@@ -174,12 +179,14 @@ sap.ui.define([
 		this.awaitEvent(FRAME_LOADED);
 
 		this._iLoadTimeout = setTimeout(function () {
-			var iSeconds = LOAD_TIMEOUT / 1000;
+			var iSeconds = LOAD_TIMEOUT / 1000,
+				oCard = this.getCardInstance();
 
-			this.handleError(
-				"Failed to load '" + this.getSrc() + "' after " + iSeconds + " seconds.",
-				oResourceBundle.getText("CARD_WEB_PAGE_TIMEOUT_ERROR", [iSeconds])
-			);
+			this.handleError({
+				type: IllustratedMessageType.ReloadScreen,
+				title: oCard.getTranslatedText("CARD_WEB_PAGE_TIMEOUT_ERROR", [iSeconds]),
+				details: "Failed to load '" + this.getSrc() + "' after " + iSeconds + " seconds."
+			});
 		}.bind(this), LOAD_TIMEOUT);
 	};
 

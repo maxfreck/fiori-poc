@@ -2,7 +2,7 @@
 
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -1645,6 +1645,20 @@ html[data-sap-ui-os^="iOS"] {
 		color: @sapUiListTextColor;
 	}
 }
+
+.sapUiSizeCompact .sapMListTblCell,
+.sapUiSizeCozy .sapMListTblCell {
+	.sapMObjStatus.sapMObjStatusInverted {
+
+		.sapMObjStatusIcon{
+			vertical-align: middle;
+		}
+
+		.sapMObjStatusText {
+			line-height: 0.875rem;
+		}
+	}
+}
 /* END "ObjectStatus.less" */
 
 /* START "OverflowToolbarAssociativePopover.less" */
@@ -2613,10 +2627,10 @@ html.sap-desktop {
 	background: transparent;
 	border: 0.125rem solid @sapUiFieldBorderColor;
 	&:focus:before {
-		top: -5px;
-		bottom: -5px;
-		left: -5px;
-		right: -5px;
+		top: -0.3125rem;
+		bottom: -0.3125rem;
+		left: -0.3125rem;
+		right: -0.3125rem;
 	}
 }
 

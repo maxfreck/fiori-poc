@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,6 +11,7 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/Applier",
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
 	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/variants/VariantModel",
 	"sap/base/Log",
 	"sap/ui/performance/Measurement"
@@ -21,6 +22,7 @@ sap.ui.define([
 	Applier,
 	FlexState,
 	ManifestUtils,
+	ControlVariantApplyAPI,
 	VariantModel,
 	Log,
 	Measurement
@@ -32,7 +34,7 @@ sap.ui.define([
 	 * @alias sap.ui.fl.FlexControllerFactory
 	 * @experimental Since 1.27.0
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.fl
@@ -44,6 +46,7 @@ sap.ui.define([
 	// in this object a promise is stored for every application component instance
 	// if the same instance is initialized twice the promise is replaced
 	FlexControllerFactory._componentInstantiationPromises = new WeakMap();
+	var oEmbeddedComponentsPromises = {};
 
 	/**
 	 * Creates or returns an instance of the FlexController
@@ -109,7 +112,6 @@ sap.ui.define([
 				return Promise.resolve(oResult);
 			}
 
-			window.sessionStorage.removeItem("sap.ui.rta.restart." + Layer.CUSTOMER);
 			return new Promise(function (resolve, reject) {
 				Promise.all([
 					sap.ui.getCore().loadLibrary("sap.ui.rta", {async: true}),
@@ -146,35 +148,38 @@ sap.ui.define([
 			var sComponentId = oComponent.getId();
 			// TODO: remove this line when the maps and filtered response are always up to data
 			// Currently with the variants the maps are out of sync when the app gets loaded again without complete reload
-			FlexState.clearFilteredResponse(ManifestUtils.getFlexReferenceForControl(oComponent));
+			FlexState.rebuildFilteredResponse(ManifestUtils.getFlexReferenceForControl(oComponent));
 			var oReturnPromise = FlexState.initialize({
 				componentId: sComponentId,
 				asyncHints: vConfig.asyncHints
-			}).then(_propagateChangesForAppComponent.bind(this, oComponent));
+			})
+				.then(_propagateChangesForAppComponent.bind(this, oComponent))
+				.then(function() {
+					// update any potential embedded component waiting for this app component
+					if (oEmbeddedComponentsPromises[sComponentId]) {
+						oEmbeddedComponentsPromises[sComponentId].forEach(function(oEmbeddedComponent) {
+							var oVariantModel = oComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+							oEmbeddedComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+						});
+						delete oEmbeddedComponentsPromises[sComponentId];
+					}
+				});
 			FlexControllerFactory._componentInstantiationPromises.set(oComponent, oReturnPromise);
+
 			return oReturnPromise;
 		} else if (Utils.isEmbeddedComponent(oComponent)) {
 			var oAppComponent = Utils.getAppComponentForControl(oComponent);
 			// Some embedded components might not have an app component, e.g. sap.ushell.plugins.rta, sap.ushell.plugins.rta-personalize
 			if (oAppComponent && Utils.isApplicationComponent(oAppComponent)) {
-				var oInitialPromise = Promise.resolve();
+				// once the VModel is set to the outer component it also has to be set to any embedded component
 				if (FlexControllerFactory._componentInstantiationPromises.has(oAppComponent)) {
-					oInitialPromise = FlexControllerFactory._componentInstantiationPromises.get(oAppComponent);
+					return FlexControllerFactory._componentInstantiationPromises.get(oAppComponent).then(function() {
+						var oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+						oComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
+					});
 				}
-				return oInitialPromise.then(function() {
-					var oExistingVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
-					if (!oExistingVariantModel) {
-						// If variant model is not present on the app component
-						// then a new variant model should be set on it.
-						// Setting a variant model will ensure that at least a standard variant will exist
-						// for all variant management controls.
-						return _propagateChangesForAppComponent(oAppComponent);
-					}
-					return oExistingVariantModel;
-				}).then(function (oVariantModel) {
-					// set app component's variant model on the embedded component
-					oComponent.setModel(oVariantModel, Utils.VARIANT_MODEL_NAME);
-				});
+				oEmbeddedComponentsPromises[oAppComponent.getId()] = oEmbeddedComponentsPromises[oAppComponent.getId()] || [];
+				oEmbeddedComponentsPromises[oAppComponent.getId()].push(oComponent);
 			}
 			return Promise.resolve();
 		}
@@ -206,7 +211,7 @@ sap.ui.define([
 			return oVariantModel.initialize();
 		})
 		.then(function() {
-			oAppComponent.setModel(oVariantModel, Utils.VARIANT_MODEL_NAME);
+			oAppComponent.setModel(oVariantModel, ControlVariantApplyAPI.getVariantModelName());
 			Measurement.end("flexProcessing");
 			return oVariantModel;
 		}).then(function (oResult) {

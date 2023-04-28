@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -68,7 +68,7 @@ function (
 	 * @extends sap.ui.base.ManagedObject
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -378,6 +378,8 @@ function (
 			return;
 		}
 
+		this._aOverlaysCreatedInLastBatch = [];
+
 		// TODO: get rid of this temporary solution with UICSFLEX-3718 BLI
 		var iTaskId = this._oTaskManager.add({
 			type: "registerElementOverlays"
@@ -443,7 +445,6 @@ function (
 			}
 		}, this);
 
-		this._aOverlaysCreatedInLastBatch = [];
 		this._oTaskManager.complete(iTaskId);
 	};
 
@@ -467,15 +468,6 @@ function (
 
 		this._aOverlaysCreatedInLastBatch = [];
 		delete this._bDestroyPending;
-	};
-
-	/**
-	 * Returns array with current selected overlays
-	 * @return {sap.ui.dt.Overlay[]} selected overlays
-	 * @deprecated
-	 */
-	DesignTime.prototype.getSelection = function () {
-		return this.getSelectionManager().get();
 	};
 
 	/**

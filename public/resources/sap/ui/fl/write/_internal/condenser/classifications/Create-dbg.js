@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -24,15 +24,18 @@ sap.ui.define([
 		addToReconstructionMap: function(mUIReconstructions, oCondenserInfo) {
 			var oAffectedControl = Core.byId(oCondenserInfo.affectedControl);
 			var sAggregationName = oCondenserInfo.targetAggregation || oAffectedControl && oAffectedControl.sParentAggregationName;
-			return CondenserUtils.getContainerElementIds(oCondenserInfo.targetContainer, sAggregationName)
-				.then(function (aTargetContainerElementIds) {
-					var aContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(mUIReconstructions, oCondenserInfo.targetContainer, oCondenserInfo.targetAggregation, aTargetContainerElementIds);
-					var iIndex = aContainerElementIds.indexOf(oCondenserInfo.affectedControl);
-					// if the index is -1 the element was already removed by a different add change
-					if (iIndex > -1) {
-						aContainerElementIds.splice(iIndex, 1);
-					}
-				});
+			return CondenserUtils.getContainerElementIds(
+				oCondenserInfo.targetContainer, sAggregationName,
+				oCondenserInfo.customAggregation, oCondenserInfo.affectedControlIdProperty
+			)
+			.then(function (aTargetContainerElementIds) {
+				var aContainerElementIds = CondenserUtils.getInitialUIContainerElementIds(mUIReconstructions, oCondenserInfo.targetContainer, oCondenserInfo.targetAggregation, aTargetContainerElementIds);
+				var iIndex = aContainerElementIds.indexOf(oCondenserInfo.affectedControl);
+				// if the index is -1 the element was already removed by a different add change
+				if (iIndex > -1) {
+					aContainerElementIds.splice(iIndex, 1);
+				}
+			});
 		},
 
 		/**

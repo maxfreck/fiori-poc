@@ -1,13 +1,15 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	"sap/ui/core/Core",
+	"sap/ui/Device",
 	"sap/m/table/columnmenu/Item"
 ], function(
 	Core,
+	Device,
 	ItemBase
 ) {
 	"use strict";
@@ -36,18 +38,19 @@ sap.ui.define([
 			oTable.getInbuiltFilter().setVisibleFields(aPropertyNames);
 		}
 
-		return oTable.getEngine().uimanager.create(oTable, [sKey]).then(function(oDialog) {
-			var oContent = oDialog.removeContent(0);
-			oDialog.destroy();
+		return oTable.getEngine().uimanager.create(oTable, [sKey]).then(function(aPanels) {
+			if (!Device.system.phone) {
+				aPanels[0].setProperty("_useFixedWidth", true);
+			}
 
-			this.setContent(oContent);
+			this.setContent(aPanels[0]);
 			this.setLabel(oController.getUISettings().title);
 
 			oController.update(oTable.getPropertyHelper());
 			oEngine.validateP13n(oTable, sKey, this.getContent());
 
 			this.changeButtonSettings({
-				reset: {visible: oController.getResetEnabled()}
+				reset: {visible: true}//TODO
 			});
 		}.bind(this));
 	};
@@ -73,7 +76,7 @@ sap.ui.define([
 
 	Item.prototype.destroyContent = function() {
 		// The AdaptationFilterBar must not be destroyed! A new one cannot be created.
-		if (this.getKey() !== "Filter") {
+		if (this.getKey() === "Filter") {
 			return this;
 		}
 		return this.destroyAggregation("content");

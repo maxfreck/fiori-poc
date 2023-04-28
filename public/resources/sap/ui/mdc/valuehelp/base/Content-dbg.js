@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,15 +28,18 @@ sap.ui.define([
 	/**
 	 * Constructor for a new <code>Content</code>.
 	 *
+	 * This is the basis for different value help contents. It cannot be used directly.
+	 *
 	 * @param {string} [sId] ID for the new element, generated automatically if no ID is given
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element.
 	 * @extends sap.ui.core.Element
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.base.Content
@@ -279,6 +282,18 @@ sap.ui.define([
 	};
 
 	/**
+	 * Getter for the initial focusable <code>control</code> on the panel.
+	 *
+	 * @returns {sap.ui.core.Control} Control instance which could get the focus.
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 */
+	Content.prototype.getInitialFocusedControl = function() {
+		return null;
+	};
+
+	/**
 	 * Called if the content will be hidden.
 	 *
 	 * @private
@@ -305,18 +320,16 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [oConfig.bindingContext] <code>BindingContext</code> of the checked field. Inside a table the <code>ValueHelp</code> element might be connected to a different row.
 	 * @param {boolean} oConfig.checkKey If set, the value help checks only if there is an item with the given key. This is set to <code>false</code> if the value cannot be a valid key because of type validation.
 	 * @param {boolean} oConfig.checkDescription If set, the value help checks only if there is an item with the given description. This is set to <code>false</code> if only the key is used in the field.
-	 * @param {sap.ui.mdc.condition.ConditionModel} [oConfig.conditionModel] <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, in case of <code>FilterField</code>
 	 * @param {boolean} [oConfig.caseSensitive] If set, the check is done case sensitive
 	 * @param {sap.ui.core.Control} oConfig.control Instance of the calling control
-	 * @returns {Promise<sap.ui.mdc.field.FieldHelpItem>} Promise returning object containing description, key, in and out parameters.
+	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key and payload.
 	 * @throws {sap.ui.model.FormatException|sap.ui.model.ParseException} if entry is not found or not unique
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.valuehelp.base.Container
 	 */
 	Content.prototype.getItemForValue = function (oConfig) {
-
+		return undefined;
 	};
 
 	/**
@@ -351,7 +364,18 @@ sap.ui.define([
 	};
 
 	Content.prototype._handleFilterValueUpdate = function(oChanges) {
+		if (this.isContainerOpen() && this.isTypeahead()) {
+			var oDelegate = this._getValueHelpDelegate();
+			var oDelegatePayload = this._getValueHelpDelegatePayload();
 
+			// Everytime the filterValue changes, we consult the delegate again to decide if the typeahead should still be shown or hidden via a cancel event
+			// Please also see the default implementation of sap.ui.mdc.ValueHelpDelegate.showTypeahead
+			Promise.resolve(!!oDelegate && oDelegate.showTypeahead(oDelegatePayload, this)).then(function (bShowTypeahead) {
+				if (!bShowTypeahead) {
+					this.fireCancel();
+				}
+			}.bind(this));
+		}
 	};
 
 	Content.prototype._handleConditionsUpdate = function(oChanges) {

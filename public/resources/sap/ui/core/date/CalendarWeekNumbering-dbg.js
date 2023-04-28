@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -68,6 +68,38 @@ sap.ui.define([], function() {
 		 */
 		WesternTraditional : "WesternTraditional"
 	};
+
+	/**
+	 * Returns an object containing the week configuration values for the given calendar week
+	 * numbering algorithm.
+	 *
+	 * @param {sap.ui.core.date.CalendarWeekNumbering} [sCalendarWeekNumbering=Default]
+	 *   The calendar week numbering algorithm
+	 * @returns {{firstDayOfWeek: int, minimalDaysInFirstWeek: int}|undefined}
+	 *   The week configuration values or <code>undefined</code> if the given calendar week
+	 *   numbering algorithm is "Default"
+	 *
+	 * @function
+	 * @name sap.ui.core.date.CalendarWeekNumbering.getWeekConfigurationValues
+	 * @private
+	 */
+	Object.defineProperty(CalendarWeekNumbering, "getWeekConfigurationValues", {
+		// configurable : false,
+		// enumerable : false,
+		value : function (sCalendarWeekNumbering) {
+			switch (sCalendarWeekNumbering) {
+				case CalendarWeekNumbering.ISO_8601 :
+					return {firstDayOfWeek : 1, minimalDaysInFirstWeek : 4};
+				case CalendarWeekNumbering.MiddleEastern :
+					return {firstDayOfWeek : 6, minimalDaysInFirstWeek : 1};
+				case CalendarWeekNumbering.WesternTraditional :
+					return {firstDayOfWeek : 0, minimalDaysInFirstWeek : 1};
+				default:
+					return undefined;
+			}
+		}
+		// writable : false
+	});
 
 	return CalendarWeekNumbering;
 }, /* bExport= */ true);

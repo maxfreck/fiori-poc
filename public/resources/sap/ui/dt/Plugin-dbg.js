@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,7 +26,7 @@ function(
 	 * @extends sap.ui.base.ManagedObject
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -171,7 +171,7 @@ function(
 	 */
 	Plugin.prototype.callAggregationOverlayRegistrationMethods = function(oElementOverlay) {
 		if (this.registerAggregationOverlay) {
-			var aAggregationOverlays = oElementOverlay.getAggregationOverlays();
+			var aAggregationOverlays = oElementOverlay.getChildren();
 			aAggregationOverlays.forEach(this.registerAggregationOverlay.bind(this));
 		}
 	};
@@ -198,7 +198,7 @@ function(
 		}
 
 		if (this.deregisterAggregationOverlay) {
-			var aAggregationOverlays = oElementOverlay.getAggregationOverlays();
+			var aAggregationOverlays = oElementOverlay.getChildren();
 			aAggregationOverlays.forEach(this.deregisterAggregationOverlay.bind(this));
 		}
 	};

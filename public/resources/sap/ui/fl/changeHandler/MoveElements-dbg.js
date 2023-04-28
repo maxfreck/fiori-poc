@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,7 +18,7 @@ sap.ui.define([
 	 *
 	 * @alias sap.ui.fl.changeHandler.MoveElements
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @experimental Since 1.34.0
 	 */
 	var MoveElements = { };
@@ -84,7 +84,7 @@ sap.ui.define([
 	/**
 	 * Moves an element from one aggregation to another.
 	 *
-	 * @param {sap.ui.fl.Change} oChange change object with instructions to be applied on the control map
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange change object with instructions to be applied on the control map
 	 * @param {sap.ui.core.Control} oSourceParent control that matches the change selector for applying the change, which is the source of the move
 	 * @param {object} mPropertyBag - map of properties
 	 * @param {object} mPropertyBag.view - xml node representing a ui5 view

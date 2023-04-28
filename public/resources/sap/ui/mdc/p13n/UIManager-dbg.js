@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,7 +33,7 @@ sap.ui.define([
 	 * @extends sap.ui.base.Object
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
@@ -471,7 +471,7 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.AdaptationProvider} oAdaptationProvider
 	 */
 	 UIManager._checkValidInterface = function(oAdaptationProvider) {
-		if (!oAdaptationProvider || !oAdaptationProvider.isA("sap.ui.mdc.p13n.AdaptationProvider")){
+		if (!oAdaptationProvider || !(oAdaptationProvider.isA("sap.ui.mdc.p13n.AdaptationProvider") || oAdaptationProvider.isA("sap.m.p13n.modules.AdaptationProvider")) ){
 			throw Error("The UIManager singleton must not be accessed without an AdaptationProvider interface!");
 		}
 	};
@@ -481,7 +481,6 @@ sap.ui.define([
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
-	 *
 	 */
 	UIManager.getInstance = function(oAdaptationProvider) {
 		if (!oUIManager) {

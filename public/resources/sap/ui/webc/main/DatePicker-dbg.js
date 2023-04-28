@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -76,7 +76,7 @@ sap.ui.define([
 	 * &lt;/script&gt;</code></pre>
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -332,7 +332,7 @@ sap.ui.define([
 
 	/**
 	 * Formats a Java Script date object into a string representing a locale date according to the <code>formatPattern</code> property of the DatePicker instance
-	 * @param {object} date A Java Script date object to be formatted as string
+	 * @param {Date} date A Java Script date object to be formatted as string
 	 * @public
 	 * @name sap.ui.webc.main.DatePicker#formatValue
 	 * @function

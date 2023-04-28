@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -81,7 +81,7 @@ sap.ui.define([],
 				oTabStripSelectedItem = oControl._toTabStripItem(sSelectedItemId);
 				if (oTabStripSelectedItem) {
 					// use aria prefixes as those properties can be used outside RenderManager.writeAccessabilityState method
-					mAccAttributes["aria-labelledby"] = oTabStripSelectedItem.getId();
+					mAccAttributes["labelledby"] = oTabStripSelectedItem.getId();
 				}
 			}
 			return mAccAttributes;

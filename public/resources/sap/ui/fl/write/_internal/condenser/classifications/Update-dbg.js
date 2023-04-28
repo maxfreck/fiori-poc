@@ -1,12 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
+	"sap/base/util/each"
 ], function(
-
+	each
 ) {
 	"use strict";
 
@@ -17,7 +18,7 @@ sap.ui.define([
 		 *
 		 * @param {Map} mProperties - Map with all reduced changes
 		 * @param {string} oCondenserInfo - Condenser information
-		 * @param {sap.ui.fl.Change} oChange - Change instance
+		 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - Change instance
 		 */
 		addToChangesMap: function(mProperties, oCondenserInfo, oChange) {
 			if (!mProperties[oCondenserInfo.uniqueKey]) {
@@ -27,6 +28,14 @@ sap.ui.define([
 			} else {
 				oChange.condenserState = "delete";
 			}
+		},
+
+		getChangesFromMap: function(mObjects, sUniqueKey) {
+			var aChanges = [];
+			each(mObjects[sUniqueKey], function(sKey, oCondenserInfo) {
+				aChanges.push(oCondenserInfo.change);
+			});
+			return aChanges;
 		}
 	};
 });

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -19,7 +19,7 @@ sap.ui.define([
 	 * @namespace
 	 * @name sap.ui.fl.descriptorRelated
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.rta, smart business
 	 */
@@ -29,7 +29,7 @@ sap.ui.define([
 	 * @namespace
 	 * @name sap.ui.fl.descriptorRelated.api
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.rta, smart business
 	 */
@@ -43,7 +43,7 @@ sap.ui.define([
 	 * @constructor
 	 * @alias sap.ui.fl.descriptorRelated.api.DescriptorChange
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.rta, smart business
 	 */
@@ -124,7 +124,7 @@ sap.ui.define([
 	 * @constructor
 	 * @alias sap.ui.fl.descriptorRelated.api.DescriptorChangeFactory
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.rta, smart business
 	 */

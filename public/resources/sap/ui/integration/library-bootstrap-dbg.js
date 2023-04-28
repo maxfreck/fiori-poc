@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 (function (window) {
@@ -45,7 +45,7 @@
 	}
 
 	function initTags() {
-		coreInstance.loadLibraries(["sap/ui/integration"], {
+		coreInstance.loadLibrary("sap.ui.integration", {
 			async: true
 		}).then(function () {
 			//register the tags for this library

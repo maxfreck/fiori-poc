@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -24,13 +24,13 @@ sap.ui.define([
 	 * The <code>RowActionItem</code> control represents a action for a row.
 	 * This control can only be used in the context of <code>sap.ui.mdc.Table</code> control to define row actions.
 	 * @extends sap.ui.core.Element
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.fe
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @alias sap.ui.mdc.table.RowActionItem
 	 */
 
@@ -113,6 +113,12 @@ sap.ui.define([
 			oIcon = IconPool.getIconURI(mThemeParameters["navigationIcon"]);
 		}
 		return oIcon;
+	};
+
+	RowActionItem.prototype._onPress = function(mPropertyBag) {
+		this.firePress({
+			bindingContext: mPropertyBag.bindingContext
+		});
 	};
 
 	return RowActionItem;

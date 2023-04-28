@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -145,7 +145,7 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/ui/core/Core", "sap/ui/core/Invisibl
 				rm.class(clsPrefix + "SelCol");
 				rm.attr("role", "presentation");
 				rm.openEnd();
-				rm.renderControl(oTable.getMultiSelectMode() == MultiSelectMode.Default ? oTable._getSelectAllCheckbox() : oTable._getClearAllButton());
+				rm.renderControl(oTable.getMultiSelectMode() == MultiSelectMode.ClearAll ? oTable._getClearAllButton() : oTable._getSelectAllCheckbox());
 				rm.close("th");
 				index++;
 			} else {

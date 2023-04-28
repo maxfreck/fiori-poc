@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,7 +18,10 @@
 	}
 
 sap.ui.define([
+	'sap/base/util/extend',
+	'sap/base/util/ObjectPath',
 	'sap/ui/thirdparty/jquery',
+	'sap/ui/Global',
 	'sap/ui/base/Object',
 	'sap/ui/core/Element',
 	'sap/ui/core/mvc/View',
@@ -26,7 +29,7 @@ sap.ui.define([
 	'sap/ui/test/matchers/MatcherFactory',
 	'sap/ui/test/pipelines/MatcherPipeline',
 	'sap/ui/test/_OpaLogger'
-], function ($, UI5Object, UI5Element, View, Ancestor, MatcherFactory,
+], function (extend, ObjectPath, $, Global, UI5Object, UI5Element, View, Ancestor, MatcherFactory,
 			MatcherPipeline, _OpaLogger) {
 
 		/**
@@ -50,7 +53,7 @@ sap.ui.define([
 			 *
 			 * @param {Function} [fnConstructorType] the control type, e.g: sap.m.CheckBox
 			 * @param {string} [sControlType] optional control type name, e.g: "sap.m.CheckBox"
-			 * @returns {Array} an array of the found controls (can be empty)
+			 * @returns {Array<sap.ui.core.Element>} an array of the found controls (can be empty)
 			 * @public
 			 */
 			getAllControls : function (fnConstructorType, sControlType) {
@@ -128,8 +131,13 @@ sap.ui.define([
 			 * eg : { viewName : "bar", viewNamespace : "baz." } will return all the Controls in the view with the name baz.bar<br/>
 			 * eg : { viewId : "viewBar" } will return all the controls inside the view with the ID viewBar<br/>
 			 *
-			 * @param {object} oOptions can contain a viewName, viewNamespace, viewId, fragmentId, id and controlType properties.
-			 * oOptions.id can be string, array or regular expression
+			 * @param {object} options can contain a viewName, viewNamespace, viewId, fragmentId, id and controlType properties.
+			 * @param {string} [options.viewName]
+			 * @param {string} [options.viewNamespace]
+			 * @param {string} [options.viewId]
+			 * @param {string} [options.fragmentId]
+			 * @param {string|RegExp|Array<string|RegExp>} [options.id]
+			 * @param {function} [options.controlType]
 			 * @returns {sap.ui.core.Element|sap.ui.core.Element[]|null}
 			 * If oOptions.id is a string, will return the control with such an ID or null.<br/>
 			 * If the view is not found or no control matches the given criteria, will return an empty array <br/>
@@ -419,7 +427,7 @@ sap.ui.define([
 			 */
 			_getFilteredControls : function(oOptions) {
 				var vControl = this._filterControlsByCondition(oOptions);
-				var oFilterOptions = $.extend({}, oOptions);
+				var oFilterOptions = extend({}, oOptions);
 
 				// when on the root level of oOptions, these options are already processed (see _filterControlsByCondition) and should not be processed again,
 				// as this results in error when no controls are passed to the matcher pipeline (see _filterControlsByMatchers)
@@ -456,7 +464,7 @@ sap.ui.define([
 
 			// instantiate any matchers with declarative syntax and run controls through matcher pipeline
 			_filterControlsByMatchers: function (oOptions, vControl) {
-				var oOptionsWithMatchers = $.extend({}, oOptions);
+				var oOptionsWithMatchers = extend({}, oOptions);
 				var aMatchers = this._oMatcherFactory.getFilteringMatchers(oOptionsWithMatchers);
 				var bPluginLooksForControls = this._isLookingForAControl(oOptions);
 				var vResult = null;
@@ -556,12 +564,12 @@ sap.ui.define([
 			 * @public
 			 */
 			getControlConstructor : function (sControlType) {
-				if (sap.ui.lazyRequire._isStub(sControlType)) {
+				if (isLazyStub(sControlType)) {
 					this._oLogger.debug("The control type " + sControlType + " is currently a lazy stub.");
 					return null;
 				}
 
-				var fnControlType = $.sap.getObject(sControlType);
+				var fnControlType = ObjectPath.get(sControlType);
 
 				// no control type
 				if (!fnControlType) {
@@ -642,6 +650,24 @@ sap.ui.define([
 				return sUnprefixedControlId;
 			}
 		});
+
+		/**
+		 * Checks whether the given class name is still a lazy stub.
+		 * In future, there won't be lazy stubs, that's the default implementation of this helper.
+		 * Only when sap.ui.lazyRequire._isStub still exists, this method will check something.
+		 * @param {string} sClassName
+		 * @private
+		 */
+		var isLazyStub = function isLazyStub(sClassName) {
+			return false;
+		};
+
+		/**
+		 * @deprecated since 1.56 as lazy loading implies sync loading
+		 */
+		if ( Global.lazyRequire && typeof Global.lazyRequire._isStub === "function" ) {
+			isLazyStub = Global.lazyRequire._isStub;
+		}
 
 		/**
 		 * Creates a filter function that returns true when a given element

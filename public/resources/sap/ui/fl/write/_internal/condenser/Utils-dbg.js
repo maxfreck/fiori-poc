@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -63,18 +63,20 @@ sap.ui.define([
 	 * Retrieves the aggregation from the container instance and returns all the Ids of the controls
 	 *
 	 * @param {string} sContainerId - Container Id
-	 * @param {string} sAggregationName Name of the aggregation
+	 * @param {string} sAggregationName - Name of the aggregation
+	 * @param {object} [aCustomAggregation] - Custom Aggregation
+	 * @param {string} [sAffectedControlIdProperty] - Property name of the ID used for the container element
 	 * @returns {Promise<string[]>} Array of Ids wrapped in Promise
 	 */
-	Utils.getContainerElementIds = function(sContainerId, sAggregationName) {
+	Utils.getContainerElementIds = function(sContainerId, sAggregationName, aCustomAggregation, sAffectedControlIdProperty) {
 		var oContainer = Core.byId(sContainerId);
-		return Promise.resolve()
-			.then(JsControlTreeModifier.getAggregation.bind(JsControlTreeModifier, oContainer, sAggregationName))
-			.then(function (aContainerElements) {
-				return aContainerElements.map(function(oElement) {
-					return oElement.getId();
-				});
+
+		return Promise.resolve(aCustomAggregation || JsControlTreeModifier.getAggregation(oContainer, sAggregationName))
+		.then(function(aContainerElements) {
+			return aContainerElements.map(function(oElement) {
+				return sAffectedControlIdProperty ? oElement[sAffectedControlIdProperty] : oElement.getId();
 			});
+		});
 	};
 
 	/**

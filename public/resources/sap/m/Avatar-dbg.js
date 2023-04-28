@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,8 +14,9 @@ sap.ui.define([
     "sap/base/Log",
     "sap/ui/core/Icon",
     "./library",
-	"sap/ui/core/library"
-], function(Control, IconPool, AvatarRenderer, KeyCodes, Log, Icon, library, coreLibrary) {
+	"sap/ui/core/library",
+	'sap/ui/core/InvisibleText'
+], function(Control, IconPool, AvatarRenderer, KeyCodes, Log, Icon, library, coreLibrary, InvisibleText) {
 	"use strict";
 
 	// shortcut for sap.m.AvatarType
@@ -80,7 +81,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -272,6 +273,7 @@ sap.ui.define([
 
 		//Reference to badge hidden aggregation
 		this._badgeRef = null;
+
 	};
 
 	Avatar.prototype.onAfterRendering = function() {
@@ -289,6 +291,11 @@ sap.ui.define([
 
 		if (this._badgeRef) {
 			this._badgeRef.destroy();
+		}
+
+		if (this._oInvisibleText) {
+			this._oInvisibleText.destroy();
+			this._oInvisibleText = null;
 		}
 
 		this._sPickedRandomColor = null;
@@ -432,7 +439,7 @@ sap.ui.define([
 	 * @private
 	 */
 	 Avatar.prototype._areInitialsValid = function (sInitials) {
-		var validInitials = /^[a-zA-Z]{1,3}$/;
+		var validInitials = /^[a-zA-Z\xc0-\xd6\xd8-\xdc\xe0-\xf6\xf8-\xfc]{1,3}$/;
 		if (!validInitials.test(sInitials)) {
 			Log.warning("Initials should consist of only 1,2 or 3 latin letters", this);
 			this._sActualType = AvatarType.Icon;
@@ -712,6 +719,28 @@ sap.ui.define([
 
 		$this.removeClass("sapFAvatarInitials");
 		$this.addClass("sapFAvatarIcon");
+	};
+
+	Avatar.prototype._getInvisibleText = function() {
+
+		if (!this._oInvisibleText && this.sInitials) {
+			this._oInvisibleText = new InvisibleText({ id: this.getId() + "-InvisibleText"});
+			this._oInvisibleText.setText(this.sInitials).toStatic();
+		}
+
+		return this._oInvisibleText;
+	};
+
+	Avatar.prototype._getAriaLabelledBy = function () {
+		var aLabelledBy = this.getAriaLabelledBy(),
+			sInitialsAriaLabelledBy;
+			this.sInitials = this.getInitials();
+
+		if (this.sInitials && aLabelledBy.length > 0) {
+			sInitialsAriaLabelledBy = this._getInvisibleText().getId();
+			aLabelledBy.push(sInitialsAriaLabelledBy);
+		}
+		return aLabelledBy;
 	};
 
 	return Avatar;

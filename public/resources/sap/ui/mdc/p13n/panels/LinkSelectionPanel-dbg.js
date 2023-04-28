@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -90,7 +90,8 @@ sap.ui.define([
 	};
 
     LinkSelectionPanel.prototype._onLinkPressed = function(oEvent) {
-        if (oEvent.getSource().getTarget() !== "_blank") {
+        var bCtrlKeyPressed = oEvent.getParameters().ctrlKey || oEvent.getParameters().metaKey;
+        if (oEvent.getSource().getTarget() !== "_blank" && !bCtrlKeyPressed) {
             oEvent.preventDefault();
             this.fireLinkPressed(oEvent);
         }

@@ -1,14 +1,16 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
+	"sap/ui/base/ManagedObject",
 	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
 	"sap/ui/fl/initial/_internal/Storage",
 	"sap/ui/fl/Utils"
 ], function(
+	ManagedObject,
 	ManifestUtils,
 	ApplyStorage,
 	Utils
@@ -55,6 +57,26 @@ sap.ui.define([
 		return mFlexData;
 	}
 
+	function filterInvalidFileNames(mFlexData) {
+		[
+			"changes",
+			"variantChanges",
+			"variantDependentControlChanges",
+			"variantManagementChanges"
+		].forEach(function(sKey) {
+			mFlexData[sKey] = mFlexData[sKey].filter(function(oFlexItem) {
+				try {
+					var oTemporaryInstance = new ManagedObject(oFlexItem.fileName);
+				} catch (error) {
+					return false;
+				}
+				oTemporaryInstance.destroy();
+				return true;
+			});
+		});
+		return mFlexData;
+	}
+
 	function isMigrationNeeded(oManifest) {
 		return oManifest && !!ManifestUtils.getOvpEntry(oManifest);
 	}
@@ -73,7 +95,7 @@ sap.ui.define([
 	 * @namespace sap.ui.fl.apply._internal.flexState.Loader
 	 * @experimental
 	 * @since 1.74
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.apply._internal.flexState
 	 */
@@ -119,7 +141,10 @@ sap.ui.define([
 				appDescriptor: mPropertyBag.manifest.getRawJson ? mPropertyBag.manifest.getRawJson() : mPropertyBag.manifest,
 				version: mPropertyBag.version,
 				allContexts: mPropertyBag.allContexts
-			}).then(migrateSelectorFlags.bind(undefined, isMigrationNeeded(mPropertyBag.manifest))).then(formatFlexData);
+			})
+			.then(filterInvalidFileNames.bind())
+			.then(migrateSelectorFlags.bind(undefined, isMigrationNeeded(mPropertyBag.manifest)))
+			.then(formatFlexData);
 		}
 	};
 });

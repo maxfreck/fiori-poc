@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -22,7 +22,7 @@ sap.ui.define(["sap/ui/base/DataType"], function(DataType) {
 	 * - There is no concept for public or protected hooks. Never expose a hook directly, only indirectly as can be seen in the examples.
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @namespace
 	 * @alias sap.ui.table.utils._HookUtils
 	 *

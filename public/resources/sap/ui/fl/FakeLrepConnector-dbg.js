@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -113,19 +113,9 @@ sap.ui.define([
 				oStorage.setItem(sFlexKey, sItem);
 			},
 			getNumberOfChanges: function(oStorage, sReference) {
-				var iCount = 0;
-				Object.keys(oStorage).map(function(sKey) {
-					var bIsFlexObject = sKey.includes(FL_PREFIX);
-
-					if (!bIsFlexObject) {
-						return;
-					}
-					var oFlexObject = JSON.parse(oStorage.getItem(sKey));
-					if (oFlexObject.reference === sReference || oFlexObject.reference + ".Component" === sReference) {
-						iCount++;
-					}
-				});
-				return iCount;
+				return Object.keys(oStorage).filter(function(sKey) {
+					return sKey.includes(FL_PREFIX) && ObjectStorageUtils.isSameReference(JSON.parse(oStorage.getItem(sKey)), sReference);
+				}).length;
 			}
 		}
 	};

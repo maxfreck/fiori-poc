@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,7 +33,7 @@ function(
 	 * @extends sap.ui.dt.plugin.ControlDragDrop
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -121,7 +121,7 @@ function(
 			oOverlay.setSelected(false);
 		});
 
-		oOverlay.$().addClass("sapUiRtaOverlayPlaceholder");
+		oOverlay.getDomRef().classList.add("sapUiRtaOverlayPlaceholder");
 	};
 
 	/**
@@ -138,7 +138,7 @@ function(
 				command: oCommand
 			});
 
-			oOverlay.$().removeClass("sapUiRtaOverlayPlaceholder");
+			oOverlay.getDomRef().classList.remove("sapUiRtaOverlayPlaceholder");
 			oOverlay.setSelected(true);
 			oOverlay.focus();
 

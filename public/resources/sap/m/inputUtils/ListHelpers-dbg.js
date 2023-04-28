@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*
@@ -176,7 +176,9 @@ sap.ui.define([
 				type: ListType.Active,
 				visible: oItem.getEnabled(),
 				titleTextDirection: sTextDirection,
-				infoTextDirection: sTextDirection
+				infoTextDirection: sTextDirection,
+				wrapping: true,
+				wrapCharLimit: 10000
 			});
 
 			// Constructor does not escape properly curly braces and binding. We need to use the setters instead.

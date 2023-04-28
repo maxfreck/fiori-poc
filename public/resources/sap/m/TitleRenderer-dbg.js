@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -54,10 +54,6 @@ sap.ui.define(["sap/ui/core/Renderer", "sap/ui/core/library", "sap/m/Hyphenation
 
 		if (sTextAlign) {
 			oRm.style("text-align", sTextAlign);
-		}
-
-		if (oTitle.getParent() && oTitle.getParent().isA("sap.m.Toolbar")) {
-			oRm.class("sapMTitleTB");
 		}
 
 		sTooltip = oAssoTitle && !oTitleContent ? oAssoTitle.getTooltip_AsString() : oTitle.getTooltip_AsString();

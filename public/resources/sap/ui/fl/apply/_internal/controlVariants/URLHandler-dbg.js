@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,6 +8,7 @@ sap.ui.define([
 	"sap/ui/core/Component",
 	"sap/ui/fl/Utils",
 	"sap/base/Log",
+	"sap/base/util/deepEqual",
 	"sap/base/util/merge",
 	"sap/base/util/ObjectPath",
 	"sap/base/util/isEmptyObject",
@@ -20,6 +21,7 @@ sap.ui.define([
 	Component,
 	Utils,
 	Log,
+	deepEqual,
 	merge,
 	ObjectPath,
 	isEmptyObject,
@@ -34,9 +36,10 @@ sap.ui.define([
 	var _mVariantIdChangeHandlers = {};
 
 	/**
-	 * URL handler utility for <code>sap.ui.fl variants</code> (@see sap.ui.fl.variants.VariantManagement}
+	 * URL handler utility for <code>sap.ui.fl variants</code> (see {@link sap.ui.fl.variants.VariantManagement})
 	 *
-	 * @namespace sap.ui.fl.apply._internal.variants.URLHandler
+	 * @namespace
+	 * @alias sap.ui.fl.apply._internal.controlVariants.URLHandler
 	 * @since 1.72
 	 * @private
 	 * @ui5-restricted sap.ui.fl.variants.VariantModel
@@ -106,7 +109,7 @@ sap.ui.define([
 	 * @param {string} sNewHash - New hash
 	 *
 	 * @returns {string} Value that signifies "Continue" navigation in the "ShellNavigation" service of ushell
-	 * {@see sap.ushell.services.ShellNavigation}
+	 * (see {@link sap.ushell.services.ShellNavigation})
 	 *
 	 * @private
 	 */
@@ -176,6 +179,7 @@ sap.ui.define([
 		var oParsedHash = oURLParsingService && oURLParsingService.parseShellHash(hasher.getHash());
 
 		if (oParsedHash && oParsedHash.params) {
+			var mOldHashParams = Object.assign({}, oParsedHash.params);
 			var mTechnicalParameters = oModel.oAppComponent
 				&& oModel.oAppComponent.getComponentData
 				&& oModel.oAppComponent.getComponentData()
@@ -196,7 +200,7 @@ sap.ui.define([
 				hasher.changed.active = false; // disable changed signal
 				hasher.replaceHash(oURLParsingService.constructShellHash(oParsedHash));
 				hasher.changed.active = true; // re-enable changed signal
-			} else {
+			} else if (!deepEqual(mOldHashParams, oParsedHash.params)) {
 				oCrossApplicationNavigationService.toExternal({
 					target: {
 						semanticObject: oParsedHash.semanticObject,
@@ -271,8 +275,8 @@ sap.ui.define([
 	URLHandler.variantTechnicalParameterName = "sap-ui-fl-control-variant-id";
 
 	/**
-	 * Initializes hash data for the passed variant model.
-	 * {@see sap.ui.fl.variants.VariantModel}
+	 * Initializes hash data for the passed variant model
+	 * (see {@link sap.ui.fl.variants.VariantModel}).
 	 *
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model
@@ -457,8 +461,8 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the current hash parameters from the variant model's hash data.
-	 * {@see sap.ui.fl.variants.VariantModel}
+	 * Returns the current hash parameters from the variant model's hash data
+	 * (see {@link sap.ui.fl.variants.VariantModel}).
 	 *
 	 * @param {object} mPropertyBag - Property bag
 	 * @param {sap.ui.fl.variants.VariantModel} mPropertyBag.model - Variant model

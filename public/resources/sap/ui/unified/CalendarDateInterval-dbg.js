@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -21,7 +21,9 @@ sap.ui.define([
 	"sap/ui/core/CalendarType",
 	"sap/ui/core/Core",
 	"sap/base/Log",
-	"./DateRange"
+	"./DateRange",
+	"sap/ui/core/date/UI5Date"
+
 ], function(
 	CalendarUtils,
 	Calendar,
@@ -38,7 +40,8 @@ sap.ui.define([
 	CalendarType,
 	Core,
 	Log,
-	DateRange
+	DateRange,
+    UI5Date
 ) {
 	"use strict";
 
@@ -56,7 +59,7 @@ sap.ui.define([
 	 * @class
 	 * <code>CalendarDateInterval</code> only visualizes the dates in a one-line interval and allows the selection of a single day.
 	 * @extends sap.ui.unified.Calendar
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -321,7 +324,7 @@ sap.ui.define([
 			sAriaLabel = oTexts.sAriaLabel,
 			oHeader = this.getAggregation("header");
 		var oLocaleData = this._getLocaleData();
-		var oEndDate = CalendarDate.fromLocalJSDate(new Date(oDate.toLocalJSDate().getTime() + (this._getDays() - 1) * 24 * 60 * 60 * 1000), this.getPrimaryCalendarType());
+		var oEndDate = CalendarDate.fromLocalJSDate(UI5Date.getInstance(oDate.toLocalJSDate().getTime() + (this._getDays() - 1) * 24 * 60 * 60 * 1000), this.getPrimaryCalendarType());
 		oEndDate.setDate(1); // always use the first of the month to have stable year in Japanese calendar
 		var sDelimiter = oLocaleData.getIntervalPattern().replace("{0}", "").replace("{1}", "");
 		var sEndYear = this._oYearFormat.format(oEndDate.toUTCJSDate(), true);
@@ -352,7 +355,7 @@ sap.ui.define([
 		var oStartDate = this.getStartDate(),
 			oCalPicker = this._getCalendar(),
 			oSelectedRange = new DateRange(),
-			oEndDate = new Date(oStartDate.getTime());
+			oEndDate = UI5Date.getInstance(oStartDate.getTime());
 
 		oEndDate.setDate(oEndDate.getDate() + this._getDays() - 1);
 		oSelectedRange.setStartDate(oStartDate);
@@ -408,6 +411,13 @@ sap.ui.define([
 
 	};
 
+	/**
+	 * Set start date for the interval.
+	 *
+	 * @param {Date} oStartDate A JavaScript Date
+	 * @returns {this} Reference to <code>this</code> for method chaining
+	 * @public
+	 */
 	CalendarDateInterval.prototype.setStartDate = function(oStartDate){
 
 		CalendarUtils._checkJSDateObject(oStartDate);
@@ -427,13 +437,13 @@ sap.ui.define([
 		var oMinDate = this.getMinDate();
 		if (oMinDate && oStartDate.getTime() < oMinDate.getTime()) {
 			Log.warning("startDate < minDate -> minDate as startDate set", this);
-			oStartDate = new Date(oMinDate.getTime());
+			oStartDate = UI5Date.getInstance(oMinDate.getTime());
 		}
 
 		var oMaxDate = this.getMaxDate();
 		if (oMaxDate && oStartDate.getTime() > oMaxDate.getTime()) {
 			Log.warning("startDate > maxDate -> maxDate as startDate set", this);
-			oStartDate = new Date(oMaxDate.getTime());
+			oStartDate = UI5Date.getInstance(oMaxDate.getTime());
 		}
 
 		this.setProperty("startDate", oStartDate, true);
@@ -457,11 +467,12 @@ sap.ui.define([
 	};
 
 	// needs to be overwritten because differently implemented in Calendar
-	/*
-	 * Gets current value of property startDate.
+	/**
+	 * Returns the start date of the interval.
 	 *
 	 * Start date of the Interval
-	 * @returns {object} JavaScript date object for property startDate
+	 * @returns {Date} JavaScript date object for property <code>startDate</code>
+	 * @public
 	 */
 	CalendarDateInterval.prototype.getStartDate = function(){
 
@@ -585,7 +596,7 @@ sap.ui.define([
 	 *
 	 * @protected
 	 * @param {int} iMonths How many months to be displayed
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 */
 	CalendarDateInterval.prototype.setMonths = function(iMonths){
 
@@ -604,7 +615,7 @@ sap.ui.define([
 	 *
 	 * @protected
 	 * @param {int} [iFirstDayOfWeek] First day of the week
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 */
 	CalendarDateInterval.prototype.setFirstDayOfWeek = function(iFirstDayOfWeek){
 
@@ -619,7 +630,7 @@ sap.ui.define([
 	/**
 	* Focuses given date.
 	* @param {Date} oDate a JavaScript date
-	* @returns {this} <code>this</code> for method chaining
+	* @returns {this} Reference to <code>this</code> for method chaining
 	*/
 	CalendarDateInterval.prototype.focusDate = function(oDate){
 

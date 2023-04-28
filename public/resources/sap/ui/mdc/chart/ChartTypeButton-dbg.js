@@ -1,24 +1,32 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	"sap/m/OverflowToolbarButton", "sap/m/ButtonRenderer", "sap/ui/base/ManagedObjectObserver", "sap/ui/core/library", "sap/m/library", "sap/m/IllustratedMessage"
-], function(OverflowToolbarButton, ButtonRenderer, ManagedObjectObserver, CoreLibrary, mobileLibrary, IllustratedMessage) {
+	"sap/m/OverflowToolbarButton",
+	"sap/m/ButtonRenderer",
+	"sap/ui/base/ManagedObjectObserver",
+	"sap/ui/core/library",
+	"sap/m/library",
+	"sap/m/IllustratedMessage",
+	"sap/m/library",
+	"sap/base/util/merge",
+	"sap/ui/model/Filter"
+], function(OverflowToolbarButton, ButtonRenderer, ManagedObjectObserver, CoreLibrary, mobileLibrary, IllustratedMessage, MLib, merge, Filter) {
 	"use strict";
 
 	// shortcut for sap.m.PlacementType
 	var PlacementType = mobileLibrary.PlacementType;
 
 	var HasPopup = CoreLibrary.aria.HasPopup;
-	var ResponsivePopover, List, Bar, SearchField, StandardListItem, InvisibleText, Device, oRb;
+	var ResponsivePopover, List, SearchField, StandardListItem, InvisibleText, Device, oRb;
 
 	var ChartTypeButton = OverflowToolbarButton.extend("sap.ui.mdc.chart.ChartTypeButton", {
 		metadata: {
 			library: "sap.ui.mdc"
 		},
-		constructor: function(oMDCChart) {
+		constructor: function(oMDCChart, mSettings) {
 
 			if (!oMDCChart) {
 				OverflowToolbarButton.apply(this);
@@ -26,7 +34,7 @@ sap.ui.define([
 			}
 
 			this.oMDCChartModel = oMDCChart.getManagedObjectModel();
-			var mSettings = {
+			mSettings = merge(mSettings, {
 				type: "Transparent",
 				press: function(oEvent) {
 					this.displayChartTypes(oEvent.getSource(), oMDCChart);
@@ -36,7 +44,7 @@ sap.ui.define([
 				tooltip: '{$chart>/getChartTypeInfo/text}',
 				text: '{$chart>/getChartTypeInfo/text}',
 				ariaHasPopup: HasPopup.ListBox
-			};
+			});
 			this.oMDCChart = oMDCChart;
 			OverflowToolbarButton.apply(this, [
 				mSettings
@@ -94,14 +102,14 @@ sap.ui.define([
 	};
 
 	/**
-	 * Shows popover to select chart type
-	 * @param oButton button opening the popover
-	 * @param oMDCChart the inner chart
-	 *
-	 * @experimental
-	 * @private
-	 * @ui5-restricted Fiori Elements, sap.ui.mdc
-	 */
+     * Shows popover to select chart type
+     * @param oButton button opening the popover
+     * @param oMDCChart the chart
+     *
+     * @experimental
+     * @private
+     * @ui5-restricted sap.fe, sap.ui.mdc
+     */
 	ChartTypeButton.prototype.displayChartTypes = function(oButton, oMDCChart) {
 		if (!oMDCChart || !oButton) {
 			return;
@@ -113,11 +121,10 @@ sap.ui.define([
 					resolve(true);
 				} else {
 					sap.ui.require([
-						"sap/m/ResponsivePopover", "sap/m/List", "sap/m/Bar", "sap/m/SearchField", "sap/m/StandardListItem", "sap/ui/core/InvisibleText", "sap/ui/Device"
-					], function(ResponsivePopoverLoaded, ListLoaded, BarLoaded, SearchFieldLoaded, StandardListItemLoaded, InvisibleTextLoaded, DeviceLoaded) {
+						"sap/m/ResponsivePopover", "sap/m/List", "sap/m/SearchField", "sap/m/StandardListItem", "sap/ui/core/InvisibleText", "sap/ui/Device"
+					], function(ResponsivePopoverLoaded, ListLoaded, SearchFieldLoaded, StandardListItemLoaded, InvisibleTextLoaded, DeviceLoaded) {
 						ResponsivePopover = ResponsivePopoverLoaded;
 						List = ListLoaded;
-						Bar = BarLoaded;
 						SearchField = SearchFieldLoaded;
 						StandardListItem = StandardListItemLoaded;
 						InvisibleText = InvisibleTextLoaded;
@@ -138,26 +145,31 @@ sap.ui.define([
 
 		this.oReadyPromise.then(function() {
 			if (!this.oPopover){
-				this.oPopover = this._createPopover(oButton, oMDCChart);
+				this.oPopover = this._createPopover(oMDCChart);
+
 				this.oPopover.attachAfterClose(function(){
 					this.oPopover.destroy();
 					delete this.oPopover;
 				}.bind(this));
+
 				return this.oPopover.openBy(oButton);
+
+			} else if (this.oPopover) {
+				this.oPopover.close();
 			}
 		}.bind(this));
 	};
 
 	/**
 	 * Creates the popover
-	 * @param oButton button opening the popover
-	 * @param oMDCChart inner chart
+	 * @param {sap.ui.mdc.Chart} oMDCChart chart
+     * @returns {sap.m.ResponsivePopover} the instance of the created popover
 	 *
 	 * @experimental
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 */
-	ChartTypeButton.prototype._createPopover = function(oButton, oMDCChart) {
+	ChartTypeButton.prototype._createPopover = function(oMDCChart) {
 		var oItemTemplate = new StandardListItem({
 			title: "{$chart>text}",
 			icon: "{$chart>icon}",
@@ -166,7 +178,7 @@ sap.ui.define([
 
 		var oList = new List({
 			mode: "SingleSelectMaster",
-			noData: new IllustratedMessage({title: oRb.getText("chart.NO_CHART_TYPES_AVAILABLE"), description: oRb.getText("chart.NO_CHART_TYPES_AVAILABLE_ACTION")}),
+			noData: new IllustratedMessage({title: oRb.getText("chart.NO_CHART_TYPES_AVAILABLE"), description: oRb.getText("chart.NO_CHART_TYPES_AVAILABLE_ACTION"),  illustrationType: MLib.IllustratedMessageType.AddDimensions}),
 			items: {
 				path: "$chart>/getAvailableChartTypes",
 				template: oItemTemplate
@@ -181,15 +193,17 @@ sap.ui.define([
 							var oObj = oCtx.getObject();
 							if (oObj && oObj.key) {
 								sap.ui.require([
-									"sap/ui/mdc/p13n/FlexUtil", "sap/ui/mdc/flexibility/Chart.flexibility"
-								], function(FlexUtil,ChartFlex) {
+									"sap/ui/mdc/flexibility/Chart.flexibility"
+								], function(ChartFlex) {
 									//var aChanges = [];
 
 									oMDCChart.getEngine().createChanges({
 										control: oMDCChart,
 										key: "Type",
 										state: {
-											type: oObj.key
+											properties: {
+												chartType: oObj.key
+											}
 										}
 									});
 									/*
@@ -208,21 +222,19 @@ sap.ui.define([
 			}
 		});
 
-		var oSubHeader = new Bar();
 		var oSearchField = new SearchField({
-			placeholder: oRb.getText("chart.CHART_TYPE_SEARCH")
+			placeholder: oRb.getText("chart.CHART_TYPE_SEARCH"),
+			liveChange: function(oEvent) {
+				if (oMDCChart){
+					this._triggerSearchInPopover(oEvent, oList);
+				}
+			}.bind(this)
 		});
-		oSearchField.attachLiveChange(function(oEvent) {
-			if (oMDCChart){
-				this._triggerSearchInPopover(oEvent, oList);
-			}
-		}.bind(this));
-		oSubHeader.addContentRight(oSearchField);
 
 		var oPopover = new ResponsivePopover({
 			id: oMDCChart.getId() + "-btnChartTypePopover",
 			placement: PlacementType.VerticalPreferredBottom,
-			subHeader: oSubHeader,
+			subHeader: oSearchField,
 			contentWidth: "25rem"
 		});
 
@@ -244,13 +256,8 @@ sap.ui.define([
 		oPopover.addContent(oList);
 
 		if (oList.getItems().length < 7) {
-			oSubHeader.setVisible(false);
+			oSearchField.setVisible(false);
 		}
-
-		/*
-		oPopover.attachAfterClose(function(oEvent) {
-			oPopover.destroy();
-		});*/
 
 		return oPopover;
 	};
@@ -264,40 +271,25 @@ sap.ui.define([
 	 */
 	ChartTypeButton.prototype._triggerSearchInPopover = function(oEvent, oList) {
 
-		var parameters, i, sTitle, sTooltip, sValue, aItems;
-
 		if (!oEvent || !oList) {
 			return;
 		}
 
-		parameters = oEvent.getParameters();
-		if (!parameters) {
-			return;
+		var sSearchValue = oEvent.getParameter("newValue");
+		var oSearchFilter = [];
+		if (sSearchValue) {
+			oSearchFilter = new Filter("text", "Contains", sSearchValue);
 		}
-
-		sValue = parameters.newValue ? parameters.newValue.toLowerCase() : "";
-
-		aItems = oList.getItems();
-		for (i = 0; i < aItems.length; i++) {
-
-			sTooltip = aItems[i].getTooltip();
-			sTitle = aItems[i].getTitle();
-
-			if ((sTitle && (sTitle.toLowerCase().indexOf(sValue) > -1)) || (sTooltip && (sTooltip.toLowerCase().indexOf(sValue) > -1))) {
-				aItems[i].setVisible(true);
-			} else {
-				aItems[i].setVisible(false);
-			}
-		}
+		oList.getBinding("items").filter(oSearchFilter);
 	};
 
-	/**
-	 * Closes the popover to select chart type
-	 *
-	 * @experimental
-	 * @private
-	 * @ui5-restricted Fiori Elements, sap.ui.mdc
-	 */
+    /**
+     * Closes the popover to select chart type
+     *
+     * @experimental
+     * @private
+     * @ui5-restricted sap.fe, sap.ui.mdc
+     */
 	ChartTypeButton.prototype.exit = function() {
 		OverflowToolbarButton.prototype.exit.apply(this, arguments);
 		if (this.oPopover) {

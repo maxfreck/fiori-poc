@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,7 +14,8 @@ sap.ui.define([
 	"sap/ui/core/Locale",
 	"./library",
 	"./Button",
-	'./TimePickerInternalsRenderer',
+	"sap/ui/core/date/UI5Date",
+	"./TimePickerInternalsRenderer",
 	"sap/ui/core/Configuration"
 ],
 	function(
@@ -27,6 +28,7 @@ sap.ui.define([
 		Locale,
 		library,
 		Button,
+        UI5Date,
 		TimePickerInternalsRenderer,
 		Configuration
 	) {
@@ -47,7 +49,7 @@ sap.ui.define([
 		 * @extends sap.ui.core.Control
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @private
@@ -77,7 +79,7 @@ sap.ui.define([
 					 * The <code>displayFormat</code> comes from the browser language settings if not set explicitly.
 					 *
 					 */
-					displayFormat: {name: "displayFormat", type: "string", group: "Appearance"},
+					displayFormat: {type: "string", group: "Appearance"},
 
 					/**
 					 * Sets the minutes clock step. The step must be at least 1
@@ -608,7 +610,7 @@ sap.ui.define([
 					type: ButtonType.Transparent,
 					visible: false,
 					press: function () {
-						this._setTimeValues(new Date());
+						this._setTimeValues(UI5Date.getInstance());
 					}.bind(this)
 				}).addStyleClass("sapMTPNow");
 			}

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -17,7 +17,7 @@ sap.ui.define([
 	 * @class
 	 * @namespace sap.ui.fl.write._internal.fieldExtensibility.ABAPExtensibilityVariant
 	 * @since 1.87
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @public
 	 * @param {sap.ui.base.ManagedObject} oControl - Control to add extensions
 	 */

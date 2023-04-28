@@ -3,7 +3,7 @@ sap.ui.require.preload({
 	"sap/ui/webc/main/Avatar.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Avatar"],function(a,e){"use strict";var t=e.AvatarColorScheme;var i=e.AvatarShape;var r=e.AvatarSize;var n=a.extend("sap.ui.webc.main.Avatar",{metadata:{library:"sap.ui.webc.main",tag:"ui5-avatar-ui5",interfaces:["sap.ui.webc.main.IAvatar"],properties:{accessibleName:{type:"string",defaultValue:""},colorScheme:{type:"sap.ui.webc.main.AvatarColorScheme",defaultValue:t.Accent6},icon:{type:"string",defaultValue:""},initials:{type:"string",defaultValue:""},interactive:{type:"boolean",defaultValue:false},shape:{type:"sap.ui.webc.main.AvatarShape",defaultValue:i.Circle},size:{type:"sap.ui.webc.main.AvatarSize",defaultValue:r.S}},defaultAggregation:"image",aggregations:{image:{type:"sap.ui.core.Control",multiple:false}},events:{click:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/Avatar.designtime"}});return n});
@@ -11,7 +11,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Avata
 	"sap/ui/webc/main/AvatarGroup.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/AvatarGroup"],function(e,t){"use strict";var a=t.AvatarGroupType;var r=e.extend("sap.ui.webc.main.AvatarGroup",{metadata:{library:"sap.ui.webc.main",tag:"ui5-avatar-group-ui5",properties:{type:{type:"sap.ui.webc.main.AvatarGroupType",defaultValue:a.Group}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.IAvatar",multiple:true},overflowButton:{type:"sap.ui.core.Control",multiple:false,slot:"overflowButton"}},events:{click:{parameters:{targetRef:{type:"HTMLElement"},overflowButtonClicked:{type:"boolean"}}},overflow:{parameters:{}}},getters:["colorScheme","hiddenItems"]}});return r});
@@ -19,7 +19,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Avata
 	"sap/ui/webc/main/Badge.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Badge"],function(e,i){"use strict";var t=e.extend("sap.ui.webc.main.Badge",{metadata:{library:"sap.ui.webc.main",tag:"ui5-badge-ui5",properties:{colorScheme:{type:"string",defaultValue:"1"},text:{type:"string",defaultValue:"",mapping:"textContent"}},aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:false,slot:"icon"}},designtime:"sap/ui/webc/main/designtime/Badge.designtime"}});return t});
@@ -27,7 +27,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Badge
 	"sap/ui/webc/main/Breadcrumbs.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Breadcrumbs"],function(e,a){"use strict";var t=a.BreadcrumbsDesign;var r=a.BreadcrumbsSeparatorStyle;var i=e.extend("sap.ui.webc.main.Breadcrumbs",{metadata:{library:"sap.ui.webc.main",tag:"ui5-breadcrumbs-ui5",properties:{design:{type:"sap.ui.webc.main.BreadcrumbsDesign",defaultValue:t.Standard},separatorStyle:{type:"sap.ui.webc.main.BreadcrumbsSeparatorStyle",defaultValue:r.Slash}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.IBreadcrumbsItem",multiple:true}},events:{itemClick:{allowPreventDefault:true,parameters:{item:{type:"HTMLElement"},altKey:{type:"boolean"},ctrlKey:{type:"boolean"},metaKey:{type:"boolean"},shiftKey:{type:"boolean"}}}}}});return i});
@@ -35,7 +35,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Bread
 	"sap/ui/webc/main/BreadcrumbsItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/BreadcrumbsItem"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.BreadcrumbsItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-breadcrumbs-item-ui5",interfaces:["sap.ui.webc.main.IBreadcrumbsItem"],properties:{accessibleName:{type:"string",defaultValue:undefined},href:{type:"string",defaultValue:""},target:{type:"string",defaultValue:undefined},text:{type:"string",defaultValue:"",mapping:"textContent"}},designtime:"sap/ui/webc/main/designtime/BreadcrumbsItem.designtime"}});return a});
@@ -43,7 +43,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Bread
 	"sap/ui/webc/main/BusyIndicator.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/BusyIndicator"],function(e,i){"use strict";var t=i.BusyIndicatorSize;var a=e.extend("sap.ui.webc.main.BusyIndicator",{metadata:{library:"sap.ui.webc.main",tag:"ui5-busy-indicator-ui5",properties:{active:{type:"boolean",defaultValue:false},delay:{type:"int",defaultValue:1e3},display:{type:"string",defaultValue:"inline-block",mapping:"style"},size:{type:"sap.ui.webc.main.BusyIndicatorSize",defaultValue:t.Medium},text:{type:"string",defaultValue:""},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}},designtime:"sap/ui/webc/main/designtime/BusyIndicator.designtime"}});return a});
@@ -51,7 +51,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/BusyI
 	"sap/ui/webc/main/Button.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/Button"],function(e,t,a,i){"use strict";var n=i.TextDirection;var r=t.ButtonDesign;var o=e.extend("sap.ui.webc.main.Button",{metadata:{library:"sap.ui.webc.main",tag:"ui5-button-ui5",interfaces:["sap.ui.webc.main.IButton","sap.ui.core.IFormContent"],properties:{accessibilityAttributes:{type:"object",defaultValue:{}},accessibleName:{type:"string"},design:{type:"sap.ui.webc.main.ButtonDesign",defaultValue:r.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},iconEnd:{type:"boolean",defaultValue:false},submits:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},textDirection:{type:"sap.ui.core.TextDirection",defaultValue:n.Inherit,mapping:{type:"attribute",to:"dir",formatter:"_mapTextDirection"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{click:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/Button.designtime"}});a.call(o.prototype);return o});
@@ -59,7 +59,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Calendar.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/library","./thirdparty/Calendar"],function(e,a,t){"use strict";var r=t.CalendarType;var n=a.CalendarSelectionMode;var l=e.extend("sap.ui.webc.main.Calendar",{metadata:{library:"sap.ui.webc.main",tag:"ui5-calendar-ui5",properties:{formatPattern:{type:"string",defaultValue:""},hideWeekNumbers:{type:"boolean",defaultValue:false},maxDate:{type:"string",defaultValue:""},minDate:{type:"string",defaultValue:""},primaryCalendarType:{type:"sap.ui.core.CalendarType"},secondaryCalendarType:{type:"sap.ui.core.CalendarType",defaultValue:r.undefined},selectionMode:{type:"sap.ui.webc.main.CalendarSelectionMode",defaultValue:n.Single}},defaultAggregation:"dates",aggregations:{dates:{type:"sap.ui.webc.main.ICalendarDate",multiple:true}},events:{selectedDatesChange:{allowPreventDefault:true,parameters:{values:{type:"Array"},dates:{type:"Array"}}}}}});return l});
@@ -67,7 +67,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/librar
 	"sap/ui/webc/main/CalendarDate.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/CalendarDate"],function(a,e){"use strict";var i=a.extend("sap.ui.webc.main.CalendarDate",{metadata:{library:"sap.ui.webc.main",tag:"ui5-date-ui5",interfaces:["sap.ui.webc.main.ICalendarDate"],properties:{value:{type:"string"}}}});return i});
@@ -75,7 +75,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Calen
 	"sap/ui/webc/main/Card.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Card"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.Card",{metadata:{library:"sap.ui.webc.main",tag:"ui5-card-ui5",properties:{accessibleName:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},header:{type:"sap.ui.core.Control",multiple:true,slot:"header"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},designtime:"sap/ui/webc/main/designtime/Card.designtime"}});return a});
@@ -83,7 +83,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Card"
 	"sap/ui/webc/main/CardHeader.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/CardHeader"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.CardHeader",{metadata:{library:"sap.ui.webc.main",tag:"ui5-card-header-ui5",properties:{interactive:{type:"boolean",defaultValue:false},status:{type:"string",defaultValue:""},subtitleText:{type:"string",defaultValue:""},titleText:{type:"string",defaultValue:""}},aggregations:{action:{type:"sap.ui.core.Control",multiple:true,slot:"action"},avatar:{type:"sap.ui.core.Control",multiple:true,slot:"avatar"}},events:{click:{parameters:{}}}}});return a});
@@ -91,7 +91,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/CardH
 	"sap/ui/webc/main/Carousel.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Carousel"],function(e,a){"use strict";var t=a.CarouselArrowsPlacement;var i=e.extend("sap.ui.webc.main.Carousel",{metadata:{library:"sap.ui.webc.main",tag:"ui5-carousel-ui5",properties:{arrowsPlacement:{type:"sap.ui.webc.main.CarouselArrowsPlacement",defaultValue:t.Content},cyclic:{type:"boolean",defaultValue:false},hideNavigationArrows:{type:"boolean",defaultValue:false},hidePageIndicator:{type:"boolean",defaultValue:false},itemsPerPageL:{type:"int",defaultValue:1},itemsPerPageM:{type:"int",defaultValue:1},itemsPerPageS:{type:"int",defaultValue:1}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}},events:{navigate:{parameters:{selectedIndex:{type:"int"}}}},methods:["navigateTo"],designtime:"sap/ui/webc/main/designtime/Carousel.designtime"}});return i});
@@ -99,7 +99,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Carou
 	"sap/ui/webc/main/CheckBox.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/CheckBox","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,r){"use strict";var i=r.ValueState;var p=a.WrappingType;var l=e.extend("sap.ui.webc.main.CheckBox",{metadata:{library:"sap.ui.webc.main",tag:"ui5-checkbox-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string",defaultValue:""},checked:{type:"boolean",defaultValue:false},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},indeterminate:{type:"boolean",defaultValue:false},name:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},width:{type:"sap.ui.core.CSSSize",mapping:"style"},wrappingType:{type:"sap.ui.webc.main.WrappingType",defaultValue:p.None}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/CheckBox.designtime"}});t.call(l.prototype);l.prototype.getFormDoNotAdjustWidth=function(){return this.getText()?false:true};return l});
@@ -107,7 +107,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/ColorPalette.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ColorPalette","./thirdparty/features/ColorPaletteMoreColors"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.ColorPalette",{metadata:{library:"sap.ui.webc.main",tag:"ui5-color-palette-ui5",defaultAggregation:"colors",aggregations:{colors:{type:"sap.ui.webc.main.IColorPaletteItem",multiple:true}},events:{itemClick:{parameters:{color:{type:"string"}}}}}});return a});
@@ -115,7 +115,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Color
 	"sap/ui/webc/main/ColorPaletteItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ColorPaletteItem"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.ColorPaletteItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-color-palette-item-ui5",interfaces:["sap.ui.webc.main.IColorPaletteItem"],properties:{value:{type:"sap.ui.core.CSSColor"}}}});return a});
@@ -123,7 +123,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Color
 	"sap/ui/webc/main/ColorPalettePopover.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ColorPalettePopover","./thirdparty/features/ColorPaletteMoreColors"],function(e,o){"use strict";var t=e.extend("sap.ui.webc.main.ColorPalettePopover",{metadata:{library:"sap.ui.webc.main",tag:"ui5-color-palette-popover-ui5",properties:{defaultColor:{type:"sap.ui.core.CSSColor"},showDefaultColor:{type:"boolean",defaultValue:false},showMoreColors:{type:"boolean",defaultValue:false},showRecentColors:{type:"boolean",defaultValue:false}},defaultAggregation:"colors",aggregations:{colors:{type:"sap.ui.webc.main.IColorPaletteItem",multiple:true}},events:{itemClick:{parameters:{color:{type:"string"}}}},methods:["openPopover","showAt"]}});return t});
@@ -131,7 +131,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Color
 	"sap/ui/webc/main/ColorPicker.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ColorPicker"],function(e,r){"use strict";var i=e.extend("sap.ui.webc.main.ColorPicker",{metadata:{library:"sap.ui.webc.main",tag:"ui5-color-picker-ui5",properties:{color:{type:"sap.ui.core.CSSColor"}},events:{change:{parameters:{}}}}});return i});
@@ -139,7 +139,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Color
 	"sap/ui/webc/main/ComboBox.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/ComboBox"],function(e,a,t,i){"use strict";var l=i.ValueState;var r=e.extend("sap.ui.webc.main.ComboBox",{metadata:{library:"sap.ui.webc.main",tag:"ui5-combobox-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},filter:{type:"string",defaultValue:"StartsWithPerTerm"},loading:{type:"boolean",defaultValue:false},placeholder:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:l.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:false,slot:"icon"},items:{type:"sap.ui.webc.main.IComboBoxItem",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}},input:{parameters:{}},selectionChange:{parameters:{item:{type:"HTMLElement"}}}}}});t.call(r.prototype);return r});
@@ -147,7 +147,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/ComboBoxGroupItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ComboBoxGroupItem"],function(e,t){"use strict";var i=e.extend("sap.ui.webc.main.ComboBoxGroupItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-cb-group-item-ui5",interfaces:["sap.ui.webc.main.IComboBoxItem"],properties:{text:{type:"string",defaultValue:""}}}});return i});
@@ -155,7 +155,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Combo
 	"sap/ui/webc/main/ComboBoxItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ComboBoxItem"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.ComboBoxItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-cb-item-ui5",interfaces:["sap.ui.webc.main.IComboBoxItem"],properties:{additionalText:{type:"string",defaultValue:""},text:{type:"string",defaultValue:""}}}});return a});
@@ -163,7 +163,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Combo
 	"sap/ui/webc/main/CustomListItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/CustomListItem"],function(e,t){"use strict";var i=t.ListItemType;var a=e.extend("sap.ui.webc.main.CustomListItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-li-custom-ui5",interfaces:["sap.ui.webc.main.IListItem"],properties:{accessibleName:{type:"string",defaultValue:""},selected:{type:"boolean",defaultValue:false},type:{type:"sap.ui.webc.main.ListItemType",defaultValue:i.Active}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}},events:{detailClick:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/CustomListItem.designtime"}});return a});
@@ -171,7 +171,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Custo
 	"sap/ui/webc/main/DatePicker.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/DatePicker","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,r){"use strict";var l=r.CalendarType;var i=r.ValueState;var p=e.extend("sap.ui.webc.main.DatePicker",{metadata:{library:"sap.ui.webc.main",tag:"ui5-date-picker-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},formatPattern:{type:"string",defaultValue:""},hideWeekNumbers:{type:"boolean",defaultValue:false},maxDate:{type:"string",defaultValue:""},minDate:{type:"string",defaultValue:""},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:undefined},primaryCalendarType:{type:"sap.ui.core.CalendarType"},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},secondaryCalendarType:{type:"sap.ui.core.CalendarType",defaultValue:l.undefined},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}},input:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}}},methods:["closePicker","formatValue","isInValidRange","isOpen","isValid","openPicker"],getters:["dateValue"],designtime:"sap/ui/webc/main/designtime/DatePicker.designtime"}});t.call(p.prototype);return p});
@@ -179,7 +179,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/DateRangePicker.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/DateRangePicker","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,r){"use strict";var l=r.CalendarType;var i=r.ValueState;var p=e.extend("sap.ui.webc.main.DateRangePicker",{metadata:{library:"sap.ui.webc.main",tag:"ui5-daterange-picker-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},delimiter:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},formatPattern:{type:"string",defaultValue:""},hideWeekNumbers:{type:"boolean",defaultValue:false},maxDate:{type:"string",defaultValue:""},minDate:{type:"string",defaultValue:""},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:undefined},primaryCalendarType:{type:"sap.ui.core.CalendarType"},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},secondaryCalendarType:{type:"sap.ui.core.CalendarType",defaultValue:l.undefined},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}},input:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}}},methods:["closePicker","formatValue","isInValidRange","isOpen","isValid","openPicker"],getters:["dateValue","dateValueUTC","endDateValue","startDateValue"]}});t.call(p.prototype);return p});
@@ -187,7 +187,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/DateTimePicker.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/DateTimePicker","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,r){"use strict";var i=r.CalendarType;var l=r.ValueState;var p=e.extend("sap.ui.webc.main.DateTimePicker",{metadata:{library:"sap.ui.webc.main",tag:"ui5-datetime-picker-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},formatPattern:{type:"string",defaultValue:""},hideWeekNumbers:{type:"boolean",defaultValue:false},maxDate:{type:"string",defaultValue:""},minDate:{type:"string",defaultValue:""},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:undefined},primaryCalendarType:{type:"sap.ui.core.CalendarType"},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},secondaryCalendarType:{type:"sap.ui.core.CalendarType",defaultValue:i.undefined},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:l.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}},input:{allowPreventDefault:true,parameters:{value:{type:"string"},valid:{type:"boolean"}}}},methods:["closePicker","formatValue","isInValidRange","isOpen","isValid","openPicker"],getters:["dateValue"],designtime:"sap/ui/webc/main/designtime/DateTimePicker.designtime"}});t.call(p.prototype);return p});
@@ -195,7 +195,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Dialog.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Dialog"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.Dialog",{metadata:{library:"sap.ui.webc.main",tag:"ui5-dialog-ui5",properties:{accessibleName:{type:"string",defaultValue:""},draggable:{type:"boolean",defaultValue:false},headerText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},open:{type:"boolean",defaultValue:false},preventFocusRestore:{type:"boolean",defaultValue:false},resizable:{type:"boolean",defaultValue:false},stretch:{type:"boolean",defaultValue:false},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},footer:{type:"sap.ui.core.Control",multiple:true,slot:"footer"},header:{type:"sap.ui.core.Control",multiple:true,slot:"header"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}},initialFocus:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"initialFocus"}}},events:{afterClose:{parameters:{}},afterOpen:{parameters:{}},beforeClose:{allowPreventDefault:true,parameters:{escPressed:{type:"boolean"}}},beforeOpen:{allowPreventDefault:true,parameters:{}}},methods:["applyFocus","close","isOpen","show"],designtime:"sap/ui/webc/main/designtime/Dialog.designtime"}});return a});
@@ -203,7 +203,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Dialo
 	"sap/ui/webc/main/FileUploader.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/FileUploader","./thirdparty/features/InputElementsFormSupport"],function(e,t,a,l){"use strict";var p=l.ValueState;var r=e.extend("sap.ui.webc.main.FileUploader",{metadata:{library:"sap.ui.webc.main",tag:"ui5-file-uploader-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accept:{type:"string",defaultValue:""},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},hideInput:{type:"boolean",defaultValue:false},multiple:{type:"boolean",defaultValue:false},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:""},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:p.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}},events:{change:{parameters:{files:{type:"FileList"}}}},getters:["files"]}});a.call(r.prototype);return r});
@@ -211,7 +211,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/GroupHeaderListItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/GroupHeaderListItem"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.GroupHeaderListItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-li-groupheader-ui5",interfaces:["sap.ui.webc.main.IListItem"],properties:{accessibleName:{type:"string",defaultValue:""},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"}}}});return a});
@@ -219,7 +219,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Group
 	"sap/ui/webc/main/Icon.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Icon"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.Icon",{metadata:{library:"sap.ui.webc.main",tag:"ui5-icon-ui5",interfaces:["sap.ui.webc.main.IIcon"],properties:{accessibleName:{type:"string",defaultValue:""},accessibleRole:{type:"string",defaultValue:""},backgroundColor:{type:"sap.ui.core.CSSColor",mapping:"style"},color:{type:"sap.ui.core.CSSColor",mapping:"style"},height:{type:"sap.ui.core.CSSSize",mapping:"style"},interactive:{type:"boolean",defaultValue:false},name:{type:"string",defaultValue:""},showTooltip:{type:"boolean",defaultValue:false},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},events:{click:{parameters:{}}}}});a.prototype.getFormDoNotAdjustWidth=function(){return true};return a});
@@ -227,7 +227,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Icon"
 	"sap/ui/webc/main/Input.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/Input","./thirdparty/features/InputElementsFormSupport","./thirdparty/features/InputSuggestions"],function(e,t,a,p){"use strict";var i=p.ValueState;var n=t.InputType;var u=e.extend("sap.ui.webc.main.Input",{metadata:{library:"sap.ui.webc.main",tag:"ui5-input-ui5",interfaces:["sap.ui.webc.main.IInput","sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},maxlength:{type:"int"},name:{type:"string",defaultValue:""},noTypeahead:{type:"boolean",defaultValue:false},placeholder:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},showClearIcon:{type:"boolean",defaultValue:false},showSuggestions:{type:"boolean",defaultValue:false},type:{type:"sap.ui.webc.main.InputType",defaultValue:n.Text},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"suggestionItems",aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:true,slot:"icon"},suggestionItems:{type:"sap.ui.webc.main.IInputSuggestionItem",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}},input:{parameters:{}},suggestionItemPreview:{parameters:{item:{type:"HTMLElement"},targetRef:{type:"HTMLElement"}}},suggestionItemSelect:{parameters:{item:{type:"HTMLElement"}}}},methods:["openPicker"],getters:["previewItem"],designtime:"sap/ui/webc/main/designtime/Input.designtime"}});a.call(u.prototype);return u});
@@ -235,7 +235,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Label.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/LabelEnablement","./thirdparty/Label"],function(e,a,i){"use strict";var t=a.WrappingType;var p=e.extend("sap.ui.webc.main.Label",{metadata:{library:"sap.ui.webc.main",tag:"ui5-label-ui5",interfaces:["sap.ui.core.Label"],properties:{required:{type:"boolean",defaultValue:false},showColon:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},width:{type:"sap.ui.core.CSSSize",mapping:"style"},wrappingType:{type:"sap.ui.webc.main.WrappingType",defaultValue:t.None}},associations:{labelFor:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"for"}}},designtime:"sap/ui/webc/main/designtime/Label.designtime"}});i.enrich(p.prototype);return p});
@@ -243,7 +243,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/LabelE
 	"sap/ui/webc/main/Link.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/Link"],function(e,t,a){"use strict";var i=t.LinkDesign;var n=t.WrappingType;var p=e.extend("sap.ui.webc.main.Link",{metadata:{library:"sap.ui.webc.main",tag:"ui5-link-ui5",properties:{accessibilityAttributes:{type:"object",defaultValue:{}},accessibleName:{type:"string",defaultValue:""},design:{type:"sap.ui.webc.main.LinkDesign",defaultValue:i.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},href:{type:"string",defaultValue:""},target:{type:"string",defaultValue:""},text:{type:"string",defaultValue:"",mapping:"textContent"},wrappingType:{type:"sap.ui.webc.main.WrappingType",defaultValue:n.None}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{click:{allowPreventDefault:true,parameters:{altKey:{type:"boolean"},ctrlKey:{type:"boolean"},metaKey:{type:"boolean"},shiftKey:{type:"boolean"}}}},designtime:"sap/ui/webc/main/designtime/Link.designtime"}});a.call(p.prototype);return p});
@@ -251,7 +251,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/List.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/List"],function(e,t){"use strict";var a=t.ListGrowingMode;var i=t.ListMode;var r=t.ListSeparators;var s=e.extend("sap.ui.webc.main.List",{metadata:{library:"sap.ui.webc.main",tag:"ui5-list-ui5",properties:{accessibleName:{type:"string",defaultValue:""},accessibleRole:{type:"string",defaultValue:"list"},busy:{type:"boolean",defaultValue:false},busyDelay:{type:"int",defaultValue:1e3},footerText:{type:"string",defaultValue:""},growing:{type:"sap.ui.webc.main.ListGrowingMode",defaultValue:a.None},headerText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},indent:{type:"boolean",defaultValue:false},mode:{type:"sap.ui.webc.main.ListMode",defaultValue:i.None},noDataText:{type:"string",defaultValue:""},separators:{type:"sap.ui.webc.main.ListSeparators",defaultValue:r.All},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{header:{type:"sap.ui.core.Control",multiple:true,slot:"header"},items:{type:"sap.ui.webc.main.IListItem",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{itemClick:{allowPreventDefault:true,parameters:{item:{type:"HTMLElement"}}},itemClose:{parameters:{item:{type:"HTMLElement"}}},itemDelete:{parameters:{item:{type:"HTMLElement"}}},itemToggle:{parameters:{item:{type:"HTMLElement"}}},loadMore:{parameters:{}},selectionChange:{parameters:{selectedItems:{type:"Array"},previouslySelectedItems:{type:"Array"}}}},designtime:"sap/ui/webc/main/designtime/List.designtime"}});return s});
@@ -259,7 +259,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/List"
 	"sap/ui/webc/main/Menu.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Menu"],function(e,t){"use strict";var i=e.extend("sap.ui.webc.main.Menu",{metadata:{library:"sap.ui.webc.main",tag:"ui5-menu-ui5",properties:{headerText:{type:"string",defaultValue:""}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.IMenuItem",multiple:true}},events:{itemClick:{parameters:{item:{type:"object"},text:{type:"string"}}}},methods:["close","showAt"]}});return i});
@@ -267,7 +267,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Menu"
 	"sap/ui/webc/main/MenuItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/MenuItem"],function(e,t,a){"use strict";var i=e.extend("sap.ui.webc.main.MenuItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-menu-item-ui5",interfaces:["sap.ui.webc.main.IMenuItem"],properties:{enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},startsSection:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.IMenuItem",multiple:true}}}});a.call(i.prototype);return i});
@@ -275,7 +275,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/MessageStrip.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/MessageStrip"],function(e,a){"use strict";var t=a.MessageStripDesign;var i=e.extend("sap.ui.webc.main.MessageStrip",{metadata:{library:"sap.ui.webc.main",tag:"ui5-message-strip-ui5",properties:{design:{type:"sap.ui.webc.main.MessageStripDesign",defaultValue:t.Information},height:{type:"sap.ui.core.CSSSize",mapping:"style"},hideCloseButton:{type:"boolean",defaultValue:false},hideIcon:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:false,slot:"icon"}},events:{close:{parameters:{}}}}});return i});
@@ -283,7 +283,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Messa
 	"sap/ui/webc/main/MultiComboBox.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/MultiComboBox"],function(e,a,t,l){"use strict";var i=l.ValueState;var o=e.extend("sap.ui.webc.main.MultiComboBox",{metadata:{library:"sap.ui.webc.main",tag:"ui5-multi-combobox-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},allowCustomValues:{type:"boolean",defaultValue:false},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},filter:{type:"string",defaultValue:"StartsWithPerTerm"},noTypeahead:{type:"boolean",defaultValue:false},placeholder:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:false,slot:"icon"},items:{type:"sap.ui.webc.main.IMultiComboBoxItem",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}},input:{parameters:{}},openChange:{parameters:{}},selectionChange:{parameters:{items:{type:"Array"}}}},getters:["open"]}});t.call(o.prototype);return o});
@@ -291,7 +291,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/MultiComboBoxGroupItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/MultiComboBoxGroupItem"],function(e,t){"use strict";var i=e.extend("sap.ui.webc.main.MultiComboBoxGroupItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-mcb-group-item-ui5",interfaces:["sap.ui.webc.main.IMultiComboBoxItem"],properties:{text:{type:"string",defaultValue:""}}}});return i});
@@ -299,7 +299,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Multi
 	"sap/ui/webc/main/MultiComboBoxItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/MultiComboBoxItem"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.MultiComboBoxItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-mcb-item-ui5",interfaces:["sap.ui.webc.main.IMultiComboBoxItem"],properties:{additionalText:{type:"string",defaultValue:""},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""}}}});return a});
@@ -307,7 +307,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Multi
 	"sap/ui/webc/main/MultiInput.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/base/ManagedObjectObserver","sap/ui/core/library","./thirdparty/MultiInput","./thirdparty/features/InputElementsFormSupport","./thirdparty/features/InputSuggestions"],function(e,t,a,r,i){"use strict";var n=i.ValueState;var o=t.InputType;var u=e.extend("sap.ui.webc.main.MultiInput",{metadata:{library:"sap.ui.webc.main",tag:"ui5-multi-input-ui5",interfaces:["sap.ui.core.IFormContent","sap.ui.core.ISemanticFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},maxlength:{type:"int"},name:{type:"string",defaultValue:""},noTypeahead:{type:"boolean",defaultValue:false},placeholder:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},showClearIcon:{type:"boolean",defaultValue:false},showSuggestions:{type:"boolean",defaultValue:false},showValueHelpIcon:{type:"boolean",defaultValue:false},type:{type:"sap.ui.webc.main.InputType",defaultValue:o.Text},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:n.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"},_semanticFormValue:{type:"string",defaultValue:"",visibility:"hidden"}},defaultAggregation:"suggestionItems",aggregations:{icon:{type:"sap.ui.webc.main.IIcon",multiple:true,slot:"icon"},suggestionItems:{type:"sap.ui.webc.main.IInputSuggestionItem",multiple:true},tokens:{type:"sap.ui.webc.main.IToken",multiple:true,slot:"tokens"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}},input:{parameters:{}},suggestionItemPreview:{parameters:{item:{type:"HTMLElement"},targetRef:{type:"HTMLElement"}}},suggestionItemSelect:{parameters:{item:{type:"HTMLElement"}}},tokenDelete:{parameters:{token:{type:"HTMLElement"}}},valueHelpTrigger:{parameters:{}}},methods:["openPicker"],getters:["previewItem"],designtime:"sap/ui/webc/main/designtime/MultiInput.designtime"}});a.call(u.prototype);u.prototype.init=function(){this._oTokenizerObserver=new r(function(e){this.updateFormValueProperty()}.bind(this));this._oTokenizerObserver.observe(this,{aggregations:["tokens"]})};u.prototype.getFormFormattedValue=function(){return this.getTokens().map(function(e){return e.getText()}).join(", ")};u.prototype.getFormValueProperty=function(){return"_semanticFormValue"};u.prototype.updateFormValueProperty=function(){this.setProperty("_semanticFormValue",this.getFormFormattedValue(),true)};return u});
@@ -315,7 +315,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Option.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/Option"],function(e,t,a){"use strict";var i=e.extend("sap.ui.webc.main.Option",{metadata:{library:"sap.ui.webc.main",tag:"ui5-option-ui5",interfaces:["sap.ui.webc.main.ISelectOption"],properties:{additionalText:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string"},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},value:{type:"string"}}}});a.call(i.prototype);return i});
@@ -323,7 +323,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Panel.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Panel"],function(e,a){"use strict";var t=a.PanelAccessibleRole;var l=a.TitleLevel;var i=e.extend("sap.ui.webc.main.Panel",{metadata:{library:"sap.ui.webc.main",tag:"ui5-panel-ui5",properties:{accessibleName:{type:"string",defaultValue:""},accessibleRole:{type:"sap.ui.webc.main.PanelAccessibleRole",defaultValue:t.Form},collapsed:{type:"boolean",defaultValue:false},fixed:{type:"boolean",defaultValue:false},headerLevel:{type:"sap.ui.webc.main.TitleLevel",defaultValue:l.H2},headerText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},noAnimation:{type:"boolean",defaultValue:false},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},header:{type:"sap.ui.core.Control",multiple:true,slot:"header"}},events:{toggle:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/Panel.designtime"}});return i});
@@ -331,7 +331,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Panel
 	"sap/ui/webc/main/Popover.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Popover"],function(e,a){"use strict";var t=a.PopoverHorizontalAlign;var o=a.PopoverPlacementType;var l=a.PopoverVerticalAlign;var r=e.extend("sap.ui.webc.main.Popover",{metadata:{library:"sap.ui.webc.main",tag:"ui5-popover-ui5",properties:{accessibleName:{type:"string",defaultValue:""},allowTargetOverlap:{type:"boolean",defaultValue:false},headerText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},hideArrow:{type:"boolean",defaultValue:false},hideBackdrop:{type:"boolean",defaultValue:false},horizontalAlign:{type:"sap.ui.webc.main.PopoverHorizontalAlign",defaultValue:t.Center},modal:{type:"boolean",defaultValue:false},open:{type:"boolean",defaultValue:false},placementType:{type:"sap.ui.webc.main.PopoverPlacementType",defaultValue:o.Right},preventFocusRestore:{type:"boolean",defaultValue:false},verticalAlign:{type:"sap.ui.webc.main.PopoverVerticalAlign",defaultValue:l.Center},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},footer:{type:"sap.ui.core.Control",multiple:true,slot:"footer"},header:{type:"sap.ui.core.Control",multiple:true,slot:"header"}},associations:{opener:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"opener"}},ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}},initialFocus:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"initialFocus"}}},events:{afterClose:{parameters:{}},afterOpen:{parameters:{}},beforeClose:{allowPreventDefault:true,parameters:{escPressed:{type:"boolean"}}},beforeOpen:{allowPreventDefault:true,parameters:{}}},methods:["applyFocus","close","isOpen","showAt"],designtime:"sap/ui/webc/main/designtime/Popover.designtime"}});return r});
@@ -339,7 +339,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Popov
 	"sap/ui/webc/main/ProgressIndicator.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/ProgressIndicator"],function(e,a,t,r){"use strict";var i=r.ValueState;var o=e.extend("sap.ui.webc.main.ProgressIndicator",{metadata:{library:"sap.ui.webc.main",tag:"ui5-progress-indicator-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{displayValue:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},hideValue:{type:"boolean",defaultValue:false},value:{type:"int",defaultValue:0},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},width:{type:"sap.ui.core.CSSSize",mapping:"style"}}}});t.call(o.prototype);return o});
@@ -347,7 +347,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/RadioButton.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/RadioButton","./thirdparty/features/InputElementsFormSupport"],function(e,t,a,i){"use strict";var r=i.ValueState;var p=t.WrappingType;var o=e.extend("sap.ui.webc.main.RadioButton",{metadata:{library:"sap.ui.webc.main",tag:"ui5-radio-button-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{checked:{type:"boolean",defaultValue:false},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},name:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:r.None},width:{type:"sap.ui.core.CSSSize",mapping:"style"},wrappingType:{type:"sap.ui.webc.main.WrappingType",defaultValue:p.None}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/RadioButton.designtime"}});a.call(o.prototype);o.prototype.getFormDoNotAdjustWidth=function(){return this.getText()?false:true};return o});
@@ -355,7 +355,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/RangeSlider.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/RangeSlider"],function(e,a,t){"use strict";var l=e.extend("sap.ui.webc.main.RangeSlider",{metadata:{library:"sap.ui.webc.main",tag:"ui5-range-slider-ui5",properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},endValue:{type:"float",defaultValue:100},labelInterval:{type:"int",defaultValue:0},max:{type:"float",defaultValue:100},min:{type:"float",defaultValue:0},showTickmarks:{type:"boolean",defaultValue:false},showTooltip:{type:"boolean",defaultValue:false},startValue:{type:"float",defaultValue:0},step:{type:"int",defaultValue:1},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},events:{change:{parameters:{}},input:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/RangeSlider.designtime"}});t.call(l.prototype);return l});
@@ -363,7 +363,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/RatingIndicator.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/RatingIndicator"],function(e,a,t){"use strict";var i=e.extend("sap.ui.webc.main.RatingIndicator",{metadata:{library:"sap.ui.webc.main",tag:"ui5-rating-indicator-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},max:{type:"int",defaultValue:5},readonly:{type:"boolean",defaultValue:false},value:{type:"float",defaultValue:0},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},events:{change:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/RatingIndicator.designtime"}});t.call(i.prototype);return i});
@@ -371,7 +371,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/ResponsivePopover.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/ResponsivePopover"],function(e,a){"use strict";var t=a.PopoverHorizontalAlign;var o=a.PopoverPlacementType;var l=a.PopoverVerticalAlign;var r=e.extend("sap.ui.webc.main.ResponsivePopover",{metadata:{library:"sap.ui.webc.main",tag:"ui5-responsive-popover-ui5",properties:{accessibleName:{type:"string",defaultValue:""},allowTargetOverlap:{type:"boolean",defaultValue:false},headerText:{type:"string",defaultValue:""},hideArrow:{type:"boolean",defaultValue:false},hideBackdrop:{type:"boolean",defaultValue:false},horizontalAlign:{type:"sap.ui.webc.main.PopoverHorizontalAlign",defaultValue:t.Center},modal:{type:"boolean",defaultValue:false},open:{type:"boolean",defaultValue:false},placementType:{type:"sap.ui.webc.main.PopoverPlacementType",defaultValue:o.Right},preventFocusRestore:{type:"boolean",defaultValue:false},verticalAlign:{type:"sap.ui.webc.main.PopoverVerticalAlign",defaultValue:l.Center}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},footer:{type:"sap.ui.core.Control",multiple:true,slot:"footer"},header:{type:"sap.ui.core.Control",multiple:true,slot:"header"}},associations:{opener:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"opener"}},ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}},initialFocus:{type:"sap.ui.core.Control",multiple:false,mapping:{type:"property",to:"initialFocus"}}},events:{afterClose:{parameters:{}},afterOpen:{parameters:{}},beforeClose:{allowPreventDefault:true,parameters:{escPressed:{type:"boolean"}}},beforeOpen:{allowPreventDefault:true,parameters:{}}},methods:["applyFocus","close","isOpen","showAt"],designtime:"sap/ui/webc/main/designtime/ResponsivePopover.designtime"}});return r});
@@ -379,7 +379,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Respo
 	"sap/ui/webc/main/SegmentedButton.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/SegmentedButton"],function(e,t){"use strict";var i=e.extend("sap.ui.webc.main.SegmentedButton",{metadata:{library:"sap.ui.webc.main",tag:"ui5-segmented-button-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.ISegmentedButtonItem",multiple:true}},events:{selectionChange:{parameters:{selectedItem:{type:"HTMLElement"}}}},getters:["selectedItem"]}});i.prototype.getFormDoNotAdjustWidth=function(){return true};return i});
@@ -387,7 +387,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Segme
 	"sap/ui/webc/main/SegmentedButtonItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/SegmentedButtonItem"],function(e,t,a){"use strict";var i=t.ButtonDesign;var n=e.extend("sap.ui.webc.main.SegmentedButtonItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-segmented-button-item-ui5",interfaces:["sap.ui.webc.main.ISegmentedButtonItem"],properties:{accessibilityAttributes:{type:"object",defaultValue:{}},accessibleName:{type:"string"},design:{type:"sap.ui.webc.main.ButtonDesign",defaultValue:i.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},iconEnd:{type:"boolean",defaultValue:false},pressed:{type:"boolean",defaultValue:false},submits:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{click:{parameters:{}}}}});a.call(n.prototype);return n});
@@ -395,7 +395,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Select.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/Select","./thirdparty/features/InputElementsFormSupport"],function(e,t,a,r){"use strict";var i=r.ValueState;var p=e.extend("sap.ui.webc.main.Select",{metadata:{library:"sap.ui.webc.main",tag:"ui5-select-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},name:{type:"string",defaultValue:""},required:{type:"boolean",defaultValue:false},valueState:{type:"sap.ui.core.ValueState",defaultValue:i.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"options",aggregations:{options:{type:"sap.ui.webc.main.ISelectOption",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{selectedOption:{type:"HTMLElement"}}}},getters:["selectedOption"]}});a.call(p.prototype);return p});
@@ -403,7 +403,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Slider.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/Slider"],function(e,a,t){"use strict";var i=e.extend("sap.ui.webc.main.Slider",{metadata:{library:"sap.ui.webc.main",tag:"ui5-slider-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},labelInterval:{type:"int",defaultValue:0},max:{type:"float",defaultValue:100},min:{type:"float",defaultValue:0},showTickmarks:{type:"boolean",defaultValue:false},showTooltip:{type:"boolean",defaultValue:false},step:{type:"int",defaultValue:1},value:{type:"float",defaultValue:0},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},events:{change:{parameters:{}},input:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/Slider.designtime"}});t.call(i.prototype);return i});
@@ -411,7 +411,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/SplitButton.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/SplitButton"],function(t,e,a){"use strict";var i=e.ButtonDesign;var n=t.extend("sap.ui.webc.main.SplitButton",{metadata:{library:"sap.ui.webc.main",tag:"ui5-split-button-ui5",properties:{accessibleName:{type:"string"},activeIcon:{type:"string",defaultValue:""},design:{type:"sap.ui.webc.main.ButtonDesign",defaultValue:i.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},text:{type:"string",defaultValue:"",mapping:"textContent"}},events:{arrowClick:{parameters:{}},click:{parameters:{}}}}});a.call(n.prototype);return n});
@@ -419,7 +419,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/StandardListItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/library","./thirdparty/StandardListItem"],function(e,t,a){"use strict";var i=a.ValueState;var n=t.ListItemType;var s=e.extend("sap.ui.webc.main.StandardListItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-li-ui5",interfaces:["sap.ui.webc.main.IListItem"],properties:{accessibleName:{type:"string",defaultValue:""},additionalText:{type:"string"},additionalTextState:{type:"sap.ui.core.ValueState",defaultValue:i.None},description:{type:"string"},icon:{type:"string"},iconEnd:{type:"boolean",defaultValue:false},image:{type:"string"},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},type:{type:"sap.ui.webc.main.ListItemType",defaultValue:n.Active}},events:{detailClick:{parameters:{}}},designtime:"sap/ui/webc/main/designtime/StandardListItem.designtime"}});return s});
@@ -427,7 +427,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/librar
 	"sap/ui/webc/main/StepInput.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/StepInput","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,p){"use strict";var l=p.ValueState;var r=e.extend("sap.ui.webc.main.StepInput",{metadata:{library:"sap.ui.webc.main",tag:"ui5-step-input-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},max:{type:"float"},min:{type:"float"},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:undefined},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},step:{type:"float",defaultValue:1},value:{type:"float",defaultValue:0},valuePrecision:{type:"int",defaultValue:0},valueState:{type:"sap.ui.core.ValueState",defaultValue:l.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}}}}});t.call(r.prototype);return r});
@@ -435,7 +435,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/SuggestionGroupItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/SuggestionGroupItem"],function(e,t){"use strict";var i=e.extend("sap.ui.webc.main.SuggestionGroupItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-suggestion-group-item-ui5",interfaces:["sap.ui.webc.main.IInputSuggestionItem"],properties:{text:{type:"string",defaultValue:""}}}});return i});
@@ -443,7 +443,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Sugge
 	"sap/ui/webc/main/SuggestionItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/library","./thirdparty/SuggestionItem"],function(e,t,i){"use strict";var a=i.ValueState;var n=t.ListItemType;var u=e.extend("sap.ui.webc.main.SuggestionItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-suggestion-item-ui5",interfaces:["sap.ui.webc.main.IInputSuggestionItem"],properties:{additionalText:{type:"string"},additionalTextState:{type:"sap.ui.core.ValueState",defaultValue:a.None},description:{type:"string"},icon:{type:"string"},iconEnd:{type:"boolean",defaultValue:false},image:{type:"string"},text:{type:"string",defaultValue:""},type:{type:"sap.ui.webc.main.ListItemType",defaultValue:n.Active}}}});return u});
@@ -451,7 +451,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/librar
 	"sap/ui/webc/main/Switch.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/Switch"],function(e,t,a){"use strict";var i=t.SwitchDesign;var r=e.extend("sap.ui.webc.main.Switch",{metadata:{library:"sap.ui.webc.main",tag:"ui5-switch-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},checked:{type:"boolean",defaultValue:false},design:{type:"sap.ui.webc.main.SwitchDesign",defaultValue:i.Textual},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},textOff:{type:"string",defaultValue:""},textOn:{type:"string",defaultValue:""},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}}}}});a.call(r.prototype);return r});
@@ -459,7 +459,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Tab.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/Tab"],function(e,a,t){"use strict";var i=a.SemanticColor;var n=e.extend("sap.ui.webc.main.Tab",{metadata:{library:"sap.ui.webc.main",tag:"ui5-tab-ui5",interfaces:["sap.ui.webc.main.ITab"],properties:{additionalText:{type:"string",defaultValue:""},design:{type:"sap.ui.webc.main.SemanticColor",defaultValue:i.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true},subTabs:{type:"sap.ui.webc.main.ITab",multiple:true,slot:"subTabs"}},methods:["getTabInStripDomRef"],designtime:"sap/ui/webc/main/designtime/Tab.designtime"}});t.call(n.prototype);return n});
@@ -467,7 +467,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/TabContainer.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TabContainer"],function(e,a){"use strict";var t=a.TabLayout;var i=a.TabsOverflowMode;var n=e.extend("sap.ui.webc.main.TabContainer",{metadata:{library:"sap.ui.webc.main",tag:"ui5-tabcontainer-ui5",properties:{collapsed:{type:"boolean",defaultValue:false},fixed:{type:"boolean",defaultValue:false},height:{type:"sap.ui.core.CSSSize",mapping:"style"},showOverflow:{type:"boolean",defaultValue:false},tabLayout:{type:"sap.ui.webc.main.TabLayout",defaultValue:t.Standard},tabsOverflowMode:{type:"sap.ui.webc.main.TabsOverflowMode",defaultValue:i.End},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.ITab",multiple:true},overflowButton:{type:"sap.ui.webc.main.IButton",multiple:false,slot:"overflowButton"},startOverflowButton:{type:"sap.ui.webc.main.IButton",multiple:false,slot:"startOverflowButton"}},events:{tabSelect:{parameters:{tab:{type:"HTMLElement"},tabIndex:{type:"int"}}}},designtime:"sap/ui/webc/main/designtime/TabContainer.designtime"}});return n});
@@ -475,7 +475,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TabCo
 	"sap/ui/webc/main/TabSeparator.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TabSeparator"],function(a,e){"use strict";var i=a.extend("sap.ui.webc.main.TabSeparator",{metadata:{library:"sap.ui.webc.main",tag:"ui5-tab-separator-ui5",interfaces:["sap.ui.webc.main.ITab"]}});return i});
@@ -483,7 +483,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TabSe
 	"sap/ui/webc/main/Table.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table"],function(e,a){"use strict";var t=a.TableGrowingMode;var i=a.TableMode;var l=e.extend("sap.ui.webc.main.Table",{metadata:{library:"sap.ui.webc.main",tag:"ui5-table-ui5",properties:{accessibleName:{type:"string"},busy:{type:"boolean",defaultValue:false},busyDelay:{type:"int",defaultValue:1e3},growing:{type:"sap.ui.webc.main.TableGrowingMode",defaultValue:t.None},growingButtonSubtext:{type:"string",defaultValue:""},growingButtonText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},hideNoData:{type:"boolean",defaultValue:false},mode:{type:"sap.ui.webc.main.TableMode",defaultValue:i.None},noDataText:{type:"string",defaultValue:""},stickyColumnHeader:{type:"boolean",defaultValue:false},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"rows",aggregations:{columns:{type:"sap.ui.webc.main.ITableColumn",multiple:true,slot:"columns"},rows:{type:"sap.ui.webc.main.ITableRow",multiple:true}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{loadMore:{parameters:{}},popinChange:{parameters:{poppedColumns:{type:"Array"}}},rowClick:{parameters:{row:{type:"HTMLElement"}}},selectionChange:{parameters:{selectedRows:{type:"Array"},previouslySelectedRows:{type:"Array"}}}},designtime:"sap/ui/webc/main/designtime/Table.designtime"}});return l});
@@ -491,7 +491,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table
 	"sap/ui/webc/main/TableCell.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TableCell"],function(e,a){"use strict";var t=e.extend("sap.ui.webc.main.TableCell",{metadata:{library:"sap.ui.webc.main",tag:"ui5-table-cell-ui5",interfaces:["sap.ui.webc.main.ITableCell"],defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}}}});return t});
@@ -499,7 +499,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table
 	"sap/ui/webc/main/TableColumn.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TableColumn"],function(e,t){"use strict";var a=e.extend("sap.ui.webc.main.TableColumn",{metadata:{library:"sap.ui.webc.main",tag:"ui5-table-column-ui5",interfaces:["sap.ui.webc.main.ITableColumn"],properties:{demandPopin:{type:"boolean",defaultValue:false},minWidth:{type:"int",defaultValue:Infinity},popinText:{type:"string",defaultValue:""}},defaultAggregation:"content",aggregations:{content:{type:"sap.ui.core.Control",multiple:true}},designtime:"sap/ui/webc/main/designtime/TableColumn.designtime"}});return a});
@@ -507,7 +507,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table
 	"sap/ui/webc/main/TableGroupRow.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TableGroupRow"],function(e,a){"use strict";var t=e.extend("sap.ui.webc.main.TableGroupRow",{metadata:{library:"sap.ui.webc.main",tag:"ui5-table-group-row-ui5",interfaces:["sap.ui.webc.main.ITableRow"],properties:{text:{type:"string",defaultValue:"",mapping:"textContent"}}}});return t});
@@ -515,7 +515,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table
 	"sap/ui/webc/main/TableRow.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/TableRow"],function(e,a){"use strict";var t=a.TableRowType;var i=e.extend("sap.ui.webc.main.TableRow",{metadata:{library:"sap.ui.webc.main",tag:"ui5-table-row-ui5",interfaces:["sap.ui.webc.main.ITableRow"],properties:{selected:{type:"boolean",defaultValue:false},type:{type:"sap.ui.webc.main.TableRowType",defaultValue:t.Inactive}},defaultAggregation:"cells",aggregations:{cells:{type:"sap.ui.webc.main.ITableCell",multiple:true}}}});return i});
@@ -523,7 +523,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Table
 	"sap/ui/webc/main/TextArea.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/TextArea","./thirdparty/features/InputElementsFormSupport"],function(e,a,t,l){"use strict";var r=l.ValueState;var p=e.extend("sap.ui.webc.main.TextArea",{metadata:{library:"sap.ui.webc.main",tag:"ui5-textarea-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{accessibleName:{type:"string"},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},growing:{type:"boolean",defaultValue:false},growingMaxLines:{type:"int",defaultValue:0},height:{type:"sap.ui.core.CSSSize",mapping:"style"},maxlength:{type:"int",defaultValue:null},name:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:""},readonly:{type:"boolean",defaultValue:false},required:{type:"boolean",defaultValue:false},rows:{type:"int",defaultValue:0},showExceededText:{type:"boolean",defaultValue:false},value:{type:"string",defaultValue:""},valueState:{type:"sap.ui.core.ValueState",defaultValue:r.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{change:{parameters:{}},input:{parameters:{}}}}});t.call(p.prototype);return p});
@@ -531,7 +531,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/TimePicker.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","sap/ui/core/library","./thirdparty/TimePicker"],function(e,a,t,i){"use strict";var r=i.ValueState;var l=e.extend("sap.ui.webc.main.TimePicker",{metadata:{library:"sap.ui.webc.main",tag:"ui5-time-picker-ui5",interfaces:["sap.ui.core.IFormContent"],properties:{enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},formatPattern:{type:"string",defaultValue:""},placeholder:{type:"string",defaultValue:undefined},readonly:{type:"boolean",defaultValue:false},value:{type:"string",defaultValue:undefined},valueState:{type:"sap.ui.core.ValueState",defaultValue:r.None},valueStateMessage:{type:"string",defaultValue:"",mapping:{type:"slot",to:"div"}},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},events:{change:{parameters:{}},input:{parameters:{}}},methods:["closePicker","formatValue","isOpen","isValid","openPicker"],getters:["dateValue"]}});t.call(l.prototype);return l});
@@ -539,7 +539,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Title.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Title"],function(e,i){"use strict";var t=i.TitleLevel;var a=i.WrappingType;var p=e.extend("sap.ui.webc.main.Title",{metadata:{library:"sap.ui.webc.main",tag:"ui5-title-ui5",properties:{level:{type:"sap.ui.webc.main.TitleLevel",defaultValue:t.H2},text:{type:"string",defaultValue:"",mapping:"textContent"},width:{type:"sap.ui.core.CSSSize",mapping:"style"},wrappingType:{type:"sap.ui.webc.main.WrappingType",defaultValue:a.None}},designtime:"sap/ui/webc/main/designtime/Title.designtime"}});return p});
@@ -547,7 +547,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Title
 	"sap/ui/webc/main/Toast.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Toast"],function(e,t){"use strict";var a=t.ToastPlacement;var i=e.extend("sap.ui.webc.main.Toast",{metadata:{library:"sap.ui.webc.main",tag:"ui5-toast-ui5",properties:{duration:{type:"int",defaultValue:3e3},height:{type:"sap.ui.core.CSSSize",mapping:"style"},placement:{type:"sap.ui.webc.main.ToastPlacement",defaultValue:a.BottomCenter},text:{type:"string",defaultValue:"",mapping:"textContent"},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},methods:["show"]}});return i});
@@ -555,7 +555,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Toast
 	"sap/ui/webc/main/ToggleButton.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/EnabledPropagator","./thirdparty/ToggleButton"],function(e,t,a){"use strict";var i=t.ButtonDesign;var l=e.extend("sap.ui.webc.main.ToggleButton",{metadata:{library:"sap.ui.webc.main",tag:"ui5-toggle-button-ui5",properties:{accessibilityAttributes:{type:"object",defaultValue:{}},accessibleName:{type:"string"},design:{type:"sap.ui.webc.main.ButtonDesign",defaultValue:i.Default},enabled:{type:"boolean",defaultValue:true,mapping:{type:"attribute",to:"disabled",formatter:"_mapEnabled"}},icon:{type:"string",defaultValue:""},iconEnd:{type:"boolean",defaultValue:false},pressed:{type:"boolean",defaultValue:false},submits:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:"",mapping:"textContent"},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},associations:{ariaLabelledBy:{type:"sap.ui.core.Control",multiple:true,mapping:{type:"property",to:"accessibleNameRef",formatter:"_getAriaLabelledByForRendering"}}},events:{click:{parameters:{}}}}});a.call(l.prototype);return l});
@@ -563,7 +563,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/Enable
 	"sap/ui/webc/main/Token.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Token"],function(e,a){"use strict";var t=e.extend("sap.ui.webc.main.Token",{metadata:{library:"sap.ui.webc.main",tag:"ui5-token-ui5",interfaces:["sap.ui.webc.main.IToken"],properties:{readonly:{type:"boolean"},selected:{type:"boolean"},text:{type:"string",defaultValue:""}},aggregations:{closeIcon:{type:"sap.ui.webc.main.IIcon",multiple:false,slot:"closeIcon"}},events:{select:{parameters:{}}}}});return t});
@@ -571,7 +571,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Token
 	"sap/ui/webc/main/Tree.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Tree"],function(e,t){"use strict";var a=t.ListMode;var r=e.extend("sap.ui.webc.main.Tree",{metadata:{library:"sap.ui.webc.main",tag:"ui5-tree-ui5",properties:{footerText:{type:"string",defaultValue:""},headerText:{type:"string",defaultValue:""},height:{type:"sap.ui.core.CSSSize",mapping:"style"},mode:{type:"sap.ui.webc.main.ListMode",defaultValue:a.None},noDataText:{type:"string",defaultValue:""},width:{type:"sap.ui.core.CSSSize",mapping:"style"}},defaultAggregation:"items",aggregations:{header:{type:"sap.ui.core.Control",multiple:true,slot:"header"},items:{type:"sap.ui.webc.main.ITreeItem",multiple:true}},events:{itemClick:{allowPreventDefault:true,parameters:{item:{type:"HTMLElement"}}},itemDelete:{parameters:{item:{type:"HTMLElement"}}},itemMouseout:{parameters:{item:{type:"HTMLElement"}}},itemMouseover:{parameters:{item:{type:"HTMLElement"}}},itemToggle:{allowPreventDefault:true,parameters:{item:{type:"HTMLElement"}}},selectionChange:{parameters:{selectedItems:{type:"Array"},previouslySelectedItems:{type:"Array"}}}},methods:["walk"]}});return r});
@@ -579,7 +579,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","./thirdparty/Tree"
 	"sap/ui/webc/main/TreeItem.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/library","./thirdparty/TreeItem"],function(e,t,a){"use strict";var i=a.ValueState;var l=e.extend("sap.ui.webc.main.TreeItem",{metadata:{library:"sap.ui.webc.main",tag:"ui5-tree-item-ui5",interfaces:["sap.ui.webc.main.ITreeItem"],properties:{additionalText:{type:"string"},additionalTextState:{type:"sap.ui.core.ValueState",defaultValue:i.None},expanded:{type:"boolean",defaultValue:false},hasChildren:{type:"boolean",defaultValue:false},icon:{type:"string",defaultValue:""},indeterminate:{type:"boolean",defaultValue:false},selected:{type:"boolean",defaultValue:false},text:{type:"string",defaultValue:""}},defaultAggregation:"items",aggregations:{items:{type:"sap.ui.webc.main.ITreeItem",multiple:true}},methods:["toggle"]}});return l});
@@ -587,7 +587,7 @@ sap.ui.define(["sap/ui/webc/common/WebComponent","./library","sap/ui/core/librar
 	"sap/ui/webc/main/changeHandler/ChangeLinkTarget.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(function(){"use strict";var t={};t.applyChange=function(t,e,r){var n=r.modifier;var a=t.getContent();var o=a;return Promise.resolve().then(n.getProperty.bind(n,e,"target")).then(function(r){var a={target:r};n.setProperty(e,"target",o);t.setRevertData(a)})};t.revertChange=function(t,e,r){var n=r.modifier;var a=t.getRevertData();var o=a.target;n.setProperty(e,"target",o)};t.completeChangeContent=function(t,e,r){};return t});
@@ -595,7 +595,7 @@ sap.ui.define(function(){"use strict";var t={};t.applyChange=function(t,e,r){var
 	"sap/ui/webc/main/flexibility/Badge.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -603,7 +603,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/BreadcrumbsItem.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -611,7 +611,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Button.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XBUT"}),unhideControl:"default"}});
@@ -619,7 +619,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/CheckBox.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -627,7 +627,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Dialog.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -635,7 +635,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Label.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -643,7 +643,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Link.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename","sap/ui/webc/main/changeHandler/ChangeLinkTarget"],function(e,a){"use strict";return{hideControl:"default",unhideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XBUT"}),changeLinkTarget:{changeHandler:a,layers:{CUSTOMER:false}}}});
@@ -651,7 +651,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename","sap/ui/webc/main/changeHand
 	"sap/ui/webc/main/flexibility/List.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XTIT"}),unhideControl:"default",moveControls:"default"}});
@@ -659,7 +659,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Panel.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",moveControls:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XGRP"}),unhideControl:"default"}},true);
@@ -667,7 +667,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Popover.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -675,7 +675,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/RadioButton.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -683,7 +683,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/ResponsivePopover.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"headerText",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -691,7 +691,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/StandardListItem.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
@@ -699,7 +699,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Tab.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XBUT"})}});
@@ -707,7 +707,7 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/TabContainer.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XBUT"}),unhideControl:"default"}});
@@ -715,23 +715,28 @@ sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";re
 	"sap/ui/webc/main/flexibility/Title.flexibility.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(["sap/ui/fl/changeHandler/BaseRename"],function(e){"use strict";return{hideControl:"default",rename:e.createRenameChangeHandler({propertyName:"text",translationTextType:"XTIT"}),unhideControl:"default"}});
 },
 	"sap/ui/webc/main/library.config.js":function(){
+/*!
+ * OpenUI5
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
+ * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
+ */
 sap.ui.define(["sap/ui/webc/common/thirdparty/base/CSP"],function(e){"use strict";e.setPackageCSSRoot("@ui5/webcomponents",sap.ui.require.toUrl("sap/ui/webc/main/thirdparty/css/"))});
 },
 	"sap/ui/webc/main/library.js":function(){
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
-sap.ui.define(["sap/ui/webc/common/library","./thirdparty/Assets","./library.config"],function(e){"use strict";var i=sap.ui.getCore().initLibrary({name:"sap.ui.webc.main",version:"1.108.2",dependencies:["sap.ui.core","sap.ui.webc.common"],noLibraryCSS:true,designtime:"sap/ui/webc/main/designtime/library.designtime",interfaces:["sap.ui.webc.main.IAvatar","sap.ui.webc.main.IBreadcrumbsItem","sap.ui.webc.main.IButton","sap.ui.webc.main.ICalendarDate","sap.ui.webc.main.IColorPaletteItem","sap.ui.webc.main.IComboBoxItem","sap.ui.webc.main.IIcon","sap.ui.webc.main.IInput","sap.ui.webc.main.IInputSuggestionItem","sap.ui.webc.main.IListItem","sap.ui.webc.main.IMenuItem","sap.ui.webc.main.IMultiComboBoxItem","sap.ui.webc.main.ISegmentedButtonItem","sap.ui.webc.main.ISelectOption","sap.ui.webc.main.ITab","sap.ui.webc.main.ITableCell","sap.ui.webc.main.ITableColumn","sap.ui.webc.main.ITableRow","sap.ui.webc.main.IToken","sap.ui.webc.main.ITreeItem"],types:["sap.ui.webc.main.AvatarColorScheme","sap.ui.webc.main.AvatarGroupType","sap.ui.webc.main.AvatarShape","sap.ui.webc.main.AvatarSize","sap.ui.webc.main.BreadcrumbsDesign","sap.ui.webc.main.BreadcrumbsSeparatorStyle","sap.ui.webc.main.BusyIndicatorSize","sap.ui.webc.main.ButtonDesign","sap.ui.webc.main.CalendarSelectionMode","sap.ui.webc.main.CarouselArrowsPlacement","sap.ui.webc.main.GrowingMode","sap.ui.webc.main.HasPopup","sap.ui.webc.main.InputType","sap.ui.webc.main.LinkDesign","sap.ui.webc.main.ListGrowingMode","sap.ui.webc.main.ListItemType","sap.ui.webc.main.ListMode","sap.ui.webc.main.ListSeparators","sap.ui.webc.main.MessageStripDesign","sap.ui.webc.main.PanelAccessibleRole","sap.ui.webc.main.PopoverHorizontalAlign","sap.ui.webc.main.PopoverPlacementType","sap.ui.webc.main.PopoverVerticalAlign","sap.ui.webc.main.Priority","sap.ui.webc.main.SemanticColor","sap.ui.webc.main.SwitchDesign","sap.ui.webc.main.TabLayout","sap.ui.webc.main.TableGrowingMode","sap.ui.webc.main.TableMode","sap.ui.webc.main.TableRowType","sap.ui.webc.main.TabsOverflowMode","sap.ui.webc.main.TitleLevel","sap.ui.webc.main.ToastPlacement","sap.ui.webc.main.WrappingType"],controls:["sap.ui.webc.main.Avatar","sap.ui.webc.main.AvatarGroup","sap.ui.webc.main.Badge","sap.ui.webc.main.Breadcrumbs","sap.ui.webc.main.BreadcrumbsItem","sap.ui.webc.main.BusyIndicator","sap.ui.webc.main.Button","sap.ui.webc.main.Calendar","sap.ui.webc.main.CalendarDate","sap.ui.webc.main.Card","sap.ui.webc.main.CardHeader","sap.ui.webc.main.Carousel","sap.ui.webc.main.CheckBox","sap.ui.webc.main.ColorPalette","sap.ui.webc.main.ColorPaletteItem","sap.ui.webc.main.ColorPalettePopover","sap.ui.webc.main.ColorPicker","sap.ui.webc.main.ComboBox","sap.ui.webc.main.ComboBoxGroupItem","sap.ui.webc.main.ComboBoxItem","sap.ui.webc.main.CustomListItem","sap.ui.webc.main.DatePicker","sap.ui.webc.main.DateRangePicker","sap.ui.webc.main.DateTimePicker","sap.ui.webc.main.Dialog","sap.ui.webc.main.FileUploader","sap.ui.webc.main.GroupHeaderListItem","sap.ui.webc.main.Icon","sap.ui.webc.main.Input","sap.ui.webc.main.Label","sap.ui.webc.main.Link","sap.ui.webc.main.List","sap.ui.webc.main.Menu","sap.ui.webc.main.MenuItem","sap.ui.webc.main.MessageStrip","sap.ui.webc.main.MultiComboBox","sap.ui.webc.main.MultiComboBoxGroupItem","sap.ui.webc.main.MultiComboBoxItem","sap.ui.webc.main.MultiInput","sap.ui.webc.main.Option","sap.ui.webc.main.Panel","sap.ui.webc.main.Popover","sap.ui.webc.main.ProgressIndicator","sap.ui.webc.main.RadioButton","sap.ui.webc.main.RangeSlider","sap.ui.webc.main.RatingIndicator","sap.ui.webc.main.ResponsivePopover","sap.ui.webc.main.SegmentedButton","sap.ui.webc.main.SegmentedButtonItem","sap.ui.webc.main.Select","sap.ui.webc.main.Slider","sap.ui.webc.main.SplitButton","sap.ui.webc.main.StandardListItem","sap.ui.webc.main.StepInput","sap.ui.webc.main.SuggestionGroupItem","sap.ui.webc.main.SuggestionItem","sap.ui.webc.main.Switch","sap.ui.webc.main.Tab","sap.ui.webc.main.TabContainer","sap.ui.webc.main.Table","sap.ui.webc.main.TableCell","sap.ui.webc.main.TableColumn","sap.ui.webc.main.TableGroupRow","sap.ui.webc.main.TableRow","sap.ui.webc.main.TabSeparator","sap.ui.webc.main.TextArea","sap.ui.webc.main.TimePicker","sap.ui.webc.main.Title","sap.ui.webc.main.Toast","sap.ui.webc.main.ToggleButton","sap.ui.webc.main.Token","sap.ui.webc.main.Tree","sap.ui.webc.main.TreeItem"],elements:[],extensions:{flChangeHandlers:{"sap.ui.webc.main.Avatar":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Badge":"sap/ui/webc/main/flexibility/Badge","sap.ui.webc.main.BreadcrumbsItem":"sap/ui/webc/main/flexibility/BreadcrumbsItem","sap.ui.webc.main.BusyIndicator":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Button":"sap/ui/webc/main/flexibility/Button","sap.ui.webc.main.Card":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Carousel":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.CheckBox":"sap/ui/webc/main/flexibility/CheckBox","sap.ui.webc.main.CustomListItem":{hideControl:"default",unhideControl:"default",moveControls:"default"},"sap.ui.webc.main.DatePicker":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.DateTimePicker":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Dialog":"sap/ui/webc/main/flexibility/Dialog","sap.ui.webc.main.Input":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Label":"sap/ui/webc/main/flexibility/Label","sap.ui.webc.main.Link":"sap/ui/webc/main/flexibility/Link","sap.ui.webc.main.List":"sap/ui/webc/main/flexibility/List","sap.ui.webc.main.MultiInput":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Panel":"sap/ui/webc/main/flexibility/Panel","sap.ui.webc.main.Popover":"sap/ui/webc/main/flexibility/Popover","sap.ui.webc.main.RadioButton":"sap/ui/webc/main/flexibility/RadioButton","sap.ui.webc.main.RangeSlider":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.RatingIndicator":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.ResponsivePopover":"sap/ui/webc/main/flexibility/ResponsivePopover","sap.ui.webc.main.Slider":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.StandardListItem":"sap/ui/webc/main/flexibility/StandardListItem","sap.ui.webc.main.Tab":"sap/ui/webc/main/flexibility/Tab","sap.ui.webc.main.TabContainer":"sap/ui/webc/main/flexibility/TabContainer","sap.ui.webc.main.Table":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Title":"sap/ui/webc/main/flexibility/Title"}}});i.AvatarColorScheme={Accent1:"Accent1",Accent10:"Accent10",Accent2:"Accent2",Accent3:"Accent3",Accent4:"Accent4",Accent5:"Accent5",Accent6:"Accent6",Accent7:"Accent7",Accent8:"Accent8",Accent9:"Accent9",Placeholder:"Placeholder"};i.AvatarGroupType={Group:"Group",Individual:"Individual"};i.AvatarShape={Circle:"Circle",Square:"Square"};i.AvatarSize={L:"L",M:"M",S:"S",XL:"XL",XS:"XS"};i.BreadcrumbsDesign={NoCurrentPage:"NoCurrentPage",Standard:"Standard"};i.BreadcrumbsSeparatorStyle={BackSlash:"BackSlash",DoubleBackSlash:"DoubleBackSlash",DoubleGreaterThan:"DoubleGreaterThan",DoubleSlash:"DoubleSlash",GreaterThan:"GreaterThan",Slash:"Slash"};i.BusyIndicatorSize={Large:"Large",Medium:"Medium",Small:"Small"};i.ButtonDesign={Attention:"Attention",Default:"Default",Emphasized:"Emphasized",Negative:"Negative",Positive:"Positive",Transparent:"Transparent"};i.CalendarSelectionMode={Multiple:"Multiple",Range:"Range",Single:"Single"};i.CarouselArrowsPlacement={Content:"Content",Navigation:"Navigation"};i.GrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.HasPopup={Dialog:"Dialog",Grid:"Grid",ListBox:"ListBox",Menu:"Menu",Tree:"Tree"};i.InputType={Email:"Email",Number:"Number",Password:"Password",Tel:"Tel",Text:"Text",URL:"URL"};i.LinkDesign={Default:"Default",Emphasized:"Emphasized",Subtle:"Subtle"};i.ListGrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.ListItemType={Active:"Active",Detail:"Detail",Inactive:"Inactive"};i.ListMode={Delete:"Delete",MultiSelect:"MultiSelect",None:"None",SingleSelect:"SingleSelect",SingleSelectAuto:"SingleSelectAuto",SingleSelectBegin:"SingleSelectBegin",SingleSelectEnd:"SingleSelectEnd"};i.ListSeparators={All:"All",Inner:"Inner",None:"None"};i.MessageStripDesign={Information:"Information",Negative:"Negative",Positive:"Positive",Warning:"Warning"};i.PanelAccessibleRole={Complementary:"Complementary",Form:"Form",Region:"Region"};i.PopoverHorizontalAlign={Center:"Center",Left:"Left",Right:"Right",Stretch:"Stretch"};i.PopoverPlacementType={Bottom:"Bottom",Left:"Left",Right:"Right",Top:"Top"};i.PopoverVerticalAlign={Bottom:"Bottom",Center:"Center",Stretch:"Stretch",Top:"Top"};i.Priority={High:"High",Low:"Low",Medium:"Medium",None:"None"};i.SemanticColor={Critical:"Critical",Default:"Default",Negative:"Negative",Neutral:"Neutral",Positive:"Positive"};i.SwitchDesign={Graphical:"Graphical",Textual:"Textual"};i.TabLayout={Inline:"Inline",Standard:"Standard"};i.TableGrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.TableMode={MultiSelect:"MultiSelect",None:"None",SingleSelect:"SingleSelect"};i.TableRowType={Active:"Active",Inactive:"Inactive"};i.TabsOverflowMode={End:"End",StartAndEnd:"StartAndEnd"};i.TitleLevel={H1:"H1",H2:"H2",H3:"H3",H4:"H4",H5:"H5",H6:"H6"};i.ToastPlacement={BottomCenter:"BottomCenter",BottomEnd:"BottomEnd",BottomStart:"BottomStart",MiddleCenter:"MiddleCenter",MiddleEnd:"MiddleEnd",MiddleStart:"MiddleStart",TopCenter:"TopCenter",TopEnd:"TopEnd",TopStart:"TopStart"};i.WrappingType={None:"None",Normal:"Normal"};return i});
+sap.ui.define(["sap/ui/webc/common/library","./thirdparty/Assets","./library.config"],function(e){"use strict";var i=sap.ui.getCore().initLibrary({name:"sap.ui.webc.main",version:"1.113.0",dependencies:["sap.ui.core","sap.ui.webc.common"],noLibraryCSS:true,designtime:"sap/ui/webc/main/designtime/library.designtime",interfaces:["sap.ui.webc.main.IAvatar","sap.ui.webc.main.IBreadcrumbsItem","sap.ui.webc.main.IButton","sap.ui.webc.main.ICalendarDate","sap.ui.webc.main.IColorPaletteItem","sap.ui.webc.main.IComboBoxItem","sap.ui.webc.main.IIcon","sap.ui.webc.main.IInput","sap.ui.webc.main.IInputSuggestionItem","sap.ui.webc.main.IListItem","sap.ui.webc.main.IMenuItem","sap.ui.webc.main.IMultiComboBoxItem","sap.ui.webc.main.ISegmentedButtonItem","sap.ui.webc.main.ISelectOption","sap.ui.webc.main.ITab","sap.ui.webc.main.ITableCell","sap.ui.webc.main.ITableColumn","sap.ui.webc.main.ITableRow","sap.ui.webc.main.IToken","sap.ui.webc.main.ITreeItem"],types:["sap.ui.webc.main.AvatarColorScheme","sap.ui.webc.main.AvatarGroupType","sap.ui.webc.main.AvatarShape","sap.ui.webc.main.AvatarSize","sap.ui.webc.main.BreadcrumbsDesign","sap.ui.webc.main.BreadcrumbsSeparatorStyle","sap.ui.webc.main.BusyIndicatorSize","sap.ui.webc.main.ButtonDesign","sap.ui.webc.main.CalendarSelectionMode","sap.ui.webc.main.CarouselArrowsPlacement","sap.ui.webc.main.GrowingMode","sap.ui.webc.main.HasPopup","sap.ui.webc.main.InputType","sap.ui.webc.main.LinkDesign","sap.ui.webc.main.ListGrowingMode","sap.ui.webc.main.ListItemType","sap.ui.webc.main.ListMode","sap.ui.webc.main.ListSeparators","sap.ui.webc.main.MessageStripDesign","sap.ui.webc.main.PanelAccessibleRole","sap.ui.webc.main.PopoverHorizontalAlign","sap.ui.webc.main.PopoverPlacementType","sap.ui.webc.main.PopoverVerticalAlign","sap.ui.webc.main.Priority","sap.ui.webc.main.SemanticColor","sap.ui.webc.main.SwitchDesign","sap.ui.webc.main.TabLayout","sap.ui.webc.main.TableGrowingMode","sap.ui.webc.main.TableMode","sap.ui.webc.main.TableRowType","sap.ui.webc.main.TabsOverflowMode","sap.ui.webc.main.TitleLevel","sap.ui.webc.main.ToastPlacement","sap.ui.webc.main.WrappingType"],controls:["sap.ui.webc.main.Avatar","sap.ui.webc.main.AvatarGroup","sap.ui.webc.main.Badge","sap.ui.webc.main.Breadcrumbs","sap.ui.webc.main.BreadcrumbsItem","sap.ui.webc.main.BusyIndicator","sap.ui.webc.main.Button","sap.ui.webc.main.Calendar","sap.ui.webc.main.CalendarDate","sap.ui.webc.main.Card","sap.ui.webc.main.CardHeader","sap.ui.webc.main.Carousel","sap.ui.webc.main.CheckBox","sap.ui.webc.main.ColorPalette","sap.ui.webc.main.ColorPaletteItem","sap.ui.webc.main.ColorPalettePopover","sap.ui.webc.main.ColorPicker","sap.ui.webc.main.ComboBox","sap.ui.webc.main.ComboBoxGroupItem","sap.ui.webc.main.ComboBoxItem","sap.ui.webc.main.CustomListItem","sap.ui.webc.main.DatePicker","sap.ui.webc.main.DateRangePicker","sap.ui.webc.main.DateTimePicker","sap.ui.webc.main.Dialog","sap.ui.webc.main.FileUploader","sap.ui.webc.main.GroupHeaderListItem","sap.ui.webc.main.Icon","sap.ui.webc.main.Input","sap.ui.webc.main.Label","sap.ui.webc.main.Link","sap.ui.webc.main.List","sap.ui.webc.main.Menu","sap.ui.webc.main.MenuItem","sap.ui.webc.main.MessageStrip","sap.ui.webc.main.MultiComboBox","sap.ui.webc.main.MultiComboBoxGroupItem","sap.ui.webc.main.MultiComboBoxItem","sap.ui.webc.main.MultiInput","sap.ui.webc.main.Option","sap.ui.webc.main.Panel","sap.ui.webc.main.Popover","sap.ui.webc.main.ProgressIndicator","sap.ui.webc.main.RadioButton","sap.ui.webc.main.RangeSlider","sap.ui.webc.main.RatingIndicator","sap.ui.webc.main.ResponsivePopover","sap.ui.webc.main.SegmentedButton","sap.ui.webc.main.SegmentedButtonItem","sap.ui.webc.main.Select","sap.ui.webc.main.Slider","sap.ui.webc.main.SplitButton","sap.ui.webc.main.StandardListItem","sap.ui.webc.main.StepInput","sap.ui.webc.main.SuggestionGroupItem","sap.ui.webc.main.SuggestionItem","sap.ui.webc.main.Switch","sap.ui.webc.main.Tab","sap.ui.webc.main.TabContainer","sap.ui.webc.main.Table","sap.ui.webc.main.TableCell","sap.ui.webc.main.TableColumn","sap.ui.webc.main.TableGroupRow","sap.ui.webc.main.TableRow","sap.ui.webc.main.TabSeparator","sap.ui.webc.main.TextArea","sap.ui.webc.main.TimePicker","sap.ui.webc.main.Title","sap.ui.webc.main.Toast","sap.ui.webc.main.ToggleButton","sap.ui.webc.main.Token","sap.ui.webc.main.Tree","sap.ui.webc.main.TreeItem"],elements:[],extensions:{flChangeHandlers:{"sap.ui.webc.main.Avatar":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Badge":"sap/ui/webc/main/flexibility/Badge","sap.ui.webc.main.BreadcrumbsItem":"sap/ui/webc/main/flexibility/BreadcrumbsItem","sap.ui.webc.main.BusyIndicator":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Button":"sap/ui/webc/main/flexibility/Button","sap.ui.webc.main.Card":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Carousel":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.CheckBox":"sap/ui/webc/main/flexibility/CheckBox","sap.ui.webc.main.CustomListItem":{hideControl:"default",unhideControl:"default",moveControls:"default"},"sap.ui.webc.main.DatePicker":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.DateTimePicker":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Dialog":"sap/ui/webc/main/flexibility/Dialog","sap.ui.webc.main.Input":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Label":"sap/ui/webc/main/flexibility/Label","sap.ui.webc.main.Link":"sap/ui/webc/main/flexibility/Link","sap.ui.webc.main.List":"sap/ui/webc/main/flexibility/List","sap.ui.webc.main.MultiInput":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Panel":"sap/ui/webc/main/flexibility/Panel","sap.ui.webc.main.Popover":"sap/ui/webc/main/flexibility/Popover","sap.ui.webc.main.RadioButton":"sap/ui/webc/main/flexibility/RadioButton","sap.ui.webc.main.RangeSlider":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.RatingIndicator":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.ResponsivePopover":"sap/ui/webc/main/flexibility/ResponsivePopover","sap.ui.webc.main.Slider":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.StandardListItem":"sap/ui/webc/main/flexibility/StandardListItem","sap.ui.webc.main.Tab":"sap/ui/webc/main/flexibility/Tab","sap.ui.webc.main.TabContainer":"sap/ui/webc/main/flexibility/TabContainer","sap.ui.webc.main.Table":{hideControl:"default",unhideControl:"default"},"sap.ui.webc.main.Title":"sap/ui/webc/main/flexibility/Title"}}});i.AvatarColorScheme={Accent1:"Accent1",Accent10:"Accent10",Accent2:"Accent2",Accent3:"Accent3",Accent4:"Accent4",Accent5:"Accent5",Accent6:"Accent6",Accent7:"Accent7",Accent8:"Accent8",Accent9:"Accent9",Placeholder:"Placeholder"};i.AvatarGroupType={Group:"Group",Individual:"Individual"};i.AvatarShape={Circle:"Circle",Square:"Square"};i.AvatarSize={L:"L",M:"M",S:"S",XL:"XL",XS:"XS"};i.BreadcrumbsDesign={NoCurrentPage:"NoCurrentPage",Standard:"Standard"};i.BreadcrumbsSeparatorStyle={BackSlash:"BackSlash",DoubleBackSlash:"DoubleBackSlash",DoubleGreaterThan:"DoubleGreaterThan",DoubleSlash:"DoubleSlash",GreaterThan:"GreaterThan",Slash:"Slash"};i.BusyIndicatorSize={Large:"Large",Medium:"Medium",Small:"Small"};i.ButtonDesign={Attention:"Attention",Default:"Default",Emphasized:"Emphasized",Negative:"Negative",Positive:"Positive",Transparent:"Transparent"};i.CalendarSelectionMode={Multiple:"Multiple",Range:"Range",Single:"Single"};i.CarouselArrowsPlacement={Content:"Content",Navigation:"Navigation"};i.GrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.HasPopup={Dialog:"Dialog",Grid:"Grid",ListBox:"ListBox",Menu:"Menu",Tree:"Tree"};i.InputType={Email:"Email",Number:"Number",Password:"Password",Tel:"Tel",Text:"Text",URL:"URL"};i.LinkDesign={Default:"Default",Emphasized:"Emphasized",Subtle:"Subtle"};i.ListGrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.ListItemType={Active:"Active",Detail:"Detail",Inactive:"Inactive"};i.ListMode={Delete:"Delete",MultiSelect:"MultiSelect",None:"None",SingleSelect:"SingleSelect",SingleSelectAuto:"SingleSelectAuto",SingleSelectBegin:"SingleSelectBegin",SingleSelectEnd:"SingleSelectEnd"};i.ListSeparators={All:"All",Inner:"Inner",None:"None"};i.MessageStripDesign={Information:"Information",Negative:"Negative",Positive:"Positive",Warning:"Warning"};i.PanelAccessibleRole={Complementary:"Complementary",Form:"Form",Region:"Region"};i.PopoverHorizontalAlign={Center:"Center",Left:"Left",Right:"Right",Stretch:"Stretch"};i.PopoverPlacementType={Bottom:"Bottom",Left:"Left",Right:"Right",Top:"Top"};i.PopoverVerticalAlign={Bottom:"Bottom",Center:"Center",Stretch:"Stretch",Top:"Top"};i.Priority={High:"High",Low:"Low",Medium:"Medium",None:"None"};i.SemanticColor={Critical:"Critical",Default:"Default",Negative:"Negative",Neutral:"Neutral",Positive:"Positive"};i.SwitchDesign={Graphical:"Graphical",Textual:"Textual"};i.TabLayout={Inline:"Inline",Standard:"Standard"};i.TableGrowingMode={Button:"Button",None:"None",Scroll:"Scroll"};i.TableMode={MultiSelect:"MultiSelect",None:"None",SingleSelect:"SingleSelect"};i.TableRowType={Active:"Active",Inactive:"Inactive"};i.TabsOverflowMode={End:"End",StartAndEnd:"StartAndEnd"};i.TitleLevel={H1:"H1",H2:"H2",H3:"H3",H4:"H4",H5:"H5",H6:"H6"};i.ToastPlacement={BottomCenter:"BottomCenter",BottomEnd:"BottomEnd",BottomStart:"BottomStart",MiddleCenter:"MiddleCenter",MiddleEnd:"MiddleEnd",MiddleStart:"MiddleStart",TopCenter:"TopCenter",TopEnd:"TopEnd",TopStart:"TopStart"};i.WrappingType={None:"None",Normal:"Normal"};return i});
 },
-	"sap/ui/webc/main/manifest.json":'{"_version":"1.21.0","sap.app":{"id":"sap.ui.webc.main","type":"library","embeds":[],"applicationVersion":{"version":"1.108.2"},"title":"UI5 Web Components Retrofit Main Components","description":"UI5 Web Components Retrofit Main Components","ach":"CA-UI5-CTR","resources":"resources.json","offline":true,"openSourceComponents":[{"name":"ui5-web-components","packagedWithMySelf":true,"version":"1.5.0"}]},"sap.ui":{"technology":"UI5","supportedThemes":[]},"sap.ui5":{"dependencies":{"minUI5Version":"1.108","libs":{"sap.ui.core":{"minVersion":"1.108.2"},"sap.ui.webc.common":{"minVersion":"1.108.2"}}},"library":{"i18n":false,"css":false,"content":{"controls":["sap.ui.webc.main.Avatar","sap.ui.webc.main.AvatarGroup","sap.ui.webc.main.Badge","sap.ui.webc.main.Breadcrumbs","sap.ui.webc.main.BreadcrumbsItem","sap.ui.webc.main.BusyIndicator","sap.ui.webc.main.Button","sap.ui.webc.main.Calendar","sap.ui.webc.main.CalendarDate","sap.ui.webc.main.Card","sap.ui.webc.main.CardHeader","sap.ui.webc.main.Carousel","sap.ui.webc.main.CheckBox","sap.ui.webc.main.ColorPalette","sap.ui.webc.main.ColorPaletteItem","sap.ui.webc.main.ColorPalettePopover","sap.ui.webc.main.ColorPicker","sap.ui.webc.main.ComboBox","sap.ui.webc.main.ComboBoxGroupItem","sap.ui.webc.main.ComboBoxItem","sap.ui.webc.main.CustomListItem","sap.ui.webc.main.DatePicker","sap.ui.webc.main.DateRangePicker","sap.ui.webc.main.DateTimePicker","sap.ui.webc.main.Dialog","sap.ui.webc.main.FileUploader","sap.ui.webc.main.GroupHeaderListItem","sap.ui.webc.main.Icon","sap.ui.webc.main.Input","sap.ui.webc.main.Label","sap.ui.webc.main.Link","sap.ui.webc.main.List","sap.ui.webc.main.Menu","sap.ui.webc.main.MenuItem","sap.ui.webc.main.MessageStrip","sap.ui.webc.main.MultiComboBox","sap.ui.webc.main.MultiComboBoxGroupItem","sap.ui.webc.main.MultiComboBoxItem","sap.ui.webc.main.MultiInput","sap.ui.webc.main.Option","sap.ui.webc.main.Panel","sap.ui.webc.main.Popover","sap.ui.webc.main.ProgressIndicator","sap.ui.webc.main.RadioButton","sap.ui.webc.main.RangeSlider","sap.ui.webc.main.RatingIndicator","sap.ui.webc.main.ResponsivePopover","sap.ui.webc.main.SegmentedButton","sap.ui.webc.main.SegmentedButtonItem","sap.ui.webc.main.Select","sap.ui.webc.main.Slider","sap.ui.webc.main.SplitButton","sap.ui.webc.main.StandardListItem","sap.ui.webc.main.StepInput","sap.ui.webc.main.SuggestionGroupItem","sap.ui.webc.main.SuggestionItem","sap.ui.webc.main.Switch","sap.ui.webc.main.Tab","sap.ui.webc.main.TabContainer","sap.ui.webc.main.Table","sap.ui.webc.main.TableCell","sap.ui.webc.main.TableColumn","sap.ui.webc.main.TableGroupRow","sap.ui.webc.main.TableRow","sap.ui.webc.main.TabSeparator","sap.ui.webc.main.TextArea","sap.ui.webc.main.TimePicker","sap.ui.webc.main.Title","sap.ui.webc.main.Toast","sap.ui.webc.main.ToggleButton","sap.ui.webc.main.Token","sap.ui.webc.main.Tree","sap.ui.webc.main.TreeItem"],"elements":[],"types":["sap.ui.webc.main.AvatarColorScheme","sap.ui.webc.main.AvatarGroupType","sap.ui.webc.main.AvatarShape","sap.ui.webc.main.AvatarSize","sap.ui.webc.main.BreadcrumbsDesign","sap.ui.webc.main.BreadcrumbsSeparatorStyle","sap.ui.webc.main.BusyIndicatorSize","sap.ui.webc.main.ButtonDesign","sap.ui.webc.main.CalendarSelectionMode","sap.ui.webc.main.CarouselArrowsPlacement","sap.ui.webc.main.GrowingMode","sap.ui.webc.main.HasPopup","sap.ui.webc.main.InputType","sap.ui.webc.main.LinkDesign","sap.ui.webc.main.ListGrowingMode","sap.ui.webc.main.ListItemType","sap.ui.webc.main.ListMode","sap.ui.webc.main.ListSeparators","sap.ui.webc.main.MessageStripDesign","sap.ui.webc.main.PanelAccessibleRole","sap.ui.webc.main.PopoverHorizontalAlign","sap.ui.webc.main.PopoverPlacementType","sap.ui.webc.main.PopoverVerticalAlign","sap.ui.webc.main.Priority","sap.ui.webc.main.SemanticColor","sap.ui.webc.main.SwitchDesign","sap.ui.webc.main.TabLayout","sap.ui.webc.main.TableGrowingMode","sap.ui.webc.main.TableMode","sap.ui.webc.main.TableRowType","sap.ui.webc.main.TabsOverflowMode","sap.ui.webc.main.TitleLevel","sap.ui.webc.main.ToastPlacement","sap.ui.webc.main.WrappingType"],"interfaces":["sap.ui.webc.main.IAvatar","sap.ui.webc.main.IBreadcrumbsItem","sap.ui.webc.main.IButton","sap.ui.webc.main.ICalendarDate","sap.ui.webc.main.IColorPaletteItem","sap.ui.webc.main.IComboBoxItem","sap.ui.webc.main.IIcon","sap.ui.webc.main.IInput","sap.ui.webc.main.IInputSuggestionItem","sap.ui.webc.main.IListItem","sap.ui.webc.main.IMenuItem","sap.ui.webc.main.IMultiComboBoxItem","sap.ui.webc.main.ISegmentedButtonItem","sap.ui.webc.main.ISelectOption","sap.ui.webc.main.ITab","sap.ui.webc.main.ITableCell","sap.ui.webc.main.ITableColumn","sap.ui.webc.main.ITableRow","sap.ui.webc.main.IToken","sap.ui.webc.main.ITreeItem"]}}}}',
+	"sap/ui/webc/main/manifest.json":'{"_version":"1.21.0","sap.app":{"id":"sap.ui.webc.main","type":"library","embeds":[],"applicationVersion":{"version":"1.113.0"},"title":"UI5 Web Components Retrofit Main Components","description":"UI5 Web Components Retrofit Main Components","ach":"CA-UI5-CTR","resources":"resources.json","offline":true,"openSourceComponents":[{"name":"ui5-web-components","packagedWithMySelf":true,"version":"1.5.0"}]},"sap.ui":{"technology":"UI5","supportedThemes":[]},"sap.ui5":{"dependencies":{"minUI5Version":"1.113","libs":{"sap.ui.core":{"minVersion":"1.113.0"},"sap.ui.webc.common":{"minVersion":"1.113.0"}}},"library":{"i18n":false,"css":false,"content":{"controls":["sap.ui.webc.main.Avatar","sap.ui.webc.main.AvatarGroup","sap.ui.webc.main.Badge","sap.ui.webc.main.Breadcrumbs","sap.ui.webc.main.BreadcrumbsItem","sap.ui.webc.main.BusyIndicator","sap.ui.webc.main.Button","sap.ui.webc.main.Calendar","sap.ui.webc.main.CalendarDate","sap.ui.webc.main.Card","sap.ui.webc.main.CardHeader","sap.ui.webc.main.Carousel","sap.ui.webc.main.CheckBox","sap.ui.webc.main.ColorPalette","sap.ui.webc.main.ColorPaletteItem","sap.ui.webc.main.ColorPalettePopover","sap.ui.webc.main.ColorPicker","sap.ui.webc.main.ComboBox","sap.ui.webc.main.ComboBoxGroupItem","sap.ui.webc.main.ComboBoxItem","sap.ui.webc.main.CustomListItem","sap.ui.webc.main.DatePicker","sap.ui.webc.main.DateRangePicker","sap.ui.webc.main.DateTimePicker","sap.ui.webc.main.Dialog","sap.ui.webc.main.FileUploader","sap.ui.webc.main.GroupHeaderListItem","sap.ui.webc.main.Icon","sap.ui.webc.main.Input","sap.ui.webc.main.Label","sap.ui.webc.main.Link","sap.ui.webc.main.List","sap.ui.webc.main.Menu","sap.ui.webc.main.MenuItem","sap.ui.webc.main.MessageStrip","sap.ui.webc.main.MultiComboBox","sap.ui.webc.main.MultiComboBoxGroupItem","sap.ui.webc.main.MultiComboBoxItem","sap.ui.webc.main.MultiInput","sap.ui.webc.main.Option","sap.ui.webc.main.Panel","sap.ui.webc.main.Popover","sap.ui.webc.main.ProgressIndicator","sap.ui.webc.main.RadioButton","sap.ui.webc.main.RangeSlider","sap.ui.webc.main.RatingIndicator","sap.ui.webc.main.ResponsivePopover","sap.ui.webc.main.SegmentedButton","sap.ui.webc.main.SegmentedButtonItem","sap.ui.webc.main.Select","sap.ui.webc.main.Slider","sap.ui.webc.main.SplitButton","sap.ui.webc.main.StandardListItem","sap.ui.webc.main.StepInput","sap.ui.webc.main.SuggestionGroupItem","sap.ui.webc.main.SuggestionItem","sap.ui.webc.main.Switch","sap.ui.webc.main.Tab","sap.ui.webc.main.TabContainer","sap.ui.webc.main.Table","sap.ui.webc.main.TableCell","sap.ui.webc.main.TableColumn","sap.ui.webc.main.TableGroupRow","sap.ui.webc.main.TableRow","sap.ui.webc.main.TabSeparator","sap.ui.webc.main.TextArea","sap.ui.webc.main.TimePicker","sap.ui.webc.main.Title","sap.ui.webc.main.Toast","sap.ui.webc.main.ToggleButton","sap.ui.webc.main.Token","sap.ui.webc.main.Tree","sap.ui.webc.main.TreeItem"],"elements":[],"types":["sap.ui.webc.main.AvatarColorScheme","sap.ui.webc.main.AvatarGroupType","sap.ui.webc.main.AvatarShape","sap.ui.webc.main.AvatarSize","sap.ui.webc.main.BreadcrumbsDesign","sap.ui.webc.main.BreadcrumbsSeparatorStyle","sap.ui.webc.main.BusyIndicatorSize","sap.ui.webc.main.ButtonDesign","sap.ui.webc.main.CalendarSelectionMode","sap.ui.webc.main.CarouselArrowsPlacement","sap.ui.webc.main.GrowingMode","sap.ui.webc.main.HasPopup","sap.ui.webc.main.InputType","sap.ui.webc.main.LinkDesign","sap.ui.webc.main.ListGrowingMode","sap.ui.webc.main.ListItemType","sap.ui.webc.main.ListMode","sap.ui.webc.main.ListSeparators","sap.ui.webc.main.MessageStripDesign","sap.ui.webc.main.PanelAccessibleRole","sap.ui.webc.main.PopoverHorizontalAlign","sap.ui.webc.main.PopoverPlacementType","sap.ui.webc.main.PopoverVerticalAlign","sap.ui.webc.main.Priority","sap.ui.webc.main.SemanticColor","sap.ui.webc.main.SwitchDesign","sap.ui.webc.main.TabLayout","sap.ui.webc.main.TableGrowingMode","sap.ui.webc.main.TableMode","sap.ui.webc.main.TableRowType","sap.ui.webc.main.TabsOverflowMode","sap.ui.webc.main.TitleLevel","sap.ui.webc.main.ToastPlacement","sap.ui.webc.main.WrappingType"],"interfaces":["sap.ui.webc.main.IAvatar","sap.ui.webc.main.IBreadcrumbsItem","sap.ui.webc.main.IButton","sap.ui.webc.main.ICalendarDate","sap.ui.webc.main.IColorPaletteItem","sap.ui.webc.main.IComboBoxItem","sap.ui.webc.main.IIcon","sap.ui.webc.main.IInput","sap.ui.webc.main.IInputSuggestionItem","sap.ui.webc.main.IListItem","sap.ui.webc.main.IMenuItem","sap.ui.webc.main.IMultiComboBoxItem","sap.ui.webc.main.ISegmentedButtonItem","sap.ui.webc.main.ISelectOption","sap.ui.webc.main.ITab","sap.ui.webc.main.ITableCell","sap.ui.webc.main.ITableColumn","sap.ui.webc.main.ITableRow","sap.ui.webc.main.IToken","sap.ui.webc.main.ITreeItem"]}}}}',
 	"sap/ui/webc/main/thirdparty/Assets.js":function(){
 sap.ui.define(["sap/ui/webc/common/thirdparty/localization/Assets","sap/ui/webc/common/thirdparty/theming/Assets","sap/ui/webc/common/thirdparty/icons/Assets","./generated/json-imports/Themes","./generated/json-imports/i18n"],function(s,e,t,i,n){"use strict"});
 },

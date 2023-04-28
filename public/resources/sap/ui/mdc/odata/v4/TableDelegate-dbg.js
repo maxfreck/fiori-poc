@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -105,7 +105,7 @@ sap.ui.define([
 						message: oResourceBundle.getText("table.PERSONALIZATION_DIALOG_GROUP_RESTRICTION_TOTALS", [oListFormat.format(aAggregateGroupableProperties)])
 					};
 				}
-			} else if (oTable._bMobileTable) {
+			} else if (oTable._isOfType(TableType.ResponsiveTable)) {
 				if (!checkForValidity(oTable, oState.items, oState.groupLevels)) {
 					oValidation = {
 						validation: coreLibrary.MessageType.Information,
@@ -197,6 +197,13 @@ sap.ui.define([
 				oRootBinding.resume();
 			}
 		}
+
+		// When changes are made in the binding with multiple API calls, the binding fires a change event with the consolidated reason "change".
+		// The information that there is a sort or filter change is lost, hence the GridTable does not clear the selection. The changes could
+		// affect the indices and make the current selection invalid. Therefore, the delegate has to clear the selection here.
+        if (oTable._isOfType(TableType.Table)) {
+            oTable.clearSelection();
+        }
 	};
 
 	/**
@@ -257,7 +264,7 @@ sap.ui.define([
 	Delegate.getSupportedP13nModes = function(oTable) {
 		var aSupportedModes = TableDelegate.getSupportedP13nModes(oTable);
 
-		if (oTable._getStringType() === TableType.Table) {
+		if (oTable._isOfType(TableType.Table)) {
 			if (!aSupportedModes.includes(P13nMode.Group)) {
 				aSupportedModes.push(P13nMode.Group);
 			}
@@ -284,6 +291,38 @@ sap.ui.define([
 		}
 
 		return TableDelegate.getGroupSorter.apply(this, arguments);
+	};
+
+	Delegate.getSupportedFeatures = function(oTable) {
+		var oSupportedFeatures = TableDelegate.getSupportedFeatures(oTable),
+			bIsTreeTable = oTable._isOfType(TableType.TreeTable);
+
+		return Object.assign(oSupportedFeatures, {
+			"expandAll": bIsTreeTable,
+			"collapseAll": bIsTreeTable
+		});
+	};
+
+	Delegate.expandAll = function (oTable) {
+		if (!oTable._isOfType(TableType.TreeTable)) {
+			return;
+		}
+
+		var oRowBinding = oTable.getRowBinding();
+		if (oRowBinding) {
+			oRowBinding.setAggregation(Object.assign(oRowBinding.getAggregation(), { expandTo: 999 }));
+		}
+	};
+
+	Delegate.collapseAll = function (oTable) {
+		if (!oTable._isOfType(TableType.TreeTable)) {
+			return;
+		}
+
+		var oRowBinding = oTable.getRowBinding();
+		if (oRowBinding) {
+			oRowBinding.setAggregation(Object.assign(oRowBinding.getAggregation(), { expandTo: 1 }));
+		}
 	};
 
 	function createGroupPopoverItem(aGroupProperties, oMDCColumn) {
@@ -610,6 +649,9 @@ sap.ui.define([
 				}
 			});
 			oPlugin.setPropertyInfos(oTable.getPropertyHelper().getPropertiesForPlugin());
+			oTable.propertiesFinalized().then(function() {
+				oPlugin.setPropertyInfos(oTable.getPropertyHelper().getPropertiesForPlugin());
+			});
 			oTable._oTable.addDependent(oPlugin);
 			mTableMap.plugin = oPlugin;
 		});

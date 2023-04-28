@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -245,8 +245,11 @@ sap.ui.define([],
 		ObjectPageLayoutRenderer._renderHeaderContentDOM = function (oRm, oControl, bRender, sId, bApplyBelizePlusClass) {
 			oRm.openStart("header", oControl.getId() + sId)
 				.class("ui-helper-clearfix")
-				.class("sapUxAPObjectPageHeaderDetails")
-				.class("sapUxAPObjectPageHeaderDetailsDesign-" + oControl._getHeaderDesign());
+				.class("sapUxAPObjectPageHeaderDetails");
+			/**
+			 * @deprecated As of version 1.40.1
+			 */
+			oRm.class("sapUxAPObjectPageHeaderDetailsDesign-" + oControl._getHeaderDesign());
 
 			if (bApplyBelizePlusClass) {
 				oRm.class("sapContrastPlus");

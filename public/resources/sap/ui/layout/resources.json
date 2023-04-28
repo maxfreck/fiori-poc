@@ -278,7 +278,7 @@
 		{
 			"name": "DynamicSideContent-dbg.js",
 			"module": "sap/ui/layout/DynamicSideContent.js",
-			"size": 27896,
+			"size": 28161,
 			"isDebug": true,
 			"required": [
 				"sap/ui/core/Control.js",
@@ -468,7 +468,7 @@
 		{
 			"name": "HorizontalLayout-dbg.js",
 			"module": "sap/ui/layout/HorizontalLayout.js",
-			"size": 1932,
+			"size": 1955,
 			"isDebug": true,
 			"required": [
 				"sap/ui/core/Control.js",
@@ -816,9 +816,10 @@
 		{
 			"name": "SplitterRenderer-dbg.js",
 			"module": "sap/ui/layout/SplitterRenderer.js",
-			"size": 4890,
+			"size": 5072,
 			"isDebug": true,
 			"required": [
+				"sap/ui/core/Configuration.js",
 				"sap/ui/core/Core.js",
 				"sap/ui/core/library.js"
 			]
@@ -826,21 +827,22 @@
 		{
 			"name": "SplitterRenderer.js",
 			"module": "sap/ui/layout/SplitterRenderer.js",
-			"size": 2031,
+			"size": 2102,
 			"required": [
+				"sap/ui/core/Configuration.js",
 				"sap/ui/core/Core.js",
 				"sap/ui/core/library.js"
 			]
 		},
 		{
 			"name": "SplitterRenderer.js.map",
-			"size": 2454,
+			"size": 2580,
 			"isDebug": true
 		},
 		{
 			"name": "VerticalLayout-dbg.js",
 			"module": "sap/ui/layout/VerticalLayout.js",
-			"size": 2302,
+			"size": 2325,
 			"isDebug": true,
 			"required": [
 				"sap/ui/core/Control.js",
@@ -978,7 +980,7 @@
 		{
 			"name": "changeHandler/HideSimpleForm-dbg.js",
 			"module": "sap/ui/layout/changeHandler/HideSimpleForm.js",
-			"size": 10625,
+			"size": 10628,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -1002,7 +1004,7 @@
 		{
 			"name": "changeHandler/MoveSimpleForm-dbg.js",
 			"module": "sap/ui/layout/changeHandler/MoveSimpleForm.js",
-			"size": 19908,
+			"size": 20490,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -1013,7 +1015,7 @@
 		{
 			"name": "changeHandler/MoveSimpleForm.js",
 			"module": "sap/ui/layout/changeHandler/MoveSimpleForm.js",
-			"size": 7083,
+			"size": 7262,
 			"required": [
 				"sap/base/Log.js",
 				"sap/base/util/uid.js",
@@ -1022,7 +1024,7 @@
 		},
 		{
 			"name": "changeHandler/MoveSimpleForm.js.map",
-			"size": 11853,
+			"size": 12153,
 			"isDebug": true
 		},
 		{
@@ -1042,9 +1044,31 @@
 			"isDebug": true
 		},
 		{
+			"name": "changeHandler/RenameFormElement-dbg.js",
+			"module": "sap/ui/layout/changeHandler/RenameFormElement.js",
+			"size": 2677,
+			"isDebug": true,
+			"required": [
+				"sap/ui/fl/changeHandler/condenser/Classification.js"
+			]
+		},
+		{
+			"name": "changeHandler/RenameFormElement.js",
+			"module": "sap/ui/layout/changeHandler/RenameFormElement.js",
+			"size": 1584,
+			"required": [
+				"sap/ui/fl/changeHandler/condenser/Classification.js"
+			]
+		},
+		{
+			"name": "changeHandler/RenameFormElement.js.map",
+			"size": 1963,
+			"isDebug": true
+		},
+		{
 			"name": "changeHandler/RenameSimpleForm-dbg.js",
 			"module": "sap/ui/layout/changeHandler/RenameSimpleForm.js",
-			"size": 5850,
+			"size": 5901,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -1054,7 +1078,7 @@
 		{
 			"name": "changeHandler/RenameSimpleForm.js",
 			"module": "sap/ui/layout/changeHandler/RenameSimpleForm.js",
-			"size": 2184,
+			"size": 2235,
 			"required": [
 				"sap/base/Log.js",
 				"sap/ui/core/util/reflection/JsControlTreeModifier.js"
@@ -1062,7 +1086,7 @@
 		},
 		{
 			"name": "changeHandler/RenameSimpleForm.js.map",
-			"size": 2994,
+			"size": 3034,
 			"isDebug": true
 		},
 		{
@@ -2202,23 +2226,23 @@
 		{
 			"name": "flexibility/FormElement.flexibility-dbg.js",
 			"module": "sap/ui/layout/flexibility/FormElement.flexibility.js",
-			"size": 516,
+			"size": 414,
 			"isDebug": true,
 			"required": [
-				"sap/ui/fl/changeHandler/BaseRename.js"
+				"sap/ui/layout/changeHandler/RenameFormElement.js"
 			]
 		},
 		{
 			"name": "flexibility/FormElement.flexibility.js",
 			"module": "sap/ui/layout/flexibility/FormElement.flexibility.js",
-			"size": 465,
+			"size": 367,
 			"required": [
-				"sap/ui/fl/changeHandler/BaseRename.js"
+				"sap/ui/layout/changeHandler/RenameFormElement.js"
 			]
 		},
 		{
 			"name": "flexibility/FormElement.flexibility.js.map",
-			"size": 440,
+			"size": 309,
 			"isDebug": true
 		},
 		{
@@ -2426,7 +2450,7 @@
 		{
 			"name": "form/FormElement-dbg.js",
 			"module": "sap/ui/layout/form/FormElement.js",
-			"size": 14235,
+			"size": 14313,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -2439,7 +2463,7 @@
 		{
 			"name": "form/FormElement.js",
 			"module": "sap/ui/layout/form/FormElement.js",
-			"size": 5579,
+			"size": 5632,
 			"required": [
 				"sap/base/Log.js",
 				"sap/ui/base/ManagedObjectObserver.js",
@@ -2450,20 +2474,20 @@
 		},
 		{
 			"name": "form/FormElement.js.map",
-			"size": 7373,
+			"size": 7436,
 			"isDebug": true
 		},
 		{
 			"name": "form/FormLayout-dbg.js",
 			"module": "sap/ui/layout/form/FormLayout.js",
-			"size": 30726,
+			"size": 30701,
 			"isDebug": true,
 			"required": [
 				"sap/ui/core/Configuration.js",
 				"sap/ui/core/Control.js",
+				"sap/ui/core/Element.js",
 				"sap/ui/core/theming/Parameters.js",
 				"sap/ui/dom/jquery/Selectors.js",
-				"sap/ui/dom/jquery/control.js",
 				"sap/ui/layout/form/FormLayoutRenderer.js",
 				"sap/ui/layout/library.js",
 				"sap/ui/thirdparty/jquery.js"
@@ -2472,13 +2496,13 @@
 		{
 			"name": "form/FormLayout.js",
 			"module": "sap/ui/layout/form/FormLayout.js",
-			"size": 13303,
+			"size": 13293,
 			"required": [
 				"sap/ui/core/Configuration.js",
 				"sap/ui/core/Control.js",
+				"sap/ui/core/Element.js",
 				"sap/ui/core/theming/Parameters.js",
 				"sap/ui/dom/jquery/Selectors.js",
-				"sap/ui/dom/jquery/control.js",
 				"sap/ui/layout/form/FormLayoutRenderer.js",
 				"sap/ui/layout/library.js",
 				"sap/ui/thirdparty/jquery.js"
@@ -2486,7 +2510,7 @@
 		},
 		{
 			"name": "form/FormLayout.js.map",
-			"size": 16453,
+			"size": 16467,
 			"isDebug": true
 		},
 		{
@@ -2796,7 +2820,7 @@
 		{
 			"name": "form/SimpleForm-dbg.js",
 			"module": "sap/ui/layout/form/SimpleForm.js",
-			"size": 70333,
+			"size": 70377,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -2824,7 +2848,7 @@
 		{
 			"name": "form/SimpleForm.js",
 			"module": "sap/ui/layout/form/SimpleForm.js",
-			"size": 25516,
+			"size": 25552,
 			"required": [
 				"sap/base/Log.js",
 				"sap/ui/base/ManagedObjectObserver.js",
@@ -2850,7 +2874,7 @@
 		},
 		{
 			"name": "form/SimpleForm.js.map",
-			"size": 34278,
+			"size": 34314,
 			"isDebug": true
 		},
 		{
@@ -2872,7 +2896,7 @@
 		{
 			"name": "library-dbg.js",
 			"module": "sap/ui/layout/library.js",
-			"size": 25677,
+			"size": 25720,
 			"isDebug": true,
 			"required": [
 				"sap/ui/base/DataType.js",
@@ -2882,18 +2906,18 @@
 		{
 			"name": "library-preload-lazy.js",
 			"module": "sap/ui/layout/library-preload-lazy.js",
-			"size": 3544,
+			"size": 3595,
 			"format": "raw"
 		},
 		{
 			"name": "library-preload-lazy.js.map",
-			"size": 3683,
+			"size": 3734,
 			"isDebug": true
 		},
 		{
 			"name": "library-preload.js",
 			"module": "sap/ui/layout/library-preload.js",
-			"size": 289504,
+			"size": 291401,
 			"merged": true,
 			"required": [
 				"sap/base/Log.js",
@@ -2920,12 +2944,12 @@
 				"sap/ui/core/theming/Parameters.js",
 				"sap/ui/core/util/reflection/JsControlTreeModifier.js",
 				"sap/ui/dom/jquery/Selectors.js",
-				"sap/ui/dom/jquery/control.js",
 				"sap/ui/dom/jquery/rect.js",
 				"sap/ui/dom/units/Rem.js",
 				"sap/ui/fl/changeHandler/Base.js",
 				"sap/ui/fl/changeHandler/BaseAddViaDelegate.js",
 				"sap/ui/fl/changeHandler/BaseRename.js",
+				"sap/ui/fl/changeHandler/condenser/Classification.js",
 				"sap/ui/thirdparty/jquery.js"
 			],
 			"included": [
@@ -2969,6 +2993,7 @@
 				"sap/ui/layout/changeHandler/HideSimpleForm.js",
 				"sap/ui/layout/changeHandler/MoveSimpleForm.js",
 				"sap/ui/layout/changeHandler/RenameFormContainer.js",
+				"sap/ui/layout/changeHandler/RenameFormElement.js",
 				"sap/ui/layout/changeHandler/RenameSimpleForm.js",
 				"sap/ui/layout/changeHandler/UnhideSimpleForm.js",
 				"sap/ui/layout/cssgrid/CSSGrid.js",
@@ -3014,7 +3039,7 @@
 		},
 		{
 			"name": "library-preload.js.map",
-			"size": 375474,
+			"size": 377970,
 			"isDebug": true
 		},
 		{
@@ -3040,7 +3065,7 @@
 		{
 			"name": "library.js",
 			"module": "sap/ui/layout/library.js",
-			"size": 9027,
+			"size": 9051,
 			"required": [
 				"sap/ui/base/DataType.js",
 				"sap/ui/core/library.js"
@@ -3048,7 +3073,7 @@
 		},
 		{
 			"name": "library.js.map",
-			"size": 6573,
+			"size": 6612,
 			"isDebug": true
 		},
 		{
@@ -3082,7 +3107,7 @@
 		{
 			"name": "messagebundle_bg.properties",
 			"module": "sap/ui/layout/messagebundle_bg.properties",
-			"size": 1477,
+			"size": 1489,
 			"locale": "bg",
 			"raw": "messagebundle.properties"
 		},
@@ -3410,7 +3435,7 @@
 		},
 		{
 			"name": "resources.json",
-			"size": 94066
+			"size": 94789
 		},
 		{
 			"name": "rules/Form.support.js",
@@ -3560,7 +3585,7 @@
 		},
 		{
 			"name": "themes/base/css_variables.source.less",
-			"size": 121815,
+			"size": 130946,
 			"designtime": true,
 			"theme": "base"
 		},
@@ -3661,13 +3686,13 @@
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.less",
-			"size": 107765,
+			"size": 117558,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.source.less",
-			"size": 107465,
+			"size": 117258,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},

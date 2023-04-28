@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 /*
@@ -79,7 +79,7 @@ sap.ui.define([], function () {
 
 				fSumRows += oLayoutSizes.rowGap;
 
-				if (fBottomOffsetInGrid < fSumRows) {
+				if (Math.round(fBottomOffsetInGrid) <= Math.round(fSumRows)) {
 					iEndRow = i + 1;
 					break;
 				}
@@ -108,7 +108,7 @@ sap.ui.define([], function () {
 
 				fSumCols += oLayoutSizes.columnGap;
 
-				if (fRightOffsetInGrid <= fSumCols) {
+				if (Math.round(fRightOffsetInGrid) <= Math.round(fSumCols)) {
 					iEndCol = i + 1;
 					break;
 				}

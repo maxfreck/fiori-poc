@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -52,7 +52,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -944,7 +944,7 @@ sap.ui.define([
 	/* =========================================================== */
 
 	/**
- 	 * @returns {object} Current accessibility state of the control
+ 	 * @returns {{role: string, type: string, description: string, focusable: boolean, enabled: boolean, editable: boolean}} Current accessibility state of the control
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
 	 */

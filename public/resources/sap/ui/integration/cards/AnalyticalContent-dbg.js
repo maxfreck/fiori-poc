@@ -1,11 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	"./AnalyticalContentRenderer",
 	"./BaseContent",
+	"sap/m/IllustratedMessageType",
 	"sap/ui/integration/library",
 	"sap/ui/integration/util/BindingResolver",
 	"sap/base/Log",
@@ -14,6 +15,7 @@ sap.ui.define([
 ], function (
 	AnalyticalContentRenderer,
 	BaseContent,
+	IllustratedMessageType,
 	library,
 	BindingResolver,
 	Log,
@@ -88,7 +90,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -146,15 +148,22 @@ sap.ui.define([
 	AnalyticalContent.prototype.onDataChanged = function () {
 		this._createChart();
 		var oChart = this.getAggregation("_content");
+
 		if (oChart) {
 			var vizDS = oChart._getVizDataset(),
-				noData = vizDS
+				bHasData = vizDS
 					&& vizDS._FlatTableD
 					&& vizDS._FlatTableD._data
 					&& Array.isArray(vizDS._FlatTableD._data)
-					&& (!vizDS._FlatTableD._data.length);
-			if (noData) {
-				this.getParent()._handleError("No data available", true);
+					&& vizDS._FlatTableD._data.length;
+
+			if (bHasData) {
+				this.destroyAggregation("_noDataMessage");
+			} else {
+				this.showNoDataMessage({
+					type: IllustratedMessageType.NoEntries,
+					title: this.getCardInstance().getTranslatedText("CARD_NO_ITEMS_ERROR_LISTS")
+				});
 			}
 		}
 	};

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -23,14 +23,14 @@
 	 * @namespace
 	 * @alias sap.ui.mdc
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.80
 	 * @private
 	 * @ui5-restricted sap.fe
 	 * @experimental As of version 1.54 Disclaimer: Usage Restrictions: The components of this library are under development and documented as private. Their APIs are subject to change and should not be used in productive scenarios without further agreement. A general availability of sap.ui.mdc will be announced via the usual channels.
 	 */
 	 var thisLib = sap.ui.getCore().initLibrary({
-		version: "1.108.2",
+		version: "1.113.0",
 		name: "sap.ui.mdc",
 		dependencies: ["sap.ui.core", "sap.m"],
 		designtime: "sap/ui/mdc/designtime/library.designtime",
@@ -60,7 +60,6 @@
 			"sap.ui.mdc.field.FieldBase",
 			"sap.ui.mdc.field.FieldInput",
 			"sap.ui.mdc.field.FieldMultiInput",
-			"sap.ui.mdc.field.ValueHelpPanel",
 			"sap.ui.mdc.field.DefineConditionPanel",
 			"sap.ui.mdc.Field",
 			"sap.ui.mdc.FilterField",
@@ -83,20 +82,9 @@
 			"sap.ui.mdc.chart.ChartTypeButton",
 			"sap.ui.mdc.chart.DrillBreadcrumbs",
 			"sap.ui.mdc.chart.SelectionDetailsActions",
-			"sap.ui.mdc.field.CustomFieldHelp",
 			"sap.ui.mdc.field.CustomFieldInfo",
-			"sap.ui.mdc.field.FieldHelpBase",
 			"sap.ui.mdc.field.FieldInfoBase",
-			"sap.ui.mdc.field.FieldValueHelp",
-			"sap.ui.mdc.field.FieldValueHelpContentWrapperBase",
-			"sap.ui.mdc.field.FieldValueHelpTableWrapperBase",
-			"sap.ui.mdc.field.FieldValueHelpMdcTableWrapper",
-			"sap.ui.mdc.field.FieldValueHelpMTableWrapper",
-			"sap.ui.mdc.field.FieldValueHelpUITableWrapper",
-			"sap.ui.mdc.field.ListFieldHelp",
 			"sap.ui.mdc.field.ListFieldHelpItem",
-			"sap.ui.mdc.field.BoolFieldHelp",
-			"sap.ui.mdc.field.ConditionFieldHelp",
 			"sap.ui.mdc.filterbar.aligned.FilterItemLayout",
 			"sap.ui.mdc.Link",
 			"sap.ui.mdc.link.ContactDetailsAddressItem",
@@ -108,8 +96,6 @@
 			"sap.ui.mdc.link.SemanticObjectUnavailableAction",
 			"sap.ui.mdc.link.SemanticObjectMapping",
 			"sap.ui.mdc.link.SemanticObjectMappingItem",
-			"sap.ui.mdc.field.InParameter",
-			"sap.ui.mdc.field.OutParameter",
 			"sap.ui.mdc.field.MultiValueFieldItem",
 			"sap.ui.mdc.ValueHelp",
 			"sap.ui.mdc.valuehelp.Popover",
@@ -230,7 +216,7 @@
 	 * @param {boolean} oConfig.checkDescription If set, the field help checks only if there is an item with the given description. This is set to <code>false</code> if only the key is used in the field.
 	 * @param {sap.ui.mdc.condition.ConditionModel} [oConfig.conditionModel] <code>ConditionModel</code>, in case of <code>FilterField</code>
 	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key, in and out parameters.
+	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key and payload.
 	 * @throws {sap.ui.model.FormatException|sap.ui.model.ParseException} if entry is not found or not unique
 	 *
 	 * @private
@@ -301,6 +287,16 @@
 	 * @name sap.ui.mdc.valuehelp.ITypeaheadContent.shouldOpenOnNavigate
 	 * @method
 	 * @returns {boolean} True if value help shall open as valuehelp
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.valuehelp.ITypeaheadContainer
+	 */
+
+	/**
+	 * Defines if the typeahead content desires opening the typeahead whenever a user clicks on a connected control
+	 *
+	 * @name sap.ui.mdc.valuehelp.ITypeaheadContent.shouldOpenOnClick
+	 * @method
+	 * @returns {boolean} True if typeahead can open
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.valuehelp.ITypeaheadContainer
 	 */
@@ -413,9 +409,7 @@
 	 * @param {sap.ui.model.Context} [oConfig.bindingContext] <code>BindingContext</code> of the checked field. Inside a table the <code>ValueHelp</code> element might be connected to a different row.
 	 * @param {boolean} oConfig.checkKey If set, the value help checks only if there is an item with the given key. This is set to <code>false</code> if the value cannot be a valid key because of type validation.
 	 * @param {boolean} oConfig.checkDescription If set, the field help checks only if there is an item with the given description. This is set to <code>false</code> if only the key is used in the field.
-	 * @param {sap.ui.mdc.condition.ConditionModel} [oConfig.conditionModel] <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key, in and out parameters.
+	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key and payload.
 	 * @throws {sap.ui.model.FormatException|sap.ui.model.ParseException} if entry is not found or not unique
 	 *
 	 * @private
@@ -486,6 +480,26 @@
 	 * @name sap.ui.mdc.valuehelp.ITypeaheadContainer.shouldOpenOnNavigate
 	 * @method
 	 * @returns {boolean} True if value help shall open as valuehelp
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.ValueHelp
+	 */
+
+	/**
+	 * Defines if the typeahead container desires to be opened whenever a user focuses a connected control
+	 *
+	 * @name sap.ui.mdc.valuehelp.ITypeaheadContainer.shouldOpenOnFocus
+	 * @method
+	 * @returns {boolean} True if value help shall open on focus
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.ValueHelp
+	 */
+
+	/**
+	 * Defines if the typeahead container desires to be opened whenever a user clicks on a connected control
+	 *
+	 * @name sap.ui.mdc.valuehelp.ITypeaheadContainer.shouldOpenOnClick
+	 * @method
+	 * @returns {boolean} True if value help shall open on click
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.ValueHelp
 	 */
@@ -604,7 +618,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 *
@@ -612,7 +626,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 *
@@ -620,7 +634,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 *
@@ -628,7 +642,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 *
@@ -636,7 +650,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 *
@@ -644,7 +658,7 @@
 	 * @event
 	 * @param {sap.ui.base.Event} oControlEvent
 	 * @param {sap.ui.base.EventProvider} oControlEvent.getSource
-	*/
+	 */
 
 	/**
 	 * Opens the container
@@ -674,18 +688,17 @@
 	 * If an item is requested using a description or key, an object with the following
 	 * properties is returned.
 	 *
-	 * @type {sap.ui.mdc.valuehelp.ValueHelpItem}
 	 * @static
 	 * @constant
 	 * @typedef {object} sap.ui.mdc.valuehelp.ValueHelpItem
 	 * @property {any} key Key of the item
 	 * @property {string} description Description of the item
-	 * @property {object} [inParameters] In parameters of the item. For each field path a value is stored
-	 * @property {object} [outParameters] Out parameters of the item. For each field path a value is stored
+	 * @property {object} [payload] Payload of the item.
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
 	 * @experimental As of version 1.95
 	 */
+
 
 	/**
 	 *
@@ -746,6 +759,7 @@
 	 * @name sap.ui.mdc.IxState
 	 * @interface
 	 * @private
+	 * @ui5-restricted sap.ui.mdc
 	 */
 
 	/**
@@ -777,6 +791,8 @@
 	 *
 	 * @enum {string}
 	 * @private
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.58
 	 */
 	thisLib.TableType = {
@@ -786,6 +802,13 @@
 		 * @public
 		 */
 		Table: "Table",
+		/**
+		 * Tree table ({@link sap.ui.table.TreeTable} control) is used.
+		 *
+		 * @private
+		 * @experimental
+		 */
+		TreeTable: "TreeTable",
 		/**
 		 * Responsive table ({@link sap.m.Table} control) is used.
 		 *
@@ -800,7 +823,7 @@
 	 * @enum {string}
 	 * @private
 	 * @ui5-restricted sap.fe
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.62
 	 */
 	thisLib.TableP13nMode = {
@@ -842,7 +865,7 @@
 	 * @enum {string}
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.65
 	 */
 	thisLib.GrowingMode = {
@@ -873,7 +896,7 @@
 	 * @enum {string}
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.65
 	 */
 	thisLib.RowCountMode = {
@@ -969,7 +992,7 @@
 	 * @enum {string}
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.58
 	 */
 	thisLib.SelectionMode = {
@@ -1002,7 +1025,7 @@
 	 * @enum {string}
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.60
 	 */
 	thisLib.RowAction = {
@@ -1154,19 +1177,32 @@
 	};
 
 	/**
-	* @typedef {object} sap.ui.mdc.TypeConfig
-	* @property {string} [className] Model-specific data type
-	* @property {sap.ui.model.SimpleType} typeInstance Type instance for given data type
-	* @property {string} baseType Basic type category for given data type
-	* @private
-	*/
+	 * @typedef {object} sap.ui.mdc.TypeConfig
+	 * @property {string} [className] Model-specific data type
+	 * @property {sap.ui.model.SimpleType} typeInstance Type instance for given data type
+	 * @property {string} baseType Basic type category for given data type
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 */
 
 	/**
-	* @typedef {object} sap.ui.mdc.DelegateConfig
-	* @property {string} name Delegate module path
-	* @property {*} payload Delegate payload
-	* @private
-	*/
+	 * @typedef {object} sap.ui.mdc.DelegateConfig
+	 * @property {string} name Delegate module path
+	 * @property {*} payload Delegate payload
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 */
+
+	/**
+	 * Enumerations for MDC library
+	 * @namespace
+	 * @name sap.ui.mdc.enum
+	 * @since 1.74.0
+	 * @private
+	 * @experimental As of version 1.74
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 */
 
 	/**
 	 * @namespace
@@ -1174,6 +1210,102 @@
 	 * @private
 	 * @experimental As of version 1.82.0
 	 * @ui5-restricted sap.ui.mdc
+	 */
+
+	/**
+	 * @namespace
+	 * @name sap.ui.mdc.filterbar
+	 * @private
+	 * @MDC_PUBLIC_CANDIDATE
+	 * @experimental As of version 1.112.0
+	 * @ui5-restricted sap.ui.mdc, sap.fe
+	 */
+
+	/**
+	 *
+	 * @typedef {object} sap.ui.mdc.filterbar.PropertyInfo
+	 * @property {string} path
+	 *   The identifier of the property
+	 * @property {string} [name]
+	 *   The alternative identifier of the property. Either path or name can be used; preference is on path.
+	 * @property {string} label
+	 *   The label of the identifier
+	 * @property {string} [tooltip]
+	 *   The tooltip of the identifier
+	 * @property {string} datatype
+	 *   The name of the type of the property
+	 * @property {object} [constraints]
+	 *   Defines constraints for the data type of the property
+	 * @property {object} [formatOptions]
+	 *   Defines format options for the data type of the property
+	 * @property {string} [group]
+	 *   The group identifier to which the property belongs
+	 * @property {string} [groupLabel]
+	 *   The group name of the group identifier
+	 * @property {boolean} [caseSensitive = false]
+	 *   If <code>true</code> defines that the filter value will be treated as case-sensitive
+	 * @property {sap.ui.mdc.enum.FieldDisplay} [display]
+	 *   Describes how the value will be presented to the user
+	 * @property {boolean} [hiddenFilter = false]
+	 *   Defines if the filter will be visible on the filter bar
+	 * @property {boolean} [required = false]
+	 *   Defines if the filter is mandatory
+	 * @property {int} maxConditions
+	 *   Defines if the filter supports multiple values <code>-1</code> or single values <code>1</code>
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
+	 */
+
+	/**
+	 * @namespace
+	 * @name sap.ui.mdc.chart
+	 * @private
+	 * @MDC_PUBLIC_CANDIDATE
+	 * @experimental As of version 1.112.0
+	 * @ui5-restricted sap.ui.mdc, sap.fe
+	 */
+
+	/**
+	 *
+	 * @typedef {object} sap.ui.mdc.chart.PropertyInfo
+	 * @property {string} propertyPath
+	 *   The path to the property in the back end
+	 * @property {string} [name]
+	 *   The identifier of the property
+	 * @property {string} label
+	 *   The label of the identifier
+	 * @property {string} [tooltip]
+	 *   The tooltip of the identifier
+	 * @property {string} datatype
+	 *   The name of the type of the property
+	 * @property {object} [constraints]
+	 *   Defines constraints for the data type of the property
+	 * @property {object} [formatOptions]
+	 *   Defines formatting options for the data type of the property
+	 * @property {boolean} [required = false]
+	 *   Defines if the filter is mandatory
+	 * @property {int} maxConditions
+	 *   Defines if the filter supports multiple values <code>-1</code> or single values <code>1</code>
+	 * @property {boolean} groupable
+	 * 	Defines whether the property is groupable and is selectable as a dimension in the chart
+	 * @property {boolean} aggregatable
+	 *  Defines whether the property is aggregatable and is selectable as a measure in the chart
+	 * @property {string} aggregationMethod
+	 * 	The aggregation method used if the property is aggregatable
+	 * @property {string} role
+	 * 	Defines the role that the property visualizes inside the chart
+	 * @property {object} [datapoint]
+	 * 	Implementation-specific object containing information about the data point
+	 * @property {object} [criticality]
+	 *  Implementation-specific object containing information about the criticality
+	 * @property {string} [textProperty]
+	 * 	The text property used for the dimension
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc, sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 
 	return thisLib;

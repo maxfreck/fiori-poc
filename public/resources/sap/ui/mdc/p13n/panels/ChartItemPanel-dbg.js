@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -26,8 +26,9 @@ sap.ui.define([
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/CustomData",
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/library"
-], function (BasePanel, Label, ColumnListItem, Select, Text, Item, MDCLib, Button, Column, Table, Filter, FilterOperator, VBox, HBox, ComboBox, Sorter, Log, mLibrary, Device, ResizeHandler, CustomData, jQuery, coreLibrary) {
+	"sap/ui/core/library",
+	"sap/ui/events/KeyCodes"
+], function (BasePanel, Label, ColumnListItem, Select, Text, Item, MDCLib, Button, Column, Table, Filter, FilterOperator, VBox, HBox, ComboBox, Sorter, Log, mLibrary, Device, ResizeHandler, CustomData, jQuery, coreLibrary, KeyCode) {
 	"use strict";
 
 	// shortcut for sap.ui.core.ValueState
@@ -89,7 +90,9 @@ sap.ui.define([
 			this._bindListItems();
 
 		},
-		renderer: {}
+		renderer: {
+			apiVersion: 2
+		}
 	});
 
 	ChartItemPanel.prototype._setInnerLayout = function() {
@@ -417,7 +420,7 @@ sap.ui.define([
 		oListItem.addEventDelegate({
 			onmouseover: this._hoverHandler.bind(this),
 			onfocusin: this._focusHandler.bind(this),
-			onkeydown: this._handleOnKeyDown.bind(this)
+			onkeydown: this._keydownHandler.bind(this)
 		});
 
 		return oListItem;
@@ -484,31 +487,16 @@ sap.ui.define([
 		oListItem.addEventDelegate({
 			onmouseover: this._hoverHandler.bind(this),
 			onfocusin: this._focusHandler.bind(this),
-			onkeydown: this._handleOnKeyDown.bind(this)
+			onkeydown: this._keydownHandler.bind(this)
 		});
 
 		return oListItem;
 	};
 
 	//ACC realted stuff
-	ChartItemPanel.prototype._handleOnKeyDown = function(oEvent){
-		if (oEvent.keyCode === 38 && oEvent.ctrlKey){
-			//Ctrl+Arrow Up
-			//Move Up
-			//Disabled for now until further clarification
-			/*
-			if (this._oMoveUpButton && this._oMoveUpButton.getEnabled() && this._getMoveButtonContainer()){
-				this._onPressButtonMoveUp(oEvent, core.byId(oEvent.currentTarget.id));
-			}*/
-		} else if (oEvent.keyCode === 40 && oEvent.ctrlKey){
-			//Ctrl+Arrow Down
-			//Move Down
-			//Disabled for now until further clarification
-			/*
-			if (this._oMoveUpButton && this._oMoveDownButton.getEnabled() && this._getMoveButtonContainer()){
-				this._onPressButtonMoveDown(oEvent, core.byId(oEvent.currentTarget.id));
-			}*/
-		} else if (oEvent.keyCode === 68 && oEvent.ctrlKey){
+	ChartItemPanel.prototype._keydownHandler = function(oEvent){
+
+		if ((oEvent.metaKey || oEvent.ctrlKey) && oEvent.keyCode === KeyCode.D){
 			//Ctrl+D
 			//Remove
 			var oRemoveBtn, oListItem = core.byId(oEvent.currentTarget.id);
@@ -524,6 +512,8 @@ sap.ui.define([
 				oEvent.preventDefault();
 			}
 
+		} else {
+			BasePanel.prototype._keydownHandler.apply(this, arguments);
 		}
 
 	};
@@ -1183,8 +1173,8 @@ sap.ui.define([
 
 	ChartItemPanel.prototype._getMoveTopButton = function() {
 
-		if (this._oMoveTopBtn && this._oMoveTopBtn.isDestroyed()) {
-			this._oMoveTopBtn = null;
+		if (this._oMoveTopButton && this._oMoveTopButton.isDestroyed()) {
+			this._oMoveTopButton = null;
 		}
 
 		return BasePanel.prototype._getMoveTopButton.apply(this, arguments);

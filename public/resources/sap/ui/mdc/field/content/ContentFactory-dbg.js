@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -38,6 +38,7 @@ sap.ui.define([
 			library: "sap.ui.mdc"
 		},
 		constructor: function(sId, mSettings) {
+			this.init();
 			this._oField = mSettings ? mSettings.field : null;
 			this._fnHandleTokenUpdate = mSettings ? mSettings.handleTokenUpdate : null;
 			this._fnHandleContentChange = mSettings ? mSettings.handleContentChange : null;
@@ -61,8 +62,10 @@ sap.ui.define([
 	};
 
 	ContentFactory.prototype.init = function() {
-		this._oContentTypeClass;
-		this._sOperator;
+		this._oContentTypeClass = undefined;
+		this._sOperator = undefined;
+		this._bNoFormatting = false;
+		this._bHideOperator = false;
 	};
 
 	ContentFactory.prototype.exit = function() {
@@ -92,11 +95,13 @@ sap.ui.define([
 	 * @param {sap.ui.mdc.field.content.DefaultContent} oContentType The content type object
 	 * @param {sap.ui.mdc.enum.ContentMode} sContentMode A given content mode
 	 * @param {string} sId ID of the {@link sap.ui.mdc.field.FieldBase}
-	 * @returns {sap.ui.core.Control[]} Array containing the created controls
+	 * @returns {Promise<sap.ui.core.Control[]>} Array containing the created controls
 	 */
 	ContentFactory.prototype.createContent = function(oContentType, sContentMode, sId) {
 		var aControlNames = oContentType.getControlNames(sContentMode, this._sOperator);
 		var oLoadModulesPromise;
+
+		this.setNoFormatting(oContentType.getNoFormatting(sContentMode));
 
 		if (aControlNames.every(function(sControlName) {
 			return !sControlName;
@@ -105,13 +110,23 @@ sap.ui.define([
 			return Promise.resolve([]);
 		}
 
+		if (!this.getDataType()) {
+			// DataType instance not already set, make sure to load module before creating control and corresponding ConditionType (In Field case Instance is set in Binding.)
+			var sDataType = this.getField().getDataType();
+			if (sDataType) {
+				sDataType = this.getField().getTypeUtil().getDataTypeClassName(sDataType); // map EDM-Types
+				aControlNames.push(sDataType.replaceAll(".", "/"));
+			}
+		}
+
 		try {
 			oLoadModulesPromise = loadModules(aControlNames)
 				.catch(function(oError) {
-					throw new Error("loadModules promise rejected in sap.ui.mdc.field.content.ContentFactory:createContent function call - could not load controls " + JSON.stringify(aControlNames));
+					throw new Error("loadModules promise rejected in sap.ui.mdc.field.content.ContentFactory:createContent function call - could not load data type " + JSON.stringify(aControlNames));
 				})
 				.then(function(aControls) {
 					if (this.getField() && !this.getField()._bIsBeingDestroyed) {
+						this.updateConditionType(); // to make sure to have current FormatOptions if Condition(s)Type already exist
 						return oContentType.create(this, sContentMode, this._sOperator, aControls, sId);
 					} else {
 						return [];
@@ -244,18 +259,6 @@ sap.ui.define([
 		return this._fnHandleContentPress;
 	};
 
-	/**
-	 * Defines to which property the field value is bound.
-	 * @param {string} sBoundProperty the name of the property.
-	 */
-	ContentFactory.prototype.setBoundProperty = function(sBoundProperty) {
-		this._sBoundProperty = sBoundProperty;
-	};
-
-	ContentFactory.prototype.getBoundProperty = function() {
-		return this._sBoundProperty;
-	};
-
 	ContentFactory.prototype.setAriaLabelledBy = function(oContent) {
 		if (oContent.addAriaLabelledBy) {
 			var aAriaLabelledBy = this.getField().getAriaLabelledBy();
@@ -323,7 +326,7 @@ sap.ui.define([
 		this._oContentConditionTypes = oContentConditionTypes;
 	};
 
-	ContentFactory.prototype._setUsedConditionType = function(oContent, sEditMode) {
+	ContentFactory.prototype._setUsedConditionType = function(oContent, oContentEdit, oContentDisplay, sEditMode) {
 
 		// remove external types
 		if (this._oConditionType && !this._oConditionType._bCreatedByField) {
@@ -342,12 +345,12 @@ sap.ui.define([
 				oConditionType = this._oContentConditionTypes.content.oConditionType;
 				oConditionsType = this._oContentConditionTypes.content.oConditionsType;
 			}
-		} else if (sEditMode === EditMode.Display && this.getField().getContentDisplay()) {
+		} else if (sEditMode === EditMode.Display && oContentDisplay) {
 			if (this._oContentConditionTypes.contentDisplay) {
 				oConditionType = this._oContentConditionTypes.contentDisplay.oConditionType;
 				oConditionsType = this._oContentConditionTypes.contentDisplay.oConditionsType;
 			}
-		} else if (sEditMode !== EditMode.Display && this.getField().getContentEdit()) {
+		} else if (sEditMode !== EditMode.Display && oContentEdit) {
 			if (this._oContentConditionTypes.contentEdit) {
 				oConditionType = this._oContentConditionTypes.contentEdit.oConditionType;
 				oConditionsType = this._oContentConditionTypes.contentEdit.oConditionsType;
@@ -367,7 +370,35 @@ sap.ui.define([
 			this._oConditionsType = oConditionsType;
 		}
 
-		this.updateConditionType();
+		if (oConditionType || oConditionsType) {
+			// as data type module might not be loaded, load it now
+			if (!this.getDataType()) {
+				// DataType instance not already set, make sure to load module before creating control and corresponding ConditionType (In Field case Instance is set in Binding.)
+				var sDataType = this.getField().getDataType();
+				if (sDataType) {
+					sDataType = this.getField().getTypeUtil().getDataTypeClassName(sDataType); // map EDM-Types
+					sDataType = sDataType.replaceAll(".", "/");
+					try {
+						loadModules([sDataType])
+							.catch(function(oError) {
+								throw new Error("loadModules promise rejected in sap.ui.mdc.field.content.ContentFactory:_setUsedConditionType function call - could not load controls " + sDataType);
+							})
+							.then(function(aModules) {
+								if (this.getField() && !this.getField()._bIsBeingDestroyed) {
+									this.updateConditionType();
+								}
+							}.bind(this))
+							.unwrap();
+					} catch (oError) {
+						throw new Error("Error in sap.ui.mdc.field.content.ContentFactory:_setUsedConditionType function call ErrorMessage: '" + oError.message + "'");
+					}
+				}
+			} else {
+				this.updateConditionType();
+			}
+
+		}
+
 	};
 
 	ContentFactory.prototype.getDataType = function() {
@@ -378,7 +409,25 @@ sap.ui.define([
 		this._oDataType = oDataType;
 	};
 
-	ContentFactory.prototype.retrieveDataType = function() {
+	ContentFactory.prototype.checkDataTypeChanged = function(sDataType) {
+		sDataType = this.getField().getTypeUtil().getDataTypeClassName(sDataType); // map EDM-Types
+
+		try {
+			// check data-type after we can be sure it's loaded to perform depending actions later
+			return loadModules([sDataType.replaceAll(".", "/")])
+				.catch(function(oError) {
+					throw new Error("loadModules promise rejected in sap.ui.mdc.field.content.ContentFactory:checkDataTypeChanged function call - could not load data type " + sDataType);
+				})
+				.then(function(aModules) {
+					// TODO: also compare FormatOptions and Constraints
+					return !this._oDataType || this._oDataType.getMetadata().getName() !== sDataType;
+				}.bind(this));
+		} catch (oError) {
+			throw new Error("Error in sap.ui.mdc.field.content.ContentFactory:checkDataTypeChanged function call ErrorMessage: '" + oError.message + "'");
+		}
+	};
+
+	ContentFactory.prototype.retrieveDataType = function() { // make sure that data type module is loaded before
 		if (!this._oDataType) {
 			var sDataType = this.getField().getDataType();
 			if (typeof sDataType === "string") {
@@ -487,6 +536,13 @@ sap.ui.define([
 				this._oUnitConditionsType.setFormatOptions(oFormatOptions);
 			}
 		}
+	};
+
+	ContentFactory.prototype.setNoFormatting = function(bNoFormatting) {
+		this._bNoFormatting = bNoFormatting;
+	};
+	ContentFactory.prototype.getNoFormatting = function() {
+		return this._bNoFormatting;
 	};
 
 	return ContentFactory;

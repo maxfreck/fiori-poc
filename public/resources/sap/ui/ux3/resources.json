@@ -168,7 +168,7 @@
 		{
 			"name": "DataSet-dbg.js",
 			"module": "sap/ui/ux3/DataSet.js",
-			"size": 20489,
+			"size": 20506,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -348,7 +348,7 @@
 		{
 			"name": "ExactArea-dbg.js",
 			"module": "sap/ui/ux3/ExactArea.js",
-			"size": 2389,
+			"size": 2374,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/Toolbar.js",
@@ -361,7 +361,7 @@
 		{
 			"name": "ExactArea.js",
 			"module": "sap/ui/ux3/ExactArea.js",
-			"size": 912,
+			"size": 900,
 			"required": [
 				"sap/ui/commons/Toolbar.js",
 				"sap/ui/core/Control.js",
@@ -372,7 +372,7 @@
 		},
 		{
 			"name": "ExactArea.js.map",
-			"size": 870,
+			"size": 852,
 			"isDebug": true
 		},
 		{
@@ -952,7 +952,7 @@
 		{
 			"name": "NotificationBar-dbg.js",
 			"module": "sap/ui/ux3/NotificationBar.js",
-			"size": 38425,
+			"size": 38429,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -970,7 +970,7 @@
 		{
 			"name": "NotificationBar.js",
 			"module": "sap/ui/ux3/NotificationBar.js",
-			"size": 15846,
+			"size": 15831,
 			"required": [
 				"sap/base/Log.js",
 				"sap/ui/Device.js",
@@ -986,7 +986,7 @@
 		},
 		{
 			"name": "NotificationBar.js.map",
-			"size": 20148,
+			"size": 20129,
 			"isDebug": true
 		},
 		{
@@ -1700,7 +1700,7 @@
 		{
 			"name": "library-preload.js",
 			"module": "sap/ui/ux3/library-preload.js",
-			"size": 317868,
+			"size": 317841,
 			"merged": true,
 			"required": [
 				"sap/base/Log.js",
@@ -1827,7 +1827,7 @@
 		},
 		{
 			"name": "library-preload.js.map",
-			"size": 378147,
+			"size": 378110,
 			"isDebug": true
 		},
 		{
@@ -2364,7 +2364,7 @@
 		},
 		{
 			"name": "themes/base/css_variables.source.less",
-			"size": 114684,
+			"size": 123815,
 			"designtime": true,
 			"theme": "base"
 		},
@@ -2838,13 +2838,13 @@
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.less",
-			"size": 100777,
+			"size": 110570,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.source.less",
-			"size": 100477,
+			"size": 110270,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,13 +20,13 @@ sap.ui.define([
 	'sap/ui/base/SyncPromise',
 	'sap/base/Log',
 	'sap/base/util/ObjectPath',
-	'sap/base/util/values',
 	'sap/base/assert',
 	'sap/base/util/LoaderExtensions',
 	'sap/base/util/JSTokenizer',
 	'sap/base/util/each',
 	'sap/base/util/isEmptyObject',
-	'sap/ui/core/Configuration'
+	'sap/ui/core/Configuration',
+	'sap/ui/core/Lib'
 ],
 function(
 	DataType,
@@ -42,13 +42,13 @@ function(
 	SyncPromise,
 	Log,
 	ObjectPath,
-	values,
 	assert,
 	LoaderExtensions,
 	JSTokenizer,
 	each,
 	isEmptyObject,
-	Configuration
+	Configuration,
+	Library
 ) {
 	"use strict";
 
@@ -446,7 +446,7 @@ function(
 							return;
 						}
 						// fall back to async loading
-						sap.ui.require(values(oRequireContext), function() {
+						sap.ui.require(Object.values(oRequireContext), function() {
 							var aLoadedModules = arguments;
 							Object.keys(oRequireContext).forEach(function(sKey, i) {
 								oModules[sKey] = aLoadedModules[i];
@@ -748,7 +748,7 @@ function(
 		 */
 		function findControlClass(sNamespaceURI, sLocalName) {
 			var sClassName;
-			var mLibraries = sap.ui.getCore().getLoadedLibraries();
+			var mLibraries = Library.all();
 			each(mLibraries, function(sLibName, oLibrary) {
 				if ( sNamespaceURI === oLibrary.namespace || sNamespaceURI === oLibrary.name ) {
 					sClassName = oLibrary.name + "." + ((oLibrary.tagNames && oLibrary.tagNames[sLocalName]) || sLocalName);

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,8 +9,6 @@ sap.ui.define([
 	'sap/ui/thirdparty/jquery',
 	'sap/ui/Device',
 	"sap/ui/core/Element",
-	"sap/ui/core/format/TimezoneUtil",
-	"sap/ui/core/format/DateFormat",
 	'./InputBase',
 	'./DateTimeField',
 	'./Button',
@@ -34,6 +32,8 @@ sap.ui.define([
 	"sap/ui/core/LabelEnablement",
 	"sap/ui/unified/library",
 	"sap/ui/core/Configuration",
+	"sap/ui/unified/calendar/CalendarUtils",
+    'sap/ui/core/date/UI5Date',
 	"sap/ui/core/date/CalendarWeekNumbering",
 	"sap/ui/dom/jquery/cursorPos"
 ],
@@ -41,8 +41,6 @@ sap.ui.define([
 		jQuery,
 		Device,
 		Element,
-		TimezoneUtil,
-		DateFormat,
 		InputBase,
 		DateTimeField,
 		Button,
@@ -65,6 +63,8 @@ sap.ui.define([
 		LabelEnablement,
 		unifiedLibrary,
 		Configuration,
+		CalendarUtils,
+        UI5Date,
 		CalendarWeekNumbering
 	) {
 	"use strict";
@@ -154,7 +154,7 @@ sap.ui.define([
 	 * the close event), or select Cancel.
 	 *
 	 * @extends sap.m.DateTimeField
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -182,7 +182,7 @@ sap.ui.define([
 				 * If not set, the dates are only displayed in the primary calendar type
 				 * @since 1.34.1
 				 */
-				secondaryCalendarType : {type : "sap.ui.core.CalendarType", group : "Appearance", defaultValue : null},
+				secondaryCalendarType : {type : "sap.ui.core.CalendarType", group : "Appearance"},
 
 				/**
 				 * Minimum date that can be shown and selected in the <code>DatePicker</code>. This must be a JavaScript date object.
@@ -353,7 +353,7 @@ sap.ui.define([
 	 *
 	 * <b>Note:</b> If this property is used, the <code>value</code> property should not be changed from the caller.
 	 *
-	 * @returns {object} the value of property <code>dateValue</code>
+	 * @returns {Date} the value of property <code>dateValue</code>
 	 * @public
 	 * @name sap.m.DatePicker#getDateValue
 	 * @function
@@ -368,9 +368,9 @@ sap.ui.define([
 
 		this._bValid = true;
 
-		this._oMinDate = new Date(1, 0, 1); // set the date to minimum possible for that day
+		this._oMinDate = UI5Date.getInstance(1, 0, 1); // set the date to minimum possible for that day
 		this._oMinDate.setFullYear(1); // otherwise year 1 will be converted to year 1901
-		this._oMaxDate = new Date(9999, 11, 31, 23, 59, 59, 999); // set the date for the maximum possible for that day
+		this._oMaxDate = UI5Date.getInstance(9999, 11, 31, 23, 59, 59, 999); // set the date for the maximum possible for that day
 
 		var oIcon = this.addEndIcon({
 			id: this.getId() + "-icon",
@@ -481,7 +481,7 @@ sap.ui.define([
 		var oValueHelpIcon = this._getValueHelpIcon();
 
 		if (oValueHelpIcon) {
-			oValueHelpIcon.setProperty("visible", this.getEditable(), true);
+			oValueHelpIcon.setProperty("visible", this.getEditable());
 		}
 
 	};
@@ -490,7 +490,7 @@ sap.ui.define([
 	 * Sets the displayFormat of the DatePicker.
 	 *
 	 * @param {string} sDisplayFormat  new value for <code>displayFormat</code>
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 */
 	 DatePicker.prototype.setDisplayFormat = function(sDisplayFormat) {
@@ -512,7 +512,7 @@ sap.ui.define([
 	 * Defines the width of the DatePicker. Default value is 100%
 	 *
 	 * @param {string} sWidth  new value for <code>width</code>
-	 * @returns {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 */
 	DatePicker.prototype.setWidth = function(sWidth) {
@@ -661,7 +661,7 @@ sap.ui.define([
 	 * This prevents unwanted automatic corrections of wrong input.
 	 *
 	 * @param {string} sValue The new value of the input.
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 * @name sap.m.DatePicker#setValue
 	 * @function
@@ -686,6 +686,13 @@ sap.ui.define([
 		return oDate;
 	};
 
+	/**
+	 * Set minimum date that can be shown and selected in the <code>DatePicker</code>. This must be a JavaScript date object.
+	 *
+	 * @param {Date} oDate A JavaScript Date
+	 * @returns {this} Reference to <code>this</code> for method chaining
+	 * @public
+	 */
 	DatePicker.prototype.setMinDate = function(oDate) {
 
 		if (!this._isValidDate(oDate)) {
@@ -702,7 +709,7 @@ sap.ui.define([
 				throw new Error("Date must be between 0001-01-01 and 9999-12-31; " + this);
 			}
 
-			this._oMinDate = new Date(oDate.getTime());
+			this._oMinDate = UI5Date.getInstance(oDate.getTime());
 			var oDateValue = this.getDateValue();
 			if (oDateValue && oDateValue.getTime() < oDate.getTime()) {
 				this._bValid = false;
@@ -710,7 +717,7 @@ sap.ui.define([
 				Log.warning("DateValue not in valid date range", this);
 			}
 		} else {
-			this._oMinDate = new Date(1, 0, 1);
+			this._oMinDate = UI5Date.getInstance(1, 0, 1);
 			this._oMinDate.setFullYear(1); // otherwise year 1 will be converted to year 1901
 		}
 
@@ -727,6 +734,13 @@ sap.ui.define([
 
 	};
 
+	/**
+	 * Set maximum date that can be shown and selected in the <code>DatePicker</code>. This must be a JavaScript date object.
+	 *
+	 * @param {Date} oDate A JavaScript Date
+	 * @returns {this} Reference to <code>this</code> for method chaining
+	 * @public
+	 */
 	DatePicker.prototype.setMaxDate = function(oDate) {
 
 		if (!this._isValidDate(oDate)) {
@@ -743,7 +757,7 @@ sap.ui.define([
 				throw new Error("Date must be between 0001-01-01 and 9999-12-31; " + this);
 			}
 
-			this._oMaxDate = new Date(oDate.getTime());
+			this._oMaxDate = UI5Date.getInstance(oDate.getTime());
 			var oDateValue = this.getDateValue();
 			if (oDateValue && oDateValue.getTime() > oDate.getTime()) {
 				this._bValid = false;
@@ -751,7 +765,7 @@ sap.ui.define([
 				Log.warning("DateValue not in valid date", this);
 			}
 		} else {
-			this._oMaxDate = new Date(9999, 11, 31, 23, 59, 59, 999);
+			this._oMaxDate = UI5Date.getInstance(9999, 11, 31, 23, 59, 59, 999);
 		}
 
 		// re-render because order of parameter changes not clear -> check onBeforeRendering
@@ -777,10 +791,12 @@ sap.ui.define([
 
 		if (this._oMinDate.getTime() > this._oMaxDate.getTime()) {
 			Log.warning("minDate > MaxDate -> dates switched", this);
-			var oMaxDate = new Date(this._oMinDate.getTime());
-			var oMinDate = new Date(this._oMaxDate.getTime());
-			this._oMinDate = new Date(oMinDate.getTime());
-			this._oMaxDate = new Date(oMaxDate.getTime());
+			var oMaxDate = UI5Date.getInstance(this._oMinDate.getTime());
+			var oMinDate = UI5Date.getInstance(this._oMaxDate.getTime());
+			oMaxDate.setHours(23, 59, 59, 999);
+			oMinDate.setHours(0, 0, 0, 0);
+			this._oMinDate = UI5Date.getInstance(oMinDate.getTime());
+			this._oMaxDate = UI5Date.getInstance(oMaxDate.getTime());
 			this.setProperty("minDate", oMinDate, true);
 			this.setProperty("maxDate", oMaxDate, true);
 			if (this._getCalendar()) {
@@ -891,7 +907,7 @@ sap.ui.define([
 	 *
 	 * @since 1.38.5
 	 * @param {sap.ui.unified.DateTypeRange} oSpecialDate the specialDate to add; if empty, nothing is added
-	 * @return {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 */
 	DatePicker.prototype.addSpecialDate = function(oSpecialDate){
@@ -914,7 +930,7 @@ sap.ui.define([
 	 * @param {int} iIndex the 0-based index the <code>specialDate</code> should be inserted at;
 	 *              for a negative value of <code>iIndex</code>, the <code>specialDate</code> is inserted at position 0;
 	 *              for a value greater than the current size of the aggregation, the <code>specialDate</code> is inserted at the last position
-	 * @return {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 */
 	DatePicker.prototype.insertSpecialDate = function(oSpecialDate, iIndex){
@@ -973,7 +989,7 @@ sap.ui.define([
 	 * @since 1.38.5
 	 * @param {sap.ui.core.ID | sap.ui.unified.CalendarLegend} oLegend ID of an element which becomes the new target of this <code>legend</code> association;
 	 *                                                         alternatively, an element instance may be given
-	 * @return {this} Reference to <code>this</code> in order to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @public
 	 */
 	DatePicker.prototype.setLegend = function(oLegend){
@@ -1063,7 +1079,7 @@ sap.ui.define([
 				this._getCalendar().focusDate(oDate);
 				var oStartDate = this._oDateRange.getStartDate();
 				if ((!oStartDate && oDate) || (oStartDate && oDate && oStartDate.getTime() != oDate.getTime())) {
-					this._oDateRange.setStartDate(new Date(oDate.getTime()));
+					this._oDateRange.setStartDate(UI5Date.getInstance(oDate.getTime()));
 				} else if (oStartDate && !oDate) {
 					this._oDateRange.setStartDate(undefined);
 				}
@@ -1342,32 +1358,19 @@ sap.ui.define([
 	};
 
 	DatePicker.prototype._fillDateRange = function(){
-		var sFormattedDate;
 		var oDate = this.getDateValue();
 
 		if (oDate &&
 			oDate.getTime() >= this._oMinDate.getTime() &&
 			oDate.getTime() <= this._oMaxDate.getTime()) {
 
-			sFormattedDate = this._getPickerParser().format(
-				oDate,
-				this._getTimezone(true)
-			);
-			oDate = this._getPickerParser().parse(sFormattedDate, TimezoneUtil.getLocalTimezone())[0];
-
-			this._getCalendar().focusDate(new Date(oDate.getTime()));
+			this._getCalendar().focusDate(UI5Date.getInstance(oDate.getTime()));
 			if (!this._oDateRange.getStartDate() || this._oDateRange.getStartDate().getTime() != oDate.getTime()) {
-				this._oDateRange.setStartDate(new Date(oDate.getTime()));
+				this._oDateRange.setStartDate(UI5Date.getInstance(oDate.getTime()));
 			}
 		} else {
 			var oInitialFocusedDateValue = this.getInitialFocusedDateValue();
-			var oFocusDate = oInitialFocusedDateValue ? oInitialFocusedDateValue : new Date();
-
-			sFormattedDate = this._getPickerParser().format(
-				oFocusDate,
-				this._getTimezone(true)
-			);
-			oFocusDate = this._getPickerParser().parse(sFormattedDate, TimezoneUtil.getLocalTimezone())[0];
+			var oFocusDate = oInitialFocusedDateValue ? oInitialFocusedDateValue : UI5Date.getInstance();
 
 			if (oFocusDate.getTime() < this._oMinDate.getTime()) {
 				oFocusDate = this._oMinDate;
@@ -1385,7 +1388,7 @@ sap.ui.define([
 
 	/**
 	 * @see sap.ui.core.Control#getAccessibilityInfo
-	 * @returns {object} Current accessibility state of the control.
+	 * @returns {sap.ui.core.AccessibilityInfo} Current accessibility state of the control.
 	 * @protected
 	 */
 	DatePicker.prototype.getAccessibilityInfo = function() {
@@ -1408,16 +1411,9 @@ sap.ui.define([
 			oDate = this._getSelectedDate(),
 			sValue = "";
 
-		var sFormattedDate = this._getPickerParser().format(oDate, TimezoneUtil.getLocalTimezone());
-		var oParts = this._getPickerParser().parse(
-			sFormattedDate,
-			this._getTimezone(true)
-		);
-		oDate = oParts && oParts[0];
-
 		// do not use this.onChange() because output pattern will change date (e.g. only last 2 number of year -> 1966 -> 2066 )
 		if (!deepEqual(oDate, oDateOld)) {
-			this.setDateValue(new Date(oDate.getTime()));
+			this.setDateValue(UI5Date.getInstance(oDate.getTime()));
 			// compare Dates because value can be the same if only 2 digits for year
 			sValue = this.getValue();
 			this.fireChangeEvent(sValue, {valid: true});
@@ -1542,8 +1538,8 @@ sap.ui.define([
 				sCalendarType = this.getDisplayFormatType();
 			}
 
-			var oDate = UniversalDate.getInstance(new Date(oOldDate.getTime()), sCalendarType);
-			oOldDate = UniversalDate.getInstance(new Date(oOldDate.getTime()), sCalendarType);
+			var oDate = UniversalDate.getInstance(UI5Date.getInstance(oOldDate.getTime()), sCalendarType);
+			oOldDate = UniversalDate.getInstance(UI5Date.getInstance(oOldDate.getTime()), sCalendarType);
 
 			switch (sUnit) {
 			case "day":
@@ -1579,7 +1575,7 @@ sap.ui.define([
 			}
 
 			if (!deepEqual(this.getDateValue(), oDate.getJSDate())) {
-				this.setDateValue(new Date(oDate.getTime()));
+				this.setDateValue(UI5Date.getInstance(oDate.getTime()));
 
 				this._curpos = iCurpos;
 				this._$input.cursorPos(this._curpos);
@@ -1667,14 +1663,6 @@ sap.ui.define([
 
 	}
 
-	DatePicker.prototype._getPickerParser = function() {
-		if (!this._calendarParser) {
-			this._calendarParser = DateFormat.getDateTimeWithTimezoneInstance({ showTimezone: false });
-		}
-
-		return this._calendarParser;
-	};
-
 	/**
 	 * Fired when the input operation has finished and the value has changed.
 	 *
@@ -1703,7 +1691,7 @@ sap.ui.define([
 	 * </ul>
 	 *
 	 * @param {object} [mArguments] the arguments to pass along with the event.
-	 * @return {this} <code>this</code> to allow method chaining
+	 * @returns {this} Reference to <code>this</code> for method chaining
 	 * @protected
 	 * @name sap.m.DatePicker#fireChange
 	 * @function

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -33,12 +33,12 @@ sap.ui.define([
 	 * @extends sap.ui.mdc.field.FieldBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @alias sap.ui.mdc.FilterField
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.48.0
 	 *
 	 * @experimental As of version 1.48
@@ -138,22 +138,15 @@ sap.ui.define([
 
 	FilterField.prototype.setProperty = function(sPropertyName, oValue, bSuppressInvalidate) {
 
-		if (sPropertyName === "conditions" && this._bParseError && deepEqual(this.getConditions(), this.validateProperty(sPropertyName, oValue))) {
+		if (sPropertyName === "conditions" && this._isInvalidInput() && deepEqual(this.getConditions(), this.validateProperty(sPropertyName, oValue))) {
 			// in parse error and same Conditions - no update on property - so remove error here
 			// As ConditionModel triggers checkUpdate in forced mode on addCondition, setConditions... also unchanged conditions will be updated
 			// So e.g. if a variant is applied an error will be removed.
-			if (this._oContentFactory.getBoundProperty()) { // single value case
-				if (this._oManagedObjectModel) {
-					this._oManagedObjectModel.checkUpdate(true, true); // async. to reduce updates (additionalValue will follow)
-				}
-			} else { // Multi value case - don't update tokens, initialize value
-				var oContent = this._getContent()[0];
-				if (oContent && oContent.setValue) {
-					oContent.setValue(); // TODO: custom controls with different property?
-				}
-				this._removeUIMessage();
+			if (this._oManagedObjectModel) {
+				this._oManagedObjectModel.checkUpdate(true, true); // async. to reduce updates (additionalValue will follow)
 			}
-			this._bParseError = false;
+			// TODO: prevent unneeded update of tokens?
+			this._resetInvalidInput();
 		}
 
 		return FieldBase.prototype.setProperty.apply(this, arguments);
@@ -226,7 +219,7 @@ sap.ui.define([
 	/**
 	 * Adds an operator to the list of known operators.
 	 *
- 	 * <b>Note</b>: If no operator is set, the used type of the <code>FilterField</code> defines the set of default operators.
+ 	 * <b>Note</b>: If no operator is set, the used <code>datatType</code> of the <code>FilterField</code> defines the set of default operators.
 	 *
 	 * @param {sap.ui.mdc.condition.Operator|string} vOperator The operator instance or operator name
 	 * @returns {this} Reference to <code>this</code> to allow method chaining
@@ -287,7 +280,7 @@ sap.ui.define([
 	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	FilterField.prototype.removeOperator = function(vOperator) {
-		var aOperators = this.getOperators();
+		var aOperators = this._getOperators();
 		var sOpName = vOperator;
 		if (typeof vOperator !== "string") {
 			sOpName = vOperator.name;
@@ -363,7 +356,7 @@ sap.ui.define([
 				return;
 			}
 
-			this._oContentFactory.retrieveDataType();
+			this._getContentFactory().retrieveDataType();
 			FieldBase.prototype._checkCreateInternalContent.apply(this, arguments);
 		}
 

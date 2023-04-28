@@ -215,7 +215,7 @@
 		{
 			"name": "lrepConnector/LRepConnector-dbg.js",
 			"module": "sap/ui/fl/support/apps/contentbrowser/lrepConnector/LRepConnector.js",
-			"size": 11672,
+			"size": 11676,
 			"isDebug": true,
 			"required": [
 				"sap/ui/fl/Utils.js",
@@ -249,7 +249,7 @@
 		},
 		{
 			"name": "resources.json",
-			"size": 11228
+			"size": 11144
 		},
 		{
 			"name": "style.css",
@@ -261,48 +261,46 @@
 			"size": 4356,
 			"isDebug": true,
 			"required": [
-				"sap/m/GroupHeaderListItem.js",
-				"sap/ui/thirdparty/jquery.js"
+				"sap/m/GroupHeaderListItem.js"
 			]
 		},
 		{
 			"name": "utils/DataUtils.js",
 			"module": "sap/ui/fl/support/apps/contentbrowser/utils/DataUtils.js",
-			"size": 1411,
+			"size": 1380,
 			"required": [
-				"sap/m/GroupHeaderListItem.js",
-				"sap/ui/thirdparty/jquery.js"
+				"sap/m/GroupHeaderListItem.js"
 			]
 		},
 		{
 			"name": "utils/DataUtils.js.map",
-			"size": 2004,
+			"size": 2036,
 			"isDebug": true
 		},
 		{
 			"name": "utils/ErrorUtils-dbg.js",
 			"module": "sap/ui/fl/support/apps/contentbrowser/utils/ErrorUtils.js",
-			"size": 2358,
+			"size": 2337,
 			"isDebug": true,
 			"required": [
+				"sap/m/MessageItem.js",
 				"sap/m/MessagePopover.js",
-				"sap/m/MessagePopoverItem.js",
 				"sap/ui/model/json/JSONModel.js"
 			]
 		},
 		{
 			"name": "utils/ErrorUtils.js",
 			"module": "sap/ui/fl/support/apps/contentbrowser/utils/ErrorUtils.js",
-			"size": 1096,
+			"size": 1089,
 			"required": [
+				"sap/m/MessageItem.js",
 				"sap/m/MessagePopover.js",
-				"sap/m/MessagePopoverItem.js",
 				"sap/ui/model/json/JSONModel.js"
 			]
 		},
 		{
 			"name": "utils/ErrorUtils.js.map",
-			"size": 1302,
+			"size": 1293,
 			"isDebug": true
 		},
 		{

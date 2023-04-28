@@ -1,18 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"sap/ui/fl/Utils",
-	"sap/base/Log",
 	"sap/ui/fl/changeHandler/AddIFrame",
 	"sap/ui/fl/changeHandler/common/getTargetAggregationIndex",
 	"sap/ui/fl/changeHandler/common/createIFrame"
 ], function (
-	Utils,
-	Log,
 	BaseAddIFrame,
 	getTargetAggregationIndex,
 	createIFrame
@@ -25,7 +21,7 @@ sap.ui.define([
 	 * @constructor
 	 * @alias sap.uxap.changeHandler.AddIFrameObjectPageLayout
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.75
 	 * @experimental Since 1.75
 	 */
@@ -53,6 +49,7 @@ sap.ui.define([
 		var oView = mPropertyBag.view;
 		var oComponent = mPropertyBag.appComponent;
 		var oBaseSelector = oContent.selector;
+		// keep default title for legacy changes (without subsequent rename)
 		var sDefaultTitle = sap.ui.getCore().getLibraryResourceBundle("sap.uxap").getText("SECTION_TITLE_FOR_IFRAME");
 
 		var oOPSection;
@@ -77,7 +74,12 @@ sap.ui.define([
 			.then(function () {
 				var oIFrameSelector = Object.create(oBaseSelector);
 				oIFrameSelector.id += "-iframe";
-				return createIFrame(oChange, mPropertyBag, oIFrameSelector);
+				var mRenameInfo = {
+					sourceControlId: oModifier.getId(oOPSubSection),
+					selectorControlId: oModifier.getId(oOPSection),
+					propertyName: "title"
+				};
+				return createIFrame(oChange, mPropertyBag, oIFrameSelector, mRenameInfo);
 			})
 			.then(function(oIFrame) {
 				return oModifier.insertAggregation(oOPSubSection, "blocks", oIFrame, 0, oView);

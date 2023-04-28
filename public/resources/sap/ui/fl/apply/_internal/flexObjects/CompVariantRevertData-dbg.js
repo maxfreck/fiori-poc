@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,10 +10,13 @@ sap.ui.define([
 	"use strict";
 
 	/**
+	 * CompVariantRevertData
+	 *
 	 * Class for storing information about reverting variants.
 	 *
-	 * @class sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData
+	 * @class
 	 * @extends sap.ui.fl.apply._internal.flexObjects.RevertData
+	 * @alias sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData
 	 * @private
 	 * @ui5-restricted
 	 * @since 1.87.0
@@ -21,7 +24,7 @@ sap.ui.define([
 	return RevertData.extend("sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData", {
 		metadata: {
 			properties: {
-				change: {type: "sap.ui.fl.Change"}
+				change: {type: "object" } // "sap.ui.fl.apply._internal.flexObjects.FlexObject"
 			}
 		}
 	});

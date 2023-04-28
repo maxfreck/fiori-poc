@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -187,7 +187,7 @@ sap.ui.define([
 					};
 				}
 
-				// If more then one local property maps to the same target property (clash situation)
+				// If more than one local property maps to the same target property (clash situation)
 				// we take the value of the last property and write an error log
 				if (oResults[sSemanticObject][sAttributeNameMapped]) {
 					SapBaseLog.error("FlpLinkDelegate: The attribute " + sAttributeName + " can not be renamed to the attribute " + sAttributeNameMapped + " due to a clash situation. This can lead to wrong navigation later on.");

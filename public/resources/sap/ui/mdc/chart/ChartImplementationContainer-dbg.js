@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -15,14 +15,14 @@ function (Control, Renderer, Core, jQuery
     "use strict";
 
     /**
-     * Constructor for a new Chart.
+     * Constructor for a new ChartContainer.
      *
      * @param {string} [sId] ID for the new control, generated automatically if no id is given
      * @param {object} [mSettings] Initial settings for the new control
      * @class The Chart control creates a chart based on metadata and the configuration specified.
      * @extends sap.ui.core.Control
      * @author SAP SE
-     * @version 1.108.2
+     * @version 1.113.0
      * @constructor
      * @experimental As of version 1.105
      * @private
@@ -122,7 +122,7 @@ function (Control, Renderer, Core, jQuery
      * @returns {sap.ui.mdc.chart.ChartImplementationContainer} reference to <code>this</code> in order to allow method chaining
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartContainer.prototype.setContent = function(oContent) {
         this.setAggregation("content", oContent);
@@ -136,7 +136,7 @@ function (Control, Renderer, Core, jQuery
      * @returns {sap.ui.mdc.chart.ChartImplementationContainer} reference to <code>this</code> in order to allow method chaining
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartContainer.prototype.setNoDataContent = function(oContent) {
         this.setAggregation("noDataContent", oContent);
@@ -151,7 +151,7 @@ function (Control, Renderer, Core, jQuery
      * @returns {sap.ui.mdc.chart.ChartImplementationContainer} reference to <code>this</code> in order to allow method chaining
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartContainer.prototype.setChartNoDataContent = function(oContent) {
         this.setAssociation("chartNoDataContent", oContent);
@@ -165,7 +165,7 @@ function (Control, Renderer, Core, jQuery
      *
      * @experimental
      * @private
-     * @ui5-restricted Fiori Elements, sap.ui.mdc
+     * @ui5-restricted sap.fe, sap.ui.mdc
      */
     ChartContainer.prototype.showOverlay = function(bShow) {
         var $this = this.$(), $overlay = $this.find(".sapUiMdcChartOverlay");

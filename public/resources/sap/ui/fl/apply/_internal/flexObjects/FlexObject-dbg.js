@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -69,7 +69,7 @@ sap.ui.define([
 	 * @extends sap.ui.base.ManagedObject
 	 * @alias sap.ui.fl.apply._internal.flexObjects.FlexObject
 	 * @since 1.100
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl
 	 */
@@ -78,11 +78,11 @@ sap.ui.define([
 			properties: {
 				/**
 				 * Current state of the flex object regarding the persistence.
-				 * See {@link sap.ui.fl.apply._internal.flexObjects.States}.
+				 * See {@link sap.ui.fl.apply._internal.flexObjects.States.LifecycleState}.
 				 */
 				state: {
 					type: "string",
-					defaultValue: States.NEW
+					defaultValue: States.LifecycleState.NEW
 				},
 				/**
 				 * File type of the flex object.
@@ -137,20 +137,14 @@ sap.ui.define([
 			var oFlexObjectMetadata = this.getFlexObjectMetadata();
 			var sReference = oFlexObjectMetadata.reference;
 			if (sReference) {
-				if (!oFlexObjectMetadata.namespace) {
-					oFlexObjectMetadata.namespace = Utils.createNamespace({ reference: sReference }, this.getFileType());
-				}
-
-				if (!oFlexObjectMetadata.projectId) {
-					oFlexObjectMetadata.projectId = sReference.replace(".Component", "");
-				}
+				oFlexObjectMetadata.namespace = oFlexObjectMetadata.namespace || Utils.createNamespace({ reference: sReference }, this.getFileType());
+				oFlexObjectMetadata.projectId = oFlexObjectMetadata.projectId || sReference;
 			}
 			this.setFlexObjectMetadata(oFlexObjectMetadata);
 
 			var oSupportInformation = this.getSupportInformation();
-			if (!oSupportInformation.originalLanguage) {
-				oSupportInformation.originalLanguage = Utils.getCurrentLanguage();
-			}
+			oSupportInformation.originalLanguage = oSupportInformation.originalLanguage || Utils.getCurrentLanguage();
+
 			this.setSupportInformation(oSupportInformation);
 		}
 	});
@@ -206,7 +200,7 @@ sap.ui.define([
 	FlexObject.prototype.setContent = function (oContent, bSkipStateChange) {
 		this.setProperty("content", oContent);
 		if (!bSkipStateChange) {
-			this.setState(States.DIRTY);
+			this.setState(States.LifecycleState.DIRTY);
 		}
 		return this;
 	};
@@ -228,13 +222,13 @@ sap.ui.define([
 	};
 
 	function isValidStateChange(sNewState, sCurrentState) {
-		if (!Object.values(States).includes(sNewState)) {
+		if (!Object.values(States.LifecycleState).includes(sNewState)) {
 			return false;
 		}
 		// flex object state cannot move from NEW to DIRTY directly
 		if (
-			sCurrentState === States.NEW
-			&& sNewState === States.DIRTY
+			sCurrentState === States.LifecycleState.NEW
+			&& sNewState === States.LifecycleState.DIRTY
 		) {
 			return false;
 		}
@@ -243,7 +237,7 @@ sap.ui.define([
 
 	/**
 	 * Validates and sets the state of the flex object.
-	 * @param {sap.ui.fl.States} sState - New state
+	 * @param {sap.ui.fl.apply._internal.flexObjects.States.LifecycleState} sState - New state
 	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} <code>this</code> for chaining
 	 */
 	FlexObject.prototype.setState = function (sState) {
@@ -255,11 +249,15 @@ sap.ui.define([
 		return this;
 	};
 
+	FlexObject.prototype.isPersisted = function() {
+		return this.getState() === States.LifecycleState.PERSISTED;
+	};
+
 	/**
 	 * Changes the state of the flex object to DELETED.
 	 */
 	FlexObject.prototype.markForDeletion = function () {
-		this.setState(States.DELETED);
+		this.setState(States.LifecycleState.DELETED);
 	};
 
 	/**
@@ -348,7 +346,7 @@ sap.ui.define([
 		oTexts[sTextId] = Object.assign({}, oTexts[sTextId], oNewText);
 		this.setTexts(oTexts);
 		if (!bSkipStateChange) {
-			this.setState(States.DIRTY);
+			this.setState(States.LifecycleState.DIRTY);
 		}
 		return this;
 	};
@@ -485,7 +483,7 @@ sap.ui.define([
 			}
 		};
 
-		Object.entries(deepClone(oFileContent)).forEach(function (aEntry) {
+		Object.entries(deepClone(oFileContent, 15)).forEach(function (aEntry) {
 			fnMapProperty(aEntry[0], aEntry[1]);
 		});
 		return mPropertyMap;
@@ -513,7 +511,7 @@ sap.ui.define([
 			return;
 		}
 		this.update(oResponse);
-		this.setState(States.PERSISTED);
+		this.setState(States.LifecycleState.PERSISTED);
 	};
 
 	return FlexObject;

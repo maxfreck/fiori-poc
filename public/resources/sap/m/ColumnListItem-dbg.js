@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,7 +42,7 @@ sap.ui.define([
 	 * @extends sap.m.ListItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -215,6 +215,24 @@ sap.ui.define([
 		return this.$().add(this.$Popin()).find(":sapTabbable");
 	};
 
+	/**
+	 * Calculates and returns the bounding client rectangle
+	 * of the drop area taking the popin area into account.
+	 * @private
+	 */
+	ColumnListItem.prototype.getDropAreaRect = function() {
+		var oPopin = null;
+		var oDomRef = this.getDomRef();
+		var mDropRect = oDomRef.getBoundingClientRect().toJSON();
+		if (this._oPopin && (oPopin = this.getDomRef("sub"))) {
+			var mPopinRect = oPopin.getBoundingClientRect();
+			mDropRect.bottom = mPopinRect.bottom;
+			mDropRect.height += mPopinRect.height;
+		}
+
+		return mDropRect;
+	};
+
 	ColumnListItem.prototype.getAccessibilityType = function(oBundle) {
 		return oBundle.getText("ACC_CTR_TYPE_ROW");
 	};
@@ -249,7 +267,7 @@ sap.ui.define([
 			}
 		});
 
-		return aOutput.join(" . ").trim();
+		return aOutput.filter(Boolean).join(" . ").trim();
 	};
 
 	// update the aria-selected for the cells

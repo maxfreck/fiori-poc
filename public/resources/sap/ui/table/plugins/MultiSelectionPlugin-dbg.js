@@ -1,6 +1,6 @@
 /*
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -26,19 +26,20 @@ sap.ui.define([
 	/**
 	 * Constructs an instance of sap.ui.table.plugins.MultiSelectionPlugin
 	 *
-	 * @class  Implements a plugin to enable a special multi-selection behavior:
+	 * @class Implements a plugin to enable a special multi-selection behavior:
 	 * <ul>
-	 * <li>No Select All checkbox, select all can only be done via range selection</li>
-	 * <li>Dedicated Deselect All button to clear the selection</li>
-	 * <li>The number of indices which can be selected in a range is defined by the <code>limit</code> property by the application.
-	 * If the user tries to select more indices, the selection is automatically limited, and the table scrolls to the last selected index.</li>
-	 * <li>The plugin makes sure that the corresponding binding contexts up to the given limit are available, by requesting them from the
-	 *     binding.</li>
-	 * <li>Multiple consecutive selections are possible</li>
+	 *   <li>No Select All checkbox, select all can only be done via range selection</li>
+	 *   <li>Dedicated Deselect All button to clear the selection</li>
+	 *   <li>The number of indices which can be selected in a range is defined by the <code>limit</code> property.
+	 *       If the user tries to select more indices, the selection is automatically limited, and the table scrolls to the last selected index.</li>
+	 *   <li>The plugin makes sure that the corresponding binding contexts up to the given limit are available, by requesting them from the
+	 *       binding.</li>
+	 *   <li>Multiple consecutive selections are possible</li>
 	 * </ul>
 	 *
-	 * This plugin is intended for the multi-selection mode, but also supports single selection for ease of use.
-	 * When this plugin is applied to the table, the table's selection mode is automatically set to MultiToggle and cannot be changed.
+	 * This plugin is intended for server-side models and multi-selection mode. Range selections, including Select All, only work properly if the
+	 * count is known. Make sure the model/binding is configured to request the count from the service.
+	 * For ease of use, client-side models and single selection are also supported.
 	 *
 	 * @extends sap.ui.table.plugins.SelectionPlugin
 	 * @constructor
@@ -47,24 +48,25 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @alias sap.ui.table.plugins.MultiSelectionPlugin
 	 */
-	var MultiSelectionPlugin = SelectionPlugin.extend("sap.ui.table.plugins.MultiSelectionPlugin", {metadata : {
+	var MultiSelectionPlugin = SelectionPlugin.extend("sap.ui.table.plugins.MultiSelectionPlugin", {metadata: {
 		library: "sap.ui.table",
-		properties : {
+		properties: {
 			/**
 			 * Number of indices which can be selected in a range.
 			 * Accepts positive integer values. If set to 0, the limit is disabled, and the Select All checkbox appears instead of the Deselect All
 			 * button.
-			 * <b>Note:</b>
-			 * To avoid severe performance problems, the limit should only be set to 0 in the following cases:
+			 *
+			 * <b>Note:</b> To avoid severe performance problems, the limit should only be set to 0 in the following cases:
 			 * <ul>
-			 * <li>With client-side models</li>
-			 * <li>With server-side models if they are used in client mode</li>
-			 * <li>If the entity set is small</li>
+			 *   <li>With client-side models</li>
+			 *   <li>With server-side models if they are used in client mode</li>
+			 *   <li>If the entity set is small</li>
 			 * </ul>
+			 *
 			 * In other cases, we recommend to set the limit to at least double the value of the {@link sap.ui.table.Table#getThreshold threshold}
 			 * property of the related <code>sap.ui.table.Table</code> control.
 			 */
-			limit : {type : "int", group : "Behavior", defaultValue : 200},
+			limit: {type: "int", group: "Behavior", defaultValue: 200},
 			/**
 			 * Enables notifications that are displayed once a selection has been limited.
 			 *
@@ -74,34 +76,34 @@ sap.ui.define([
 			/**
 			 * Show header selector
 			 */
-			showHeaderSelector : {type : "boolean", group : "Appearance", defaultValue : true},
+			showHeaderSelector: {type: "boolean", group: "Appearance", defaultValue: true},
 			/**
 			 * Selection mode of the plugin. This property controls whether single or multiple rows can be selected. It also influences the visual
 			 * appearance. When the selection mode is changed, the current selection is removed.
 			 */
-			selectionMode : {type : "sap.ui.table.SelectionMode", group : "Behavior", defaultValue : SelectionMode.MultiToggle}
+			selectionMode: {type: "sap.ui.table.SelectionMode", group: "Behavior", defaultValue: SelectionMode.MultiToggle}
 		},
-		events : {
+		events: {
 			/**
 			 * This event is fired when the selection is changed.
 			 */
-			selectionChange : {
-				parameters : {
+			selectionChange: {
+				parameters: {
 
 					/**
 					 * Array of indices whose selection has been changed (either selected or deselected)
 					 */
-					indices : {type : "int[]"},
+					indices: {type: "int[]"},
 
 					/**
 					 * Indicates whether the selection limit has been reached
 					 */
-					limitReached : {type : "boolean"},
+					limitReached: {type: "boolean"},
 
 					/**
 					 * Contains the data passed to the function that triggered the event
 					 */
-					customPayload : {type : "object"}
+					customPayload: {type: "object"}
 				}
 			}
 		}
@@ -352,7 +354,7 @@ sap.ui.define([
 			}
 		}
 
-		return loadMultipleContexts(oPlugin.getTableBinding(), iGetContextsStartIndex, iGetContextsLength).then(function () {
+		return loadContexts(oPlugin.getTableBinding(), iGetContextsStartIndex, iGetContextsLength).then(function() {
 			return {indexFrom: iIndexFrom, indexTo: iIndexTo};
 		});
 	}
@@ -557,33 +559,18 @@ sap.ui.define([
 		this._oNotificationPopover.close();
 	};
 
-	function loadMultipleContexts(oBinding, iStartIndex, iLength){
-		return new Promise(function(resolve){
-			loadContexts(oBinding, iStartIndex, iLength, resolve);
-		});
-	}
-
-	function loadContexts(oBinding, iStartIndex, iLength, fResolve) {
+	function loadContexts(oBinding, iStartIndex, iLength) {
 		var aContexts = oBinding.getContexts(iStartIndex, iLength, 0, true);
-		var bLoadItems = false;
+		var bContextsAvailable = aContexts.length === Math.min(iLength, oBinding.getLength()) && !aContexts.includes(undefined);
 
-		for (var i = 0; i < aContexts.length; i++) {
-			if (!aContexts[i]) {
-				bLoadItems = true;
-				break;
-			}
-		}
-		if (!bLoadItems && !aContexts.dataRequested) {
-			fResolve(aContexts);
-			return;
+		if (bContextsAvailable) {
+			return Promise.resolve(aContexts);
 		}
 
-		oBinding.attachEventOnce("dataReceived", function() {
-			if (aContexts.length == iLength) {
-				fResolve(aContexts);
-			} else {
-				loadContexts(oBinding, iStartIndex, iLength, fResolve);
-			}
+		return new Promise(function(resolve) {
+			oBinding.attachEventOnce("dataReceived", function() {
+				resolve(loadContexts(oBinding, iStartIndex, iLength));
+			});
 		});
 	}
 
@@ -704,7 +691,9 @@ sap.ui.define([
 		this.fireSelectionChange({
 			rowIndices: aRowIndices,
 			limitReached: this.isLimitReached(),
-			customPayload: typeof this._oCustomEventPayloadTmp === "object" ? this._oCustomEventPayloadTmp : null
+			customPayload: typeof this._oCustomEventPayloadTmp === "object" ? this._oCustomEventPayloadTmp : null,
+			// _internalTrigger restricted for sap.ui.comp.valuehelpdialog.ValueHelpDialog and sap.ui.mdc.valuehelp.content.MDCTable
+			_internalTrigger: oEvent.getParameter("_internalTrigger")
 		});
 	};
 

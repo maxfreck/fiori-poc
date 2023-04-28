@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -74,7 +74,7 @@ sap.ui.define([
 		 * @mixes sap.ui.model.odata.v4.ODataParentBinding
 		 * @public
 		 * @since 1.37.0
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @borrows sap.ui.model.odata.v4.ODataBinding#getGroupId as #getGroupId
 		 * @borrows sap.ui.model.odata.v4.ODataBinding#getRootBinding as #getRootBinding
@@ -148,6 +148,8 @@ sap.ui.define([
 		if (sPath.endsWith("/")) {
 			throw new Error("Invalid path: " + sPath);
 		}
+		// Whether the binding has fetched its own $select/$expand in the current parent cache
+		this.bHasFetchedExpandSelectProperties = false;
 		this.oOperation = undefined;
 		this.oParameterContext = null;
 		this.oReturnValueContext = null;
@@ -199,81 +201,6 @@ sap.ui.define([
 	}
 
 	asODataParentBinding(ODataContextBinding.prototype);
-
-	/**
-	 * Deletes the entity in <code>this.oElementContext</code>, identified by the edit URL.
-	 *
-	 * @param {sap.ui.model.odata.v4.lib._GroupLock} [oGroupLock]
-	 *   A lock for the group ID to be used for the DELETE request; w/o a lock, no DELETE is sent.
-	 *   For a transient entity, the lock is ignored (use NULL)!
-	 * @param {string} sEditUrl
-	 *   The entity's edit URL to be used for the DELETE request; w/o a lock, this is mostly
-	 *   ignored.
-	 * @param {sap.ui.model.odata.v4.Context} _oContext - ignored
-	 * @param {object} [_oETagEntity] - ignored
-	 * @param {boolean} [bDoNotRequestCount]
-	 *   Whether not to request the new count from the server; useful in case of
-	 *   {@link sap.ui.model.odata.v4.Context#replaceWith} where it is known that the count remains
-	 *   unchanged; w/o a lock this should be true
-	 * @returns {sap.ui.base.SyncPromise}
-	 *   A promise which is resolved without a result in case of success, or rejected with an
-	 *   instance of <code>Error</code> in case of failure.
-	 * @throws {Error}
-	 *   If the cache promise for this binding is not yet fulfilled, or if the cache is shared
-	 *
-	 * @private
-	 */
-	ODataContextBinding.prototype._delete = function (oGroupLock, sEditUrl, _oContext, _oETagEntity,
-			bDoNotRequestCount) {
-		// In case the context binding has an empty path, the respective context in the parent
-		// needs to be removed as well. As there could be more levels of bindings pointing to the
-		// same entity, first go up the binding hierarchy and find the context pointing to the same
-		// entity in the highest level binding.
-		// In case that top binding is a list binding, perform the deletion from there but use the
-		// ETag of this binding.
-		// In case the top binding is a context binding, perform the deletion from here but destroy
-		// the context(s) in that uppermost binding. Note that no data may be available in the
-		// uppermost context binding and hence the deletion would not work there, BCP 1980308439.
-		var oEmptyPathParentContext = this._findEmptyPathParentContext(this.oElementContext),
-			oEmptyPathParentBinding = oEmptyPathParentContext.getBinding(),
-			oDeleteParentContext = oEmptyPathParentBinding.getContext(),
-			oReturnValueContext = oEmptyPathParentBinding.oReturnValueContext,
-			that = this;
-
-		// In case the uppermost parent reached with empty paths is a list binding, delete there.
-		if (!oEmptyPathParentBinding.execute) {
-			return this.fetchValue("", undefined, true).then(function (oEntity) {
-				// In the Cache, the request is generated with a reference to the entity data
-				// first. So, hand over the complete entity to have the ETag of the correct binding
-				// in the request.
-				return oEmptyPathParentContext._delete(oGroupLock, oEntity, bDoNotRequestCount);
-			});
-			// fetchValue will fail if the entity has not been read. The same happens with the
-			// deleteFromCache call below. In Context#delete the error is reported.
-		}
-
-		oEmptyPathParentBinding.oElementContext = null;
-		if (oReturnValueContext) {
-			oEmptyPathParentBinding.oReturnValueContext = null;
-		}
-		this._fireChange({reason : ChangeReason.Remove});
-		return this.deleteFromCache(oGroupLock, sEditUrl, "", null).then(function () {
-			oEmptyPathParentContext.destroy();
-			if (oReturnValueContext) {
-				oReturnValueContext.destroy();
-			}
-		}, function (oError) {
-			if (!oEmptyPathParentBinding.isRelative()
-					|| oDeleteParentContext === oEmptyPathParentBinding.getContext()) {
-				oEmptyPathParentBinding.oElementContext = oEmptyPathParentContext;
-				if (oReturnValueContext) {
-					oEmptyPathParentBinding.oReturnValueContext = oReturnValueContext;
-				}
-				that._fireChange({reason : ChangeReason.Add});
-			}
-			throw oError;
-		});
-	};
 
 	/**
 	 * Calls the OData operation that corresponds to this operation binding.
@@ -490,7 +417,7 @@ sap.ui.define([
 	 * () {...})</code>).
 	 *
 	 * If back-end requests are successful, the event has almost no parameters. For compatibility
-	 * with {@link sap.ui.model.Binding#event:dataReceived}, an event parameter
+	 * with {@link sap.ui.model.Binding#event:dataReceived 'dataReceived'}, an event parameter
 	 * <code>data : {}</code> is provided: "In error cases it will be undefined", but otherwise it
 	 * is not. Use the binding's bound context via
 	 * {@link #getBoundContext oEvent.getSource().getBoundContext()} to access the response data.
@@ -632,7 +559,7 @@ sap.ui.define([
 	 *   actions only
 	 * @param {function} [fnOnStrictHandlingFailed]
 	 *   Callback for strict handling; supported for actions only
-	 * @returns {SyncPromise}
+	 * @returns {sap.ui.base.SyncPromise}
 	 *   The request promise
 	 * @throws {Error} If
 	 *   <ul>
@@ -745,15 +672,87 @@ sap.ui.define([
 		sPath = oRequestor.getPathAndAddQueryOptions(sPath, oOperationMetadata, mParameters,
 			this.mCacheQueryOptions, vEntity);
 		oCache = _Cache.createSingle(oRequestor, sPath, this.mCacheQueryOptions,
-			oModel.bAutoExpandSelect, oModel.bSharedRequests, getOriginalResourcePath, bAction,
+			oModel.bAutoExpandSelect, oModel.bSharedRequests, undefined, bAction,
 			sMetaPath);
 		this.oCache = oCache;
 		this.oCachePromise = SyncPromise.resolve(oCache);
 
 		return bAction
 			? oCache.post(oGroupLock, mParameters, vEntity, bIgnoreETag,
-				fnOnStrictHandlingFailed && onStrictHandling)
-			: oCache.fetchValue(oGroupLock);
+				fnOnStrictHandlingFailed && onStrictHandling, getOriginalResourcePath)
+			: oCache.fetchValue(oGroupLock, "", undefined, undefined, false,
+				getOriginalResourcePath);
+	};
+
+	/**
+	 * @override
+	 * @see sap.ui.model.odata.v4.ODataParentBinding#delete
+	 */
+	ODataContextBinding.prototype.delete = function (oGroupLock, sEditUrl, oContext, _oETagEntity,
+			bDoNotRequestCount, fnUndelete) {
+		// In case the context binding has an empty path, the respective context in the parent
+		// needs to be removed as well. As there could be more levels of bindings pointing to the
+		// same entity, first go up the binding hierarchy and find the context pointing to the same
+		// entity in the highest level binding.
+		// In case that top binding is a list binding, perform the deletion from there but use the
+		// ETag of this binding.
+		// In case the top binding is a context binding, perform the deletion from here but destroy
+		// the context(s) in that uppermost binding. Note that no data may be available in the
+		// uppermost context binding and hence the deletion would not work there, BCP 1980308439.
+		var oEmptyPathParentContext = this._findEmptyPathParentContext(this.oElementContext),
+			oEmptyPathParentBinding = oEmptyPathParentContext.getBinding(),
+			oDeleteParentContext = oEmptyPathParentBinding.getContext(),
+			oReturnValueContext = oEmptyPathParentBinding.oReturnValueContext,
+			that = this;
+
+		function undelete() {
+			fnUndelete();
+			oEmptyPathParentContext.oDeletePromise = null;
+		}
+
+		// In case the uppermost parent reached with empty paths is a list binding, delete there.
+		if (!oEmptyPathParentBinding.execute) {
+			// In the Cache, the request is generated with a reference to the entity data
+			// first. So, hand over the complete entity to have the ETag of the correct binding
+			// in the request.
+			// oEmptyPathParentContext is marked as deleted in delete(), mark oContext too
+			oContext.oDeletePromise = oEmptyPathParentBinding.delete(oGroupLock, sEditUrl,
+				oEmptyPathParentContext, oContext.getValue(), bDoNotRequestCount, undelete
+			);
+			return oContext.oDeletePromise;
+		}
+
+		oEmptyPathParentBinding.oElementContext = null;
+		if (oReturnValueContext) {
+			oEmptyPathParentBinding.oReturnValueContext = null;
+		}
+		this._fireChange({reason : ChangeReason.Remove});
+		// oEmptyPathParentContext is marked as deleted in doDelete(), mark oContext too
+		oContext.oDeletePromise = oEmptyPathParentContext.doDelete(oGroupLock, sEditUrl, "", null,
+			this, function (_iIndex, iOffset) {
+				if (iOffset > 0) {
+					undelete();
+				}
+			}
+		).then(function () {
+			oEmptyPathParentContext.destroy();
+			if (oReturnValueContext) {
+				oReturnValueContext.destroy();
+			}
+		}, function (oError) {
+			// if the cache has become inactive, the callback is not called -> undelete here
+			undelete();
+			if (!oEmptyPathParentBinding.isRelative()
+					|| oDeleteParentContext === oEmptyPathParentBinding.getContext()) {
+				oEmptyPathParentBinding.oElementContext = oEmptyPathParentContext;
+				if (oReturnValueContext) {
+					oEmptyPathParentBinding.oReturnValueContext = oReturnValueContext;
+				}
+				that._fireChange({reason : ChangeReason.Add});
+			}
+			throw oError;
+		});
+		return oContext.oDeletePromise;
 	};
 
 	/**
@@ -915,11 +914,12 @@ sap.ui.define([
 	 *   </ul>
 	 *   It is also rejected if <code>bReplaceWithRVC</code> is supplied, and there is no return
 	 *   value context at all or the existing context as described above is currently part of the
-	 *   list's collection (that is, has an index).<br>
-	 *   A return value context is a {@link sap.ui.model.odata.v4.Context} which represents a bound
+	 *   list's collection (that is, has an index).
+	 *   <br>
+	 *   A return value context is an {@link sap.ui.model.odata.v4.Context} which represents a bound
 	 *   operation response. It is created only if the operation is bound and has a single entity
 	 *   return value from the same entity set as the operation's binding parameter and has a
-	 *   parent context which is a {@link sap.ui.model.odata.v4.Context} and points to an entity
+	 *   parent context which is an {@link sap.ui.model.odata.v4.Context} and points to an entity
 	 *   from an entity set. It is destroyed the next time this operation binding is executed again!
 	 *   <br>
 	 *   If a return value context is created, it must be used instead of
@@ -980,6 +980,35 @@ sap.ui.define([
 		return this._execute(this.lockGroup(sGroupId, true),
 			_Helper.publicClone(this.oOperation.mParameters, true), bIgnoreETag,
 				fnOnStrictHandlingFailed, bReplaceWithRVC);
+	};
+
+	/**
+	 * Fetches all properties described in $expand and $select of the binding parameters, unless
+	 * the binding already has fetched it. This is only done if the model uses autoExpandSelect. The
+	 * goal is that these properties are also requested as late properties.
+	 *
+	 * Expects that the binding is resolved and has no own cache (and thus a parent context). This
+	 * together with autoExpandSelect also implies that $expand contains no collection-valued
+	 * navigation properties.
+	 *
+	 * @private
+	 */
+	ODataContextBinding.prototype.doFetchExpandSelectProperties = function () {
+		var sResolvedPath,
+			that = this;
+
+		if (this.bHasFetchedExpandSelectProperties || !this.oModel.bAutoExpandSelect
+				|| !this.mParameters.$expand && !this.mParameters.$select) {
+			return;
+		}
+
+		sResolvedPath = this.getResolvedPath();
+		_Helper.convertExpandSelectToPaths(this.oModel.buildQueryOptions(this.mParameters, true))
+			.forEach(function (sPath) {
+				that.oContext.fetchValue(_Helper.buildPath(sResolvedPath, sPath))
+					.catch(that.oModel.getReporter());
+			});
+		this.bHasFetchedExpandSelectProperties = true;
 	};
 
 	/**
@@ -1081,6 +1110,9 @@ sap.ui.define([
 			}
 
 			if (!that.oOperation && that.oContext) {
+				if (!bCached) {
+					that.doFetchExpandSelectProperties();
+				}
 				return that.oContext.fetchValue(sPath, oListener, bCached);
 			}
 		});
@@ -1097,7 +1129,6 @@ sap.ui.define([
 
 		if (oContext) {
 			oEntity = oContext.getValue();
-
 			// avoid problems in fetchCanonicalPath (leading to an ODM#reportError)
 			if (oEntity && _Helper.hasPrivateAnnotation(oEntity, "predicate")) {
 				oPromise = oContext.fetchCanonicalPath();
@@ -1350,6 +1381,8 @@ sap.ui.define([
 		if (this.oOperation && this.oOperation.bAction !== false) {
 			return SyncPromise.resolve();
 		}
+
+		this.bHasFetchedExpandSelectProperties = false;
 
 		if (this.isRootBindingSuspended()) {
 			this.refreshSuspended(sGroupId);
@@ -1613,6 +1646,7 @@ sap.ui.define([
 							this.oModel.resolve(this.sPath + "/$Parameter", oContext));
 					}
 				}
+				this.bHasFetchedExpandSelectProperties = false;
 				// call Binding#setContext because of data state etc.; fires "change"
 				Binding.prototype.setContext.call(this, oContext);
 			} else {

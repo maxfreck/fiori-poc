@@ -1,7 +1,7 @@
 
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -19,9 +19,8 @@ sap.ui.define([
 	 * Includes all change handlers used during runtime.
 	 *
 	 * @namespace sap.ui.fl.apply._internal.changes.descriptor.RegistrationBuild
-	 * @experimental
 	 * @since 1.77
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.apply._internal
 	 */
@@ -34,7 +33,9 @@ sap.ui.define([
 		appdescr_ui5_setFlexExtensionPointEnabled: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/SetFlexExtensionPointEnabled"),
 		appdescr_ui5_addNewModel: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/ui5/AddNewModel"),
 		appdescr_app_addAnnotationsToOData: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/app/AddAnnotationsToOData"),
+		appdescr_app_removeAllInboundsExceptOne: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/app/RemoveAllInboundsExceptOne"),
 		appdescr_app_changeInbound: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/app/ChangeInbound"),
+		appdescr_app_addNewInbound: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/app/AddNewInbound"),
 		appdescr_fiori_setAbstract: requireAsync.bind(this, "sap/ui/fl/apply/_internal/changes/descriptor/fiori/SetAbstract")
 	};
 

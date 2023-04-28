@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -23,7 +23,7 @@ sap.ui.define(['sap/ui/commons/library', 'sap/ui/core/CustomStyleClassSupport', 
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -34,7 +34,6 @@ sap.ui.define(['sap/ui/commons/library', 'sap/ui/core/CustomStyleClassSupport', 
 
 		deprecated: true,
 		library : "sap.ui.commons",
-		aggregatingType : "MatrixLayout",
 		properties : {
 
 			/**

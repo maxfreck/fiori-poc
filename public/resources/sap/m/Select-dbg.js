@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -88,6 +88,9 @@ function(
 		// shortcut for sap.ui.core.InvisibleMessageMode
 		var InvisibleMessageMode = coreLibrary.InvisibleMessageMode;
 
+		// shortcut for sap.ui.core.TitleLevel
+		var TitleLevel = coreLibrary.TitleLevel;
+
 		/**
 		 * Constructor for a new <code>sap.m.Select</code>.
 		 *
@@ -103,7 +106,7 @@ function(
 		 * @implements sap.ui.core.IFormContent, sap.ui.core.ISemanticFormContent
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @public
@@ -114,6 +117,7 @@ function(
 				interfaces: [
 					"sap.ui.core.IFormContent",
 					"sap.m.IOverflowToolbarContent",
+					"sap.m.IToolbarInteractiveControl",
 					"sap.f.IShellBar",
 					"sap.ui.core.ISemanticFormContent"
 				],
@@ -531,10 +535,12 @@ function(
 		}
 
 		Select.prototype._attachHiddenSelectHandlers = function () {
-			var oSelect = this._getHiddenSelect();
+			var oSelect = this._getHiddenSelect(),
+				oInput = this._getHiddenInput();
 
 			oSelect.on("focus", this._addFocusClass.bind(this));
 			oSelect.on("blur", this._removeFocusClass.bind(this));
+			oInput.on("focus", this.focus.bind(this));
 		};
 
 		Select.prototype.focus = function() {
@@ -551,11 +557,16 @@ function(
 		};
 
 		Select.prototype._detachHiddenSelectHandlers = function () {
-			var oSelect = this._getHiddenSelect();
+			var oSelect = this._getHiddenSelect(),
+				oInput = this._getHiddenInput();
 
 			if (oSelect) {
 				oSelect.off("focus");
 				oSelect.off("blur");
+			}
+
+			if (oInput) {
+				oInput.off("focus");
 			}
 		};
 
@@ -658,7 +669,7 @@ function(
 		 * Required by the {@link sap.m.IOverflowToolbarContent} interface.
 		 *
 		 * @public
-		 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
+		 * @returns {sap.m.OverflowToolbarConfig} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
 		 */
 		Select.prototype.getOverflowToolbarConfig = function() {
 
@@ -1338,7 +1349,8 @@ function(
 				this.setAggregation("_pickerHeader", new Bar({
 					titleAlignment: library.TitleAlignment.Auto,
 					contentMiddle: new Title({
-						text: oResourceBundle.getText("SELECT_PICKER_TITLE_TEXT")
+						text: oResourceBundle.getText("SELECT_PICKER_TITLE_TEXT"),
+						level: TitleLevel.H1
 					}),
 					contentRight: new Button({
 						icon: sIconURI,
@@ -1420,6 +1432,8 @@ function(
 			this._sAriaRoleDescription = Core.getLibraryResourceBundle("sap.m").getText("SELECT_ROLE_DESCRIPTION");
 
 			this._oInvisibleMessage = null;
+
+			this._referencingLabelsHandlers = [];
 		};
 
 		Select.prototype.onBeforeRendering = function() {
@@ -1451,6 +1465,8 @@ function(
 
 			this._setHiddenSelectValue();
 			this._attachHiddenSelectHandlers();
+			this._clearReferencingLabelsHandlers();
+			this._handleReferencingLabels();
 		};
 
 		Select.prototype.exit = function() {
@@ -2594,6 +2610,43 @@ function(
 			}
 		};
 
+        /**
+         * Ensures clicking on external referencing labels will put the focus on the Select container.
+         * @private
+         */
+        Select.prototype._handleReferencingLabels = function () {
+            var aLabels = this.getLabels(),
+                oDelegate,
+                that = this;
+
+			aLabels.forEach(function (oLabel) {
+				if (!oLabel) {
+					return;
+				}
+				oDelegate = {
+					ontap: function () {
+						that.focus();
+					}
+				};
+				that._referencingLabelsHandlers.push({
+					oDelegate: oDelegate,
+					sLabelId: oLabel.getId()
+				});
+				oLabel.addEventDelegate(oDelegate);
+			});
+        };
+
+        Select.prototype._clearReferencingLabelsHandlers = function () {
+			var oLabel;
+            this._referencingLabelsHandlers.forEach(function (oHandler) {
+				oLabel = Core.byId(oHandler.sLabelId);
+				if (oLabel) {
+					oLabel.removeEventDelegate(oHandler.oDelegate);
+				}
+            });
+            this._referencingLabelsHandlers = [];
+        };
+
 		/**
 		 * Gets the labels referencing this control.
 		 *
@@ -2610,7 +2663,8 @@ function(
 			})
 			.map(function(sLabelID) {
 				return Core.byId(sLabelID);
-			});
+			})
+			.filter(Boolean);
 
 			return aLabelIDs;
 		};
@@ -3148,7 +3202,8 @@ function(
 		 *
 		 * @see sap.ui.core.Control#getAccessibilityInfo
 		 * @protected
-		 * @returns {object} The <code>sap.m.Select</code> accessibility information
+		 * @returns {sap.ui.core.AccessibilityInfo}
+		 * The object contains the accessibility information for <code>sap.m.Select</code>
 		 */
 		Select.prototype.getAccessibilityInfo = function() {
 			var aDescriptions = [],
@@ -3185,6 +3240,19 @@ function(
 				oInfo.description = sDescription;
 			}
 			return oInfo;
+		};
+
+		/**
+		 * Required by the {@link sap.m.IToolbarInteractiveControl} interface.
+		 * Determines if the Control is interactive.
+		 *
+		 * @returns {boolean} If it is an interactive Control
+		 *
+		 * @private
+		 * @ui5-restricted sap.m.OverflowToolBar, sap.m.Toolbar
+		 */
+		Select.prototype._getToolbarInteractive = function () {
+			return true;
 		};
 
 		/**

@@ -134,7 +134,7 @@
 		},
 		{
 			"name": "FeedInput.less",
-			"size": 290,
+			"size": 298,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -152,7 +152,7 @@
 		},
 		{
 			"name": "GenericTile.less",
-			"size": 5050,
+			"size": 5033,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -200,7 +200,7 @@
 		},
 		{
 			"name": "LightBox.less",
-			"size": 941,
+			"size": 860,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -320,7 +320,7 @@
 		},
 		{
 			"name": "ObjectStatus.less",
-			"size": 10079,
+			"size": 10250,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -338,7 +338,7 @@
 		},
 		{
 			"name": "Panel.less",
-			"size": 1274,
+			"size": 1295,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -458,7 +458,7 @@
 		},
 		{
 			"name": "Slider.less",
-			"size": 2053,
+			"size": 2035,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -488,7 +488,7 @@
 		},
 		{
 			"name": "Switch.less",
-			"size": 6470,
+			"size": 6610,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -524,7 +524,7 @@
 		},
 		{
 			"name": "TextArea.less",
-			"size": 278,
+			"size": 801,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -578,7 +578,7 @@
 		},
 		{
 			"name": "Toolbar.less",
-			"size": 521,
+			"size": 529,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -626,40 +626,40 @@
 		},
 		{
 			"name": "css_variables.css",
-			"size": 50734,
+			"size": 51713,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "css_variables.less",
-			"size": 177676,
+			"size": 187841,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 177306,
+			"size": 187471,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 781858,
+			"size": 794362,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "library-parameters.json",
 			"module": "sap/m/themes/sap_fiori_3_hcw/library-parameters.json",
-			"size": 21184,
+			"size": 21628,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "library.css",
-			"size": 781854,
+			"size": 794357,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "library.less",
-			"size": 167244,
+			"size": 167999,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcw"
 		},
@@ -671,12 +671,12 @@
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 834659,
+			"size": 847421,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 834655,
+			"size": 847416,
 			"theme": "sap_fiori_3_hcw"
 		},
 		{

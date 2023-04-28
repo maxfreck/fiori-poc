@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,6 @@ sap.ui.define([
         "use strict";
 
         /**
-         /**
          * Constructor for a new ChartSelectionDetails.
          *
          * @param {string} [sId] id for the new control, generated automatically if no id is given
@@ -33,9 +32,9 @@ sap.ui.define([
          * @class The ChartSelectionDetails control creates a sap.m.SelectionDetails popover based on metadata and the configuration specified.
          * @extends sap.m.SelectionDetails
          * @author SAP SE
-         * @version 1.108.2
+         * @version 1.113.0
          * @constructor
-         * @experimental As of version ...
+         * @experimental As of version 1.88
          * @private
          * @ui5-restricted sap.fe
          * @MDC_PUBLIC_CANDIDATE

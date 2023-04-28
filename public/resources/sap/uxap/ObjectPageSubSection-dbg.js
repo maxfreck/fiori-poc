@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -250,6 +250,21 @@ sap.ui.define([
 	};
 
 	/**
+	 * Override the parent setter to preserve the externally visible parent-child relationship
+	 * @override
+	 * @returns {this} Returns <code>this</code> to allow method chaining
+	 */
+	ObjectPageSubSection.prototype.setParent = function () {
+		var oResult = ObjectPageSectionBase.prototype.setParent.apply(this, arguments),
+			oPublicParent = this.getParent();
+		if (oPublicParent && oPublicParent.isA("sap.uxap.ObjectPageSection")
+			&& this.sParentAggregationName !== "subSections") {
+				this.sParentAggregationName = "subSections";
+		}
+		return oResult;
+	};
+
+	/**
 	 * Getter for the private "_columnSpan" property
 	 * @returns {string}
 	 * @restricted
@@ -312,6 +327,26 @@ sap.ui.define([
 	 */
 	ObjectPageSubSection.prototype.getSectionText = function (sValue) {
 		return ObjectPageSubSection._getLibraryResourceBundle().getText("SUBSECTION_CONTROL_NAME");
+	};
+
+	/**
+	 * @override
+	 * @private
+	 */
+	 ObjectPageSubSection.prototype._getShouldLabelTitle = function () {
+		if (this._getUseTitleOnTheLeft()) {
+			// in case layout is "TitleOnTheLeft", the title of promoted section
+			// is visible and should be labeled if showTitle is true
+			return this.getShowTitle();
+		}
+
+		if (this._sBorrowedTitleDomId) {
+			// in case section is promoted the title is not displayed
+			// on the subsection level - we don't need to include it in the aria label
+			return false;
+		}
+
+		return this.getShowTitle();
 	};
 
 	/**
@@ -836,7 +871,7 @@ sap.ui.define([
 				});
 			} else {
 				oObject.getContent().forEach(function (oControl) {
-					this.addAggregation(sAggregationName, oControl);
+					this.addAggregation(sAggregationName, oControl, true);
 				}, this);
 
 				oObject.removeAllContent();

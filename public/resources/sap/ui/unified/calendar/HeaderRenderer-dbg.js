@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -156,9 +156,6 @@ sap.ui.define(["sap/ui/core/Configuration"],
 			}
 			if (iLast === i) {
 				oRm.class("sapUiCalHeadBLast");
-			}
-			if (i === 3 || i == 4) {
-				oRm.attr('tabindex', "-1");
 			}
 			if (this.getAriaLabelButton(oHead, i)) {
 				mAccProps["label"] = this.getAriaLabelButton(oHead, i);

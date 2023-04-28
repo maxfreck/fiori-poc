@@ -1,12 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	"sap/ui/mdc/field/content/DefaultContent",
-	"sap/ui/model/BindingMode"
-], function(DefaultContent, BindingMode) {
+	"sap/ui/model/BindingMode",
+	'sap/ui/model/ParseException',
+	'sap/ui/model/ValidateException'
+], function(DefaultContent, BindingMode, ParseException, ValidateException) {
 	"use strict";
 
 	/**
@@ -52,6 +54,13 @@ sap.ui.define([
 			oContentFactory.setHideOperator(true);
 			oContentFactory.updateConditionType(); // to update HideOperator
 
+			/* In SearchField the value property is updated while typing. So a live-change triggers a update of the property.
+			 * If TwoWay-Binding would be used to bind the value property on conditions, the conditions would be updated on every typing, this is not wanted.
+			 * To prevent this the value property is bound to conditions using OneWay-Binding. So an update on the condition triggers an update on the value property.
+			 * To update the conditions the Change-event of the SearchField is used. Here we simulate TwoWay-Binding using setExternalValue. This triggers the update of
+			 * the conditions. (Like it would happen in TwoWay-Binding.) To inform the Binding about the success or failure of the update the ValidationSuccess, ValidationError
+			 * and ParseError events are used. (Like it would happen on TwoWay-Binding.)
+			 */
 			var oControl = new SearchField(sId, {
 				value: { path: "$field>/conditions", type: oConditionsType, mode: BindingMode.OneWay }, // oneWay as SearchField updates "value" while typing
 				placeholder: "{$field>/placeholder}",
@@ -63,12 +72,45 @@ sap.ui.define([
 					}
 					oContentFactory.getHandleEnter().call(this, oEvent);
 				},
-				change: oContentFactory.getHandleContentChange(),
+				change: function(oEvent) {
+					var oSource = oEvent.getSource();
+					var sValue = oEvent.getParameter("value");
+					var oBinding = oSource.getBinding("value");
+					try {
+						oBinding.setExternalValue(sValue); // as not automatically triggered for OneWay binding
+						var mSuccessParameters = {
+							element: oSource,
+							property: "value",
+							type: oBinding.getType(),
+							newValue: sValue,
+							oldValue: "" // TODO
+						};
+						oSource.fireValidationSuccess(mSuccessParameters, false, true); // bAllowPreventDefault, bEnableEventBubbling
+					} catch (oException) {
+						var mErrorParameters = {
+							element: oSource,
+							property: "value",
+							type: oBinding.getType(),
+							newValue: sValue,
+							oldValue: "", // TODO
+							exception: oException,
+							message: oException.message
+						};
+						if (oException instanceof ParseException) {
+							oSource.fireParseError(mErrorParameters, false, true); // mParameters, bAllowPreventDefault, bEnableEventBubbling
+						} else if (oException instanceof ValidateException) {
+							oSource.fireValidationError(mErrorParameters, false, true); // mParameters, bAllowPreventDefault, bEnableEventBubbling
+						} else {
+							throw oException;
+						}
+					}
+
+					oContentFactory.getHandleContentChange().call(this, oEvent);
+				},
 				liveChange: oContentFactory.getHandleContentLiveChange()
 			});
 
 			oContentFactory.setAriaLabelledBy(oControl);
-			oContentFactory.setBoundProperty("value");
 
 			return [oControl];
 		},

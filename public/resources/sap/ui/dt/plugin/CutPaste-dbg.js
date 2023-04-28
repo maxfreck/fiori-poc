@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -33,7 +33,7 @@ sap.ui.define([
 	 * @class The CutPaste enables Cut & Paste functionality for the overlays based on aggregation types
 	 * @extends sap.ui.dt.Plugin
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.34
@@ -226,7 +226,7 @@ sap.ui.define([
 	};
 
 	CutPaste.prototype._getTargetZoneAggregation = function(oTargetOverlay) {
-		var aAggregationOverlays = oTargetOverlay.getAggregationOverlays();
+		var aAggregationOverlays = oTargetOverlay.getChildren();
 		var aPossibleTargetZones = aAggregationOverlays.filter(function(oAggregationOverlay) {
 			return oAggregationOverlay.isTargetZone();
 		});

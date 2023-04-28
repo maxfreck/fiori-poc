@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,7 +26,6 @@ sap.ui.define([],
 
 			oRm.openStart("div", oControl);
 			oRm.class("sapFPSItemContainer");
-			oRm.attr("tabindex", 0);
 			if (sTooltip) {
 				oRm.attr("title", sTooltip);
 			}

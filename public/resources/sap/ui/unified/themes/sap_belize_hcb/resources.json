@@ -14,7 +14,7 @@
 		},
 		{
 			"name": "CalendarLegend.less",
-			"size": 900,
+			"size": 1340,
 			"designtime": true,
 			"theme": "sap_belize_hcb"
 		},
@@ -38,7 +38,7 @@
 		},
 		{
 			"name": "Menu.less",
-			"size": 893,
+			"size": 948,
 			"designtime": true,
 			"theme": "sap_belize_hcb"
 		},
@@ -67,13 +67,13 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 137391,
+			"size": 146522,
 			"designtime": true,
 			"theme": "sap_belize_hcb"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 137017,
+			"size": 146148,
 			"designtime": true,
 			"theme": "sap_belize_hcb"
 		},
@@ -84,7 +84,7 @@
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 144317,
+			"size": 145046,
 			"theme": "sap_belize_hcb"
 		},
 		{
@@ -95,12 +95,12 @@
 		},
 		{
 			"name": "library.css",
-			"size": 144215,
+			"size": 144941,
 			"theme": "sap_belize_hcb"
 		},
 		{
 			"name": "library.less",
-			"size": 29802,
+			"size": 30297,
 			"designtime": true,
 			"theme": "sap_belize_hcb"
 		},
@@ -112,17 +112,17 @@
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 154626,
+			"size": 155448,
 			"theme": "sap_belize_hcb"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 154524,
+			"size": 155343,
 			"theme": "sap_belize_hcb"
 		},
 		{
 			"name": "resources.json",
-			"size": 2301
+			"size": 2302
 		}
 	]
 }

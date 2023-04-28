@@ -608,10 +608,11 @@
 		{
 			"name": "interaction/ContextMenu-dbg.js",
 			"module": "sap/ui/testrecorder/interaction/ContextMenu.js",
-			"size": 6687,
+			"size": 6637,
 			"isDebug": true,
 			"required": [
 				"sap/ui/base/Object.js",
+				"sap/ui/core/Element.js",
 				"sap/ui/testrecorder/CommunicationBus.js",
 				"sap/ui/testrecorder/CommunicationChannels.js",
 				"sap/ui/testrecorder/Constants.js",
@@ -623,9 +624,10 @@
 		{
 			"name": "interaction/ContextMenu.js",
 			"module": "sap/ui/testrecorder/interaction/ContextMenu.js",
-			"size": 2996,
+			"size": 2985,
 			"required": [
 				"sap/ui/base/Object.js",
+				"sap/ui/core/Element.js",
 				"sap/ui/testrecorder/CommunicationBus.js",
 				"sap/ui/testrecorder/CommunicationChannels.js",
 				"sap/ui/testrecorder/Constants.js",
@@ -636,7 +638,7 @@
 		},
 		{
 			"name": "interaction/ContextMenu.js.map",
-			"size": 4402,
+			"size": 4358,
 			"isDebug": true
 		},
 		{
@@ -779,7 +781,7 @@
 		{
 			"name": "library-preload.js",
 			"module": "sap/ui/testrecorder/library-preload.js",
-			"size": 62193,
+			"size": 62182,
 			"merged": true,
 			"required": [
 				"sap/base/Log.js",
@@ -811,6 +813,7 @@
 				"sap/ui/codeeditor/CodeEditor.js",
 				"sap/ui/core/Configuration.js",
 				"sap/ui/core/Core.js",
+				"sap/ui/core/Element.js",
 				"sap/ui/core/HTML.js",
 				"sap/ui/core/Icon.js",
 				"sap/ui/core/Item.js",
@@ -879,7 +882,7 @@
 		},
 		{
 			"name": "library-preload.js.map",
-			"size": 65103,
+			"size": 65059,
 			"isDebug": true
 		},
 		{
@@ -976,7 +979,7 @@
 		},
 		{
 			"name": "resources.json",
-			"size": 32735
+			"size": 32825
 		},
 		{
 			"name": "ui/Overlay-dbg.js",

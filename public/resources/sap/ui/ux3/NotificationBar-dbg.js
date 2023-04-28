@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -56,7 +56,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -82,11 +82,12 @@ sap.ui.define([
 
 			/**
 			 * This property defines if the toggler should be displayed the whole time when the NotificationBar is shown.
+			 *
+			 * @since 1.24.5
 			 */
 			alwaysShowToggler : {
 				type : "boolean",
-				defaultValue : false,
-				since : "1.24.5"
+				defaultValue : false
 			}
 		},
 		aggregations : {

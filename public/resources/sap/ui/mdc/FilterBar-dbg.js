@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -21,7 +21,7 @@ sap.ui.define([
 	 * The metadata information is provided via the {@link sap.ui.mdc.FilterBarDelegate FilterBarDelegate} implementation. This implementation has to be provided by the application.
 	 * @extends sap.ui.mdc.filterbar.FilterBarBase
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @experimental As of version 1.61
 	 * @private
@@ -97,18 +97,20 @@ sap.ui.define([
 		var aOldMode = this.getP13nMode();
 		this.setProperty("p13nMode", aMode || [], false);
 
-		var oRegisterConfig = {};
-		oRegisterConfig.controller = {};
+		var oRegisterConfig = {
+			helper: this.getPropertyHelper(),
+			controller: {}
+		};
 
 		aMode && aMode.forEach(function(sMode) {
 			if (!aOldMode || aOldMode.indexOf(sMode) < 0) {
 				this._setP13nMode(sMode, true);
 			}
 			if (sMode == "Item") {
-				oRegisterConfig.controller["Item"] = AdaptFiltersController;
+				oRegisterConfig.controller["Item"] = new AdaptFiltersController({control: this});
 			}
 			if (sMode == "Value") {
-				oRegisterConfig.controller["Filter"] = FilterController;
+				oRegisterConfig.controller["Filter"] = new FilterController({control: this});
 			}
 		}.bind(this));
 		aOldMode && aOldMode.forEach(function(sMode) {
@@ -117,7 +119,7 @@ sap.ui.define([
 			}
 		}.bind(this));
 
-		this.getEngine().registerAdaptation(this, oRegisterConfig);
+		this.getEngine().register(this, oRegisterConfig);
 
 		return this;
 	};
@@ -245,7 +247,10 @@ sap.ui.define([
 	FilterBar.prototype.onAdaptFilters = function(oEvent) {
 
 		return this._retrieveMetadata().then(function() {
-			return this.getEngine().uimanager.show(this, "Item", this._btnAdapt);
+			return this.getEngine().uimanager.show(this, "Item", this._btnAdapt).then(function(oPopup){
+				oPopup.setVerticalScrolling(false);
+				return oPopup;
+			});
 		}.bind(this));
 
 	};

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -19,7 +19,7 @@ sap.ui.define([
 	 * @extends sap.f.cards.loading.ListPlaceholder
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -30,9 +30,8 @@ sap.ui.define([
 		metadata: {
 			library: "sap.f",
 			properties: {
-
 				/**
-				 * The maxLegendItems set to the list.
+				 * The maxLegendItems set to the legend items.
 				 */
 				maxLegendItems: {
 					type : "int",
@@ -49,7 +48,7 @@ sap.ui.define([
 		},
 		renderer: {
 			render: function (oRm, oControl) {
-				var iMaxItems = oControl.getMaxItems(),
+				var iMinItems = oControl.getMinItems(),
 					iMaxLegendItems = oControl.getMaxLegendItems(),
 					oItem = oControl.getItem(),
 					oLegendItem = oControl.getLegendItem(),
@@ -138,7 +137,7 @@ sap.ui.define([
 
 					oRm.openEnd();
 
-					for (i = 0; i < iMaxItems; i++) {
+					for (i = 0; i < iMinItems; i++) {
 						oRm.openStart("div")
 							.class("sapFCardListPlaceholderItem")
 							.style("height", oControl.getItemHeight())

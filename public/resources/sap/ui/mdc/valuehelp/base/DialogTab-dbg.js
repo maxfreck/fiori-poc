@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,7 +20,7 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 * @class Content for the <code>sap.ui.mdc.valuehelp.content.Dialog</code> element.
 	 * @extends sap.ui.core.Control
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private

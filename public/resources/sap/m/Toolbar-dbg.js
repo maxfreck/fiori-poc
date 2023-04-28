@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,6 +14,7 @@ sap.ui.define([
 	'sap/ui/core/EnabledPropagator',
 	"sap/ui/events/KeyCodes",
 	'./ToolbarRenderer',
+	"sap/m/Button",
 	"sap/ui/core/library"
 ],
 function(
@@ -25,12 +26,15 @@ function(
 	EnabledPropagator,
 	KeyCodes,
 	ToolbarRenderer,
+	Button,
 	coreLibrary
 ) {
 	"use strict";
 
 	var ToolbarDesign = library.ToolbarDesign,
 		ToolbarStyle = library.ToolbarStyle;
+
+	var MIN_INTERACTIVE_CONTROLS = 2;
 
 	/**
 	 * Constructor for a new <code>Toolbar</code>.
@@ -72,7 +76,7 @@ function(
 	 * @implements sap.ui.core.Toolbar,sap.m.IBar
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -155,7 +159,13 @@ function(
 				/**
 				 * The content of the toolbar.
 				 */
-				content : {type : "sap.ui.core.Control", multiple : true, singularName : "content"}
+				content : {type : "sap.ui.core.Control", multiple : true, singularName : "content"},
+
+				/**
+				 * Hidden button that provides focus dom reference for active toolbar.
+				 * @private
+				 */
+				 _activeButton : {type : "sap.m.Button", multiple: false,  visibility: "hidden"}
 			},
 			associations : {
 
@@ -287,6 +297,33 @@ function(
 		return this;
 	};
 
+	Toolbar.prototype.enhanceAccessibilityState = function (oElement, mAriaProps) {
+		if (oElement === this.getAggregation("_activeButton")) {
+			return this.assignAccessibilityState(mAriaProps);
+		}
+	};
+
+	Toolbar.prototype.getAccessibilityState = function () {
+		var aAriaLabelledBy = this.getAriaLabelledBy(),
+			bActive = this.getActive();
+
+		return {
+			role: !bActive ? this._getAccessibilityRole() : undefined, // active toolbar is rendered with sap.m.Button as native button
+			haspopup: bActive ? this.getAriaHasPopup() : undefined,
+			labelledby: aAriaLabelledBy.length ? this.getAriaLabelledBy() : this.getTitleId(),
+			roledescription: this._sAriaRoleDescription
+		};
+	};
+
+	Toolbar.prototype.assignAccessibilityState = function (mAriaProps) {
+			if (!this._getAccessibilityRole() && !this.getActive()) {
+				// no role and not active -> no aria properties
+				return {};
+			}
+
+			return Object.assign(mAriaProps, this.getAccessibilityState(mAriaProps));
+	};
+
 	Toolbar.prototype.init = function() {
 		// define group for F6 handling
 		this.data("sap-ui-fastnavgroup", "true", true);
@@ -331,17 +368,18 @@ function(
 
 	// handle tap for active toolbar, do nothing if already handled
 	Toolbar.prototype.ontap = function(oEvent) {
-		if (this.getActive() && !oEvent.isMarked()) {
+		if (this.getActive() && !oEvent.isMarked() || oEvent.srcControl === this._getActiveButton()) {
 			oEvent.setMarked();
 			this.firePress({
 				srcControl : oEvent.srcControl
 			});
+			this.focus();
 		}
 	};
 
 	// fire press event when enter is hit on the active toolbar
 	Toolbar.prototype.onsapenter = function(oEvent) {
-		if (this.getActive() && oEvent.srcControl === this && !oEvent.isMarked()) {
+		if (this.getActive() && !oEvent.isMarked() || oEvent.srcControl === this._getActiveButton()) {
 			oEvent.setMarked();
 			this.firePress({
 				srcControl : this
@@ -351,7 +389,7 @@ function(
 
 	Toolbar.prototype.onsapspace = function(oEvent) {
 		// Prevent browser scrolling in case of SPACE key
-		if (oEvent.srcControl === this) {
+		if (oEvent.srcControl === this._getActiveButton()) {
 			oEvent.preventDefault();
 		}
 	};
@@ -391,6 +429,31 @@ function(
 		}
 	};
 
+	Toolbar.prototype.onfocusin = function(oEvent) {
+		if (this.getActive()) {
+			if (oEvent.target === this.getDomRef()) {
+				this._getActiveButton().focus();
+			}
+		}
+	};
+
+	Toolbar.prototype.getFocusDomRef = function() {
+		return this.getActive() ? this._getActiveButton().getFocusDomRef() : this.getDomRef();
+	};
+
+	Toolbar.prototype.getFocusInfo = function() {
+		return {
+			id: this._getActiveButton().getId()
+		};
+	};
+
+	Toolbar.prototype.applyFocusInfo = function(oFocusInfo) {
+		var oDomRef = this.getFocusDomRef();
+		if (oDomRef) {
+			this.focus();
+		}
+	};
+
 	// gets called after content is (re)rendered
 	// here "this" points to the control not to the toolbar
 	Toolbar.prototype._onAfterContentRendering = function() {
@@ -402,7 +465,13 @@ function(
 
 	// gets called when any content property is changed
 	Toolbar.prototype._onContentPropertyChanged = function(oEvent) {
-		if (oEvent.getParameter("name") != "width") {
+		var oPropName = oEvent.getParameter("name");
+
+		if (oPropName === "visible") {
+			this.invalidate();
+		}
+
+		if (oPropName != "width") {
 			return;
 		}
 
@@ -413,13 +482,54 @@ function(
 	};
 
 	Toolbar.prototype._getAccessibilityRole = function () {
-		var sRole = this._getRootAccessibilityRole();
+		var sRootAccessibilityRole = this._getRootAccessibilityRole(),
+			sRole = sRootAccessibilityRole;
 
 		if (this.getActive()) {
 			sRole = "button";
+		// Custom root accessibility roles (like 'heading' for Dialog and 'group' for FacetFilter are preserved).
+		// Also when accessibility is disabled, role "none" is preserved.
+		} else if (this._getToolbarInteractiveControlsCount() < MIN_INTERACTIVE_CONTROLS && sRootAccessibilityRole === "toolbar") {
+			sRole = "";
 		}
 
 		return sRole;
+	};
+
+	/**
+	 *
+	 * @returns {number} Toolbar interactive Controls count
+	 * @private
+	 */
+	Toolbar.prototype._getToolbarInteractiveControlsCount = function () {
+		return this.getContent().filter(function (oControl) {
+			return oControl.getVisible()
+				&& oControl.isA("sap.m.IToolbarInteractiveControl")
+				&& typeof (oControl._getToolbarInteractive) === "function" && oControl._getToolbarInteractive();
+		}).length;
+	};
+
+	Toolbar.prototype._getActiveButton = function() {
+		if (!this._activeButton) {
+			this._activeButton = new Button({text: "", id:"sapMTBActiveButton" + this.getId()}).addStyleClass("sapMTBActiveButton");
+			this._activeButton.onfocusin = function() {
+				this.addStyleClass("sapMTBFocused");
+				if (typeof Button.prototype.onfocusin === "function") {
+					 Button.prototype.onfocusin.call(this._activeButton, arguments);
+				}
+			}.bind(this);
+
+			this._activeButton.onfocusout = function() {
+				this.removeStyleClass("sapMTBFocused");
+				if (typeof Button.prototype.onfocusout === "function") {
+					Button.prototype.onfocusout.call(this._activeButton, arguments);
+			   }
+			}.bind(this);
+
+			this.setAggregation("_activeButton", this._activeButton);
+		}
+
+		return this._activeButton;
 	};
 
 	Toolbar.prototype.getAccessibilityInfo = function () {

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,7 +16,7 @@ sap.ui.define(["sap/base/Log", "sap/ui/performance/Measurement", "sap/ui/Global"
 		 * This implementation works with entries corresponding to a single ui5 version.
 		 * If the cache is loaded with different ui5 version, all previous entries will be deleted. The latter behavior is about of a further changes (feature requests)
 		 *
-		 * This implementation relies on existing configuration @see sap.ui.core.Configuration.
+		 * This implementation relies on existing configuration {@link sap.ui.core.Configuration}.
 		 *
 		 * Do not use it directly, use {@link sap.ui.core.cache.CacheManager} instead
 		 * @private

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -26,7 +26,8 @@ sap.ui.define([
 		"sap/ui/unified/DateTypeRange",
 		"sap/ui/core/date/UniversalDate",
 		"sap/ui/unified/CalendarLegendItem",
-		"sap/ui/core/Configuration"
+		"sap/ui/core/Configuration",
+		"sap/ui/core/date/UI5Date"
 	],
 	function (CalendarContentRenderer,
 		ResizeHandler,
@@ -50,7 +51,9 @@ sap.ui.define([
 		DateTypeRange,
 		UniversalDate,
 		CalendarLegendItem,
-		Configuration) {
+		Configuration,
+		UI5Date
+		) {
 		"use strict";
 
 		var ActionArea = library.CardActionArea;
@@ -70,7 +73,7 @@ sap.ui.define([
 		 * @extends sap.ui.integration.cards.BaseContent
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @private
@@ -196,6 +199,8 @@ sap.ui.define([
 		};
 
 		CalendarContent.prototype.onBeforeRendering = function () {
+			BaseContent.prototype.onBeforeRendering.apply(this, arguments);
+
 			var oInitiallySelectedDate = this._oCalendar.getSelectedDates().length ? this._oCalendar.getSelectedDates()[0].getStartDate() : this._oCalendar.getStartDate();
 
 			this._setParameters();
@@ -221,21 +226,16 @@ sap.ui.define([
 		};
 
 		/**
-		 * Setter for configuring a <code>sap.ui.integration.cards.CalendarContent</code>.
-		 *
-		 * @public
-		 * @param {Object} oConfiguration Configuration object used to create the internal calendar.
-		 * @returns {this} Pointer to the control instance to allow method chaining.
+		 * @override
 		 */
-		CalendarContent.prototype.setConfiguration = function (oConfiguration) {
-			BaseContent.prototype.setConfiguration.apply(this, arguments);
-			oConfiguration = this.getParsedConfiguration();
+		CalendarContent.prototype.applyConfiguration = function () {
+			var oConfiguration = this.getParsedConfiguration();
 
 			//workaround until actions refactor
 			this.fireEvent("_actionContentReady"); // todo
 
 			if (!oConfiguration) {
-				return this;
+				return;
 			}
 
 			if (oConfiguration.item) {
@@ -273,8 +273,6 @@ sap.ui.define([
 					control: this._getMoreButton()
 				});
 			}
-
-			return this;
 		};
 
 		/**
@@ -299,8 +297,8 @@ sap.ui.define([
 				oCurrentDate = this._oCalendar.getStartDate();
 			}
 
-			iStartOfDay = new Date(oCurrentDate.getFullYear(), oCurrentDate.getMonth(), oCurrentDate.getDate()).getTime();
-			iEndOfDay = new Date(oCurrentDate.getFullYear(), oCurrentDate.getMonth(), oCurrentDate.getDate() + 1).getTime();
+			iStartOfDay = UI5Date.getInstance(oCurrentDate.getFullYear(), oCurrentDate.getMonth(), oCurrentDate.getDate()).getTime();
+			iEndOfDay = UI5Date.getInstance(oCurrentDate.getFullYear(), oCurrentDate.getMonth(), oCurrentDate.getDate() + 1).getTime();
 
 			aBoundAppointments = this.getAppointments();
 			if (aBoundAppointments) {
@@ -349,7 +347,7 @@ sap.ui.define([
 			var fnIsVisiblePredicate = this._isAppointmentInSelectedDate(oSelectedDate);
 			var fnTodayFilter = function(oApp, iIndex) {
 				var oEndDate = oApp.getEndDate(),
-					oNow = new Date();
+					oNow = UI5Date.getInstance();
 
 				// today
 				if (oSelectedDate.getDate() === oNow.getDate()
@@ -397,14 +395,14 @@ sap.ui.define([
 				var iAppStartTime = oAppointment.getStartDate().getTime(),
 					iAppEndTime = oAppointment.getEndDate().getTime(),
 					iSelectedStartTime = oSelectedDate.getTime(),
-					oSelectedEnd = UniversalDate.getInstance(new Date(oSelectedDate.getTime())),
+					oSelectedEnd = UniversalDate.getInstance(UI5Date.getInstance(oSelectedDate.getTime())),
 					iSelectedEndTime,
 					bBiggerThanVisibleHours,
 					bStartHourBetweenStartAndEnd,
 					bEndHourBetweenStartAndEnd;
 
 				oSelectedEnd.setDate(oSelectedEnd.getDate() + 1);
-				iSelectedEndTime = oSelectedEnd.getTime();
+				iSelectedEndTime = oSelectedEnd.getTime() - 1000;
 
 				bBiggerThanVisibleHours = iAppStartTime < iSelectedStartTime && iAppEndTime > iSelectedEndTime;
 				bStartHourBetweenStartAndEnd = iAppStartTime >= iSelectedStartTime && iAppStartTime < iSelectedEndTime;
@@ -642,7 +640,7 @@ sap.ui.define([
 		// priority for the later started.
 		CalendarContent.prototype._getCurrentAppointment = function() {
 			var aAppointments = this._getVisibleAppointments(),
-				oNow = new Date(),
+				oNow = UI5Date.getInstance(),
 				oApp,
 				iStart,
 				iEnd,

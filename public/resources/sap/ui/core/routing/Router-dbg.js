@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -834,9 +834,10 @@ sap.ui.define([
 			 * @param {object} [oComponentTargetInfo.anyName.componentTargetInfo] The information for the targets within a
 			 *  nested component. This shares the same structure with the <code>oComponentTargetInfo</code> parameter.
 			 * @param {boolean} [bReplace=false]
-			*             If set to <code>true</code>, the hash is replaced, and there will be no entry in the browser
-			*             history. If set to <code>false</code>, the hash is set and the entry is stored in the browser
-			*             history.
+			 *             If set to <code>true</code>, the hash is replaced, and there will be no entry in the browser
+			 *             history. If set to <code>false</code>, the hash is set and the entry is stored in the browser
+			 *             history.
+			 * @ui5-omissible-params oComponentTargetInfo
 			 * @public
 			 * @returns {this} this for chaining.
 			 */

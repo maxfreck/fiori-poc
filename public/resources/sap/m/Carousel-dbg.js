@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,6 +9,7 @@ sap.ui.define([
 	"./library",
 	"sap/ui/core/Core",
 	"sap/ui/core/Control",
+	"sap/ui/core/Element",
 	"sap/ui/Device",
 	"sap/ui/core/ResizeHandler",
 	"sap/ui/core/library",
@@ -26,6 +27,7 @@ sap.ui.define([
 	library,
 	Core,
 	Control,
+	Element,
 	Device,
 	ResizeHandler,
 	coreLibrary,
@@ -50,6 +52,9 @@ sap.ui.define([
 
 	// shortcut for sap.m.PlacementType
 	var PlacementType = library.PlacementType;
+
+	//shortcut for sap.m.BackgroundDesign
+	var BackgroundDesign = library.BackgroundDesign;
 
 	/**
 	 * Constructor for a new Carousel.
@@ -98,7 +103,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -149,7 +154,14 @@ sap.ui.define([
 				 * place the arrows on the sides of the carousel. Alternatively <code>sap.m.CarouselArrowsPlacement.PageIndicator</code> can
 				 * be used to place the arrows on the sides of the page indicator.
 				 */
-				arrowsPlacement : {type : "sap.m.CarouselArrowsPlacement", group : "Appearance", defaultValue : CarouselArrowsPlacement.Content}
+				arrowsPlacement : {type : "sap.m.CarouselArrowsPlacement", group : "Appearance", defaultValue : CarouselArrowsPlacement.Content},
+
+				/**
+				 * Defines the carousel's background design. Default is <code>sap.m.BackgroundDesign.Translucent</code>.
+				 * @public
+				 * @since 1.110
+				 */
+				backgroundDesign : {type : "sap.m.BackgroundDesign", group : "Appearance", defaultValue : BackgroundDesign.Translucent}
 			},
 			defaultAggregation : "pages",
 			aggregations : {
@@ -737,12 +749,7 @@ sap.ui.define([
 				if (this._oMobifyCarousel) {
 					this._sOldActivePageId = this.getActivePage();
 					this._oMobifyCarousel.setShouldFireEvent(true);
-
-					if (this._isPageDisplayed(iPageNr)) {
-						this._changeActivePage(iPageNr);
-					} else {
-						this._moveToPage(iPageNr, iPageNr + 1, true);
-					}
+					this._moveToPage(iPageNr, iPageNr + 1, true);
 				}
 				// if oMobifyCarousel is not present yet, move takes place
 				// 'onAfterRendering', when oMobifyCarousel is created
@@ -829,7 +836,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Carousel.prototype._getPageIndex = function(sPageId) {
-		var i, result;
+		var i, result = 0;
 
 		for (i = 0; i < this.getPages().length; i++) {
 			if (this.getPages()[i].getId() == sPageId) {
@@ -1005,7 +1012,7 @@ sap.ui.define([
 		var oPage;
 
 		if (this._isSlide(oFocusedElement)) {
-			oPage = jQuery(oFocusedElement).find(".sapMCrsPage").control(0);
+			oPage = Element.closestTo(jQuery(oFocusedElement).find(".sapMCrsPage")[0]);
 		} else {
 			oPage = this._getClosestPage(oFocusedElement);
 		}
@@ -1013,7 +1020,9 @@ sap.ui.define([
 		if (oPage) {
 			var sPageId = oPage.getId();
 
-			if (sPageId !== this.getActivePage()) {
+			if (!this._isPageDisplayed(this._getPageIndex(sPageId))) {
+				this.getFocusDomRef().focus({ preventScroll: true });
+			} else if (sPageId !== this.getActivePage()) {
 				this._oMobifyCarousel.setShouldFireEvent(true);
 				this._changeActivePage(this._getPageIndex(sPageId));
 			}
@@ -1346,7 +1355,7 @@ sap.ui.define([
 	 * @returns {sap.ui.core.Control} The page
 	 */
 	Carousel.prototype._getClosestPage = function (oElement) {
-		return jQuery(oElement).closest(".sapMCrsPage").control(0);
+		return Element.closestTo(jQuery(oElement).closest(".sapMCrsPage")[0]);
 	};
 
 	//================================================================================

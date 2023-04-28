@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,12 +8,14 @@ sap.ui.define([
 	'sap/ui/base/EventProvider',
 	'sap/ui/unified/calendar/CalendarUtils',
 	'sap/ui/unified/calendar/CalendarDate',
+	'sap/ui/core/date/UI5Date',
 	'sap/ui/unified/library'
 ],
 	function(
 		EventProvider,
 		CalendarUtils,
 		CalendarDate,
+        UI5Date,
 		unifiedLibrary
 	) {
 		"use strict";
@@ -35,8 +37,9 @@ sap.ui.define([
 				EventProvider.apply(this, arguments);
 
 				this._unit = Periods.Day;
-				this._start = new Date();
+				this._start = UI5Date.getInstance();
 				this._step = 1;
+				this._calendarWeekNumbering = undefined;
 			}
 		});
 
@@ -63,6 +66,10 @@ sap.ui.define([
 			this._current = oDate;
 		};
 
+		DateNavigation.prototype.setWeekConfiguration = function(oWeekConfig) {
+			this._weekConfiguration = oWeekConfig;
+		};
+
 		DateNavigation.prototype.getUnit = function() {
 			return this._unit;
 		};
@@ -77,6 +84,10 @@ sap.ui.define([
 
 		DateNavigation.prototype.getCurrent = function() {
 			return this._current;
+		};
+
+		DateNavigation.prototype.getWeekConfiguration = function() {
+			return this._weekConfiguration;
 		};
 
 		DateNavigation.prototype.getEnd = function(calendarType) {
@@ -240,7 +251,7 @@ sap.ui.define([
 
 					break;
 				case Periods.Week:
-					var oToCalDateFirstWeekDate = CalendarUtils.getFirstDateOfWeek(oNewUTCCurrent);
+					var oToCalDateFirstWeekDate = CalendarUtils.getFirstDateOfWeek(oNewUTCCurrent, this.getWeekConfiguration());
 					if (this.getStart().valueOf() !== oToCalDateFirstWeekDate.valueOf()) {
 						this.setStart(CalendarUtils._createLocalDate(oToCalDateFirstWeekDate, true));
 					}

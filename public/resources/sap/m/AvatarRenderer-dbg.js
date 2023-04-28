@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,7 +42,7 @@ sap.ui.define(["sap/m/library", "sap/base/security/encodeCSS"],
 				sSrc = oAvatar.getSrc(),
 				sAvatarClass = "sapFAvatar",
 				sTooltip = oAvatar.getTooltip_AsString(),
-				aLabelledBy = oAvatar.getAriaLabelledBy(),
+				aLabelledBy = oAvatar._getAriaLabelledBy(),
 				aDescribedBy = oAvatar.getAriaDescribedBy(),
 				aHasPopup = oAvatar.getAriaHasPopup(),
 				oBadge = oAvatar.hasListeners("press") ?  oAvatar._getBadge() : null,

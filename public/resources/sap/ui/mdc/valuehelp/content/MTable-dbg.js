@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,7 +20,7 @@ sap.ui.define([
 	'sap/base/util/merge',
 	'sap/ui/mdc/enum/SelectType',
 	'sap/base/Log',
-	'sap/ui/thirdparty/jquery'
+	'sap/ui/core/Element'
 ], function(
 	FilterableListContent,
 	Condition,
@@ -37,7 +37,7 @@ sap.ui.define([
 	merge,
 	SelectType,
 	Log,
-	jQuery
+	Element
 ) {
 	"use strict";
 
@@ -51,11 +51,12 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element using a {@link sap.m.Table}.
 	 * @extends sap.ui.mdc.valuehelp.base.FilterableListContent
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.content.MTable
@@ -124,8 +125,7 @@ sap.ui.define([
 			var aConditions = this.getConditions();
 			var bHideSelection = this._isSingleSelect() && !FilterableListContent.prototype._isSingleSelect.apply(this); // if table is in single selection but Fild allows multiple values, don't select items
 
-			for (var iId in aItems) {
-				var oItem = aItems[iId];
+			aItems.forEach(function(oItem) {
 				var bSelected = bHideSelection ? false : this._isItemSelected(oItem, aConditions);
 				oItem.setSelected(bSelected);
 				if (this._oTable.indexOfItem(oItem) === this._iNavigateIndex) {
@@ -133,88 +133,72 @@ sap.ui.define([
 				} else {
 					oItem.removeStyleClass("sapMLIBFocused").removeStyleClass("sapMListFocus");
 				}
-			}
+			}.bind(this));
 		}
 	}
-	MTable.prototype.applyFilters = function(sFieldSearch) {
+	MTable.prototype.applyFilters = function() {
+
 		if (this._iNavigateIndex >= 0) { // initialize navigation
 			this.setProperty("conditions", [], true);
 			this._iNavigateIndex = -1;
 		}
 
+		var applyAfterPromise = function () {
+			if (!this.bIsDestroyed) {
+				return this.applyFilters();
+			}
+		}.bind(this);
+
 		var oListBinding = this.getListBinding();
 		var bValueHelpDelegateInitialized = this._isValueHelpDelegateInitialized();
 
+		/*
+		// Should we try to run all binding updates in sequence to prevent cache invalidation errors on the binding?
+
+		var oRunningFilterApplicationPromise = this._retrievePromise("applyFilters");
+		var oRunningInternalFilterPromise = oRunningFilterApplicationPromise && oRunningFilterApplicationPromise.isPending() && oRunningFilterApplicationPromise.getInternalPromise();
+
+		if (oRunningInternalFilterPromise) {
+			return oRunningInternalFilterPromise.then(applyAfterPromise);
+		}
+		*/
+
+		var oFilterApplicationPromise;
+
+
+
 		if ((!oListBinding || !bValueHelpDelegateInitialized)/* && (this.isContainerOpening() || this.isTypeahead())*/) {
-				Promise.all([this._retrievePromise("listBinding"), this._awaitValueHelpDelegate()]).then(function () {
-					if (!this.bIsDestroyed) {
-						this.applyFilters(sFieldSearch);
-					}
-				}.bind(this));
-			return;
+			oFilterApplicationPromise = Promise.all([this._retrievePromise("listBinding"), this._awaitValueHelpDelegate()]).then(applyAfterPromise);
 		}
 
 		if (!bValueHelpDelegateInitialized || (!this.isTypeahead() && !this.isContainerOpen() && oListBinding.isSuspended())) {
-			return;
+			return undefined;
 		}
 
-		var oDelegate = this._getValueHelpDelegate();
-		var oDelegatePayload = this._getValueHelpDelegatePayload();
+		if (!oFilterApplicationPromise) {
+			var oDelegate = this._getValueHelpDelegate();
+			var oDelegatePayload = this._getValueHelpDelegatePayload();
 
-		var sFilterFields = this.getFilterFields();
-		var oFilterBar = this._getPriorityFilterBar();
-		var oConditions = oFilterBar ? oFilterBar.getInternalConditions() : this._oInitialFilterConditions || {};
-
-		if (!oFilterBar && sFieldSearch && sFilterFields && sFilterFields !== "$search") {
-			// add condition for Search value
-			var oCondition = Condition.createCondition("Contains", [sFieldSearch], undefined, undefined, ConditionValidated.NotValidated);
-			oConditions[sFilterFields] = [oCondition];
+			var oListBindingInfo = this._getListBindingInfo();
+			var iLength = oListBindingInfo && oListBindingInfo.length;
+			oDelegate.updateBindingInfo(oDelegatePayload, this, oListBindingInfo);
+			oDelegate.updateBinding(oDelegatePayload, oListBinding, oListBindingInfo, this);
+			oFilterApplicationPromise = Promise.resolve(oDelegate.checkListBindingPending(oDelegatePayload, oListBinding, iLength));
 		}
 
-		var oConditionTypes = oConditions && this._getTypesForConditions(oConditions);
-		var oFilter = oConditions && FilterConverter.createFilters( oConditions, oConditionTypes, undefined, this.getCaseSensitive());
-		var aFilters = oFilter && [oFilter];
-		var sSearch = this.isTypeahead() ? sFieldSearch : oFilterBar && oFilterBar.getSearch();
+		this._addPromise("applyFilters", oFilterApplicationPromise); // cancels and replaces existing ones
 
-		var bUseFilter = true;
-		var oFilterInfo;
 
-		// TODO: Talk to Sebastian or Model guys why this does not work in this scenario (Cannot read property 'getAST' of undefined)
-		try {
-			oFilterInfo = oListBinding.getFilterInfo();
-		} catch (error) {
-			Log.info("ValueHelp-Filter: getFilterInfo threw error");
-		}
-
-		if (!aFilters) {
-			aFilters = [];
-		}
-
-		if (aFilters.length === 0 && !oFilterInfo) {
-			// no filter already exists and none should be set (Suggestion without In-Parameter)
-			bUseFilter = false;
-		}
-
-		if (sFilterFields === "$search" && oDelegate && oDelegate.isSearchSupported(oDelegatePayload, this, oListBinding)){
-			if (!oListBinding.isSuspended() && bUseFilter) {
-				// as we trigger two changes this would result to two requests therefore we suspend the binding
-				oListBinding.suspend();
+		return oFilterApplicationPromise.catch(function (oError) {
+			if (oError.canceled) {
+				Log.error("sap.ui.mdc.ValueHelp - Error during applyFilters:", oError.message);
+				return;
 			}
-
-			sSearch = oDelegate.adjustSearch(oDelegatePayload, this.isTypeahead(), sSearch);
-			oDelegate.executeSearch(oDelegatePayload, oListBinding, sSearch);
-			Log.info("ValueHelp-Search: " + sSearch);
-		}
-
-		if (bUseFilter) {
-			oListBinding.filter(aFilters, FilterType.Application);
-			Log.info("ValueHelp-Filter: " + this._prettyPrintFilters.call(this, aFilters));
-		}
-
-		if (oListBinding.isSuspended()) {
-			// if ListBinding is suspended resume it after filters are set
-			oListBinding.resume();
-		}
+			throw oError;
+		}).finally(function() {
+			var oLatestApplyFiltersPromise = this._retrievePromise("applyFilters");
+			return oLatestApplyFiltersPromise && oLatestApplyFiltersPromise.getInternalPromise(); // re-fetching the applyFilters promise, in case filterValue was changed during the filtering and a parallel run was triggered
+		}.bind(this));
 	};
 
 	MTable.prototype._handleSelectionChange = function (oEvent) {
@@ -238,14 +222,12 @@ sap.ui.define([
 		var oItem = oEvent.getParameter("listItem");
 		var oItemContext = this._getListItemBindingContext(oItem);
 		var oValues = this._getItemFromContext(oItemContext);
-		var bIsSingleSelect = this._isSingleSelect();
-		var bSelected = bIsSingleSelect ? true : !oItem.getSelected();
-		var sSelectType = SelectType.Set;
+		var oTable = this._getTable();
+		var bSingleSelectMaster = oTable.getMode() === ListMode.SingleSelectMaster; // Only in this mode the item will already have the desired selection state.
+		var bSelected = bSingleSelectMaster ? oItem.getSelected() : !oItem.getSelected();
+		oItem.setSelected(bSelected);
+		var sSelectType = bSelected ? SelectType.Add : SelectType.Remove;
 
-		if (!bIsSingleSelect) {
-			oItem.setSelected(bSelected);
-			sSelectType = bSelected ? SelectType.Add : SelectType.Remove;
-		}
 		var oCondition = this._createCondition(oValues.key, oValues.description, oValues.payload);
 		this._fireSelect({type: sSelectType, conditions: [oCondition]});
 		if (this.isTypeahead()) {
@@ -506,8 +488,9 @@ sap.ui.define([
 			var oDelegate = this._getValueHelpDelegate();
 			var oDelegatePayload = this._getValueHelpDelegatePayload();
 			var oListBindingInfo = this._getListBindingInfo();
+			var iLength = oListBindingInfo && oListBindingInfo.length;
 			if (oListBinding && oDelegate){
-				return oDelegate.checkListBindingPending(oDelegatePayload, oListBinding, oListBindingInfo);
+				return oDelegate.checkListBindingPending(oDelegatePayload, oListBinding, iLength);
 			} else {
 				return true;
 			}
@@ -540,21 +523,18 @@ sap.ui.define([
 
 		var oTable = this._getTable();
 		var oListBinding = oTable && oTable.getBinding("items"); //this.getListBinding();
-		var oBindingContext = oListBinding && oListBinding.getContext();
-		var oModel = oListBinding && oListBinding.getModel();
 		var sPath = oListBinding && oListBinding.getPath();
 
 		var oDelegate = this._getValueHelpDelegate();
 		var oDelegatePayload = this._getValueHelpDelegatePayload();
 
-		var sPromiseKey = ["loadItemForValue", sPath, sKeyPath, oConfig.parsedValue || oConfig.value, JSON.stringify(oConfig.context)].join("_");
-
+		var sPromiseKey = "loadItemForValue:" + JSON.stringify([sPath, sKeyPath, oConfig.parsedValue || oConfig.value, oConfig.context, oConfig.bindingContext && oConfig.bindingContext.getPath(), oConditions]);
 
 		return this._retrievePromise(sPromiseKey, function () {
 			var oFilter = _createItemFilters.call(this, oConfig, oConditions);
-			var oFilterListBinding = oModel.bindList(sPath, oBindingContext);
-
-			return oDelegate.executeFilter(oDelegatePayload, oFilterListBinding, oFilter, 2).then(function (oBinding) {
+			var oFilterListBinding = oListBinding.getModel().bindList(sPath, oListBinding.getContext(), undefined, oFilter);
+			oFilterListBinding.initialize();
+			return oDelegate.executeFilter(oDelegatePayload, oFilterListBinding, 2).then(function (oBinding) {
 				var aContexts = oBinding.getContexts();
 
 				setTimeout(function() { // as Binding might process other steps after event was fired - destroy it lazy
@@ -638,7 +618,7 @@ sap.ui.define([
 
 		if (this._getMaxConditions() !== 1) {
 			// in case of multiToken field the focus can be set to the table and the navigation will be handled by the focused table control.
-			if (this.getParent().isOpen()) {
+			if (this.getParent().isOpen() && oTable.getMode() === ListMode.MultiSelect) {
 				//TODO cursorUp and the new iSelectedIndex will not be handled correct when we give the focus to the table.
 				oTable.focus();
 				return;
@@ -790,7 +770,9 @@ sap.ui.define([
 					return this._retrievePromise("footer", function () {
 						return this._retrievePromise("listBinding").then(function (oListBinding) {
 							var oBindingInfo = this._getListBindingInfo();
-							if (oBindingInfo && oBindingInfo.length) {
+							var bDialogExist = this.getParent().hasDialog();
+
+							if (bDialogExist && oBindingInfo && oBindingInfo.length) {
 								return loadModules(["sap/m/Button", "sap/m/Toolbar", "sap/m/ToolbarSpacer"]).then(function (aModules) {
 									var Button = aModules[0];
 									var Toolbar = aModules[1];
@@ -884,7 +866,7 @@ sap.ui.define([
 		}
 
 		var oTable = this._getTable();
-		var oItem = jQuery(oEvent.target).control(0);
+		var oItem = Element.closestTo(oEvent.target);
 
 		switch (oEvent.type) {
 			case "sapprevious":

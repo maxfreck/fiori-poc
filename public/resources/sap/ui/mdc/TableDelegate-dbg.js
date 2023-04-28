@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @since 1.60
 	 * @private
 	 * @ui5-restricted sap.fe
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 	var TableDelegate = Object.assign({}, AggregationBaseDelegate);
 
@@ -57,7 +57,7 @@ sap.ui.define([
 			oBindingInfo.filters = [oTable._oMessageFilter];
 		}
 
-		if (oTable._bMobileTable) {
+		if (oTable._isOfType(TableType.ResponsiveTable)) {
 			var oGroupedProperty = oTable._getGroupedProperties()[0];
 
 			if (oGroupedProperty) {
@@ -164,9 +164,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	TableDelegate.rebind = function(oTable, oBindingInfo) {
-		if (oTable._oTable) {
-			oTable._oTable.bindRows(oBindingInfo);
-		}
+		oTable._getType().bindRows(oBindingInfo);
 	};
 
 	/**
@@ -237,10 +235,53 @@ sap.ui.define([
 		return Promise.resolve({ XLSX: {} });
 	};
 
+	/**
+	 * Expands all nodes.
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the MDC table
+	 * @protected
+	 */
+	TableDelegate.expandAll = function (oTable) {
+		throw Error("Unsupported operation: TableDelegate does not support #expandAll");
+	};
+
+	/**
+	 * Collapses all nodes.
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the MDC table
+	 * @protected
+	 */
+	TableDelegate.collapseAll = function (oTable) {
+		throw Error("Unsupported operation: TableDelegate does not support #collapseAll");
+	};
+
+	/**
+	 * Gets the features that are supported by the combination of this delegate and the current table state (e.g. type).
+	 *
+	 * @param {sap.ui.mdc.Table} oTable
+	 * @returns {object} The supported features
+	 * @private
+	 */
+	TableDelegate.getSupportedFeatures = function(oTable) {
+		return {
+			"export": true,
+			"selection": !oTable._isOfType(TableType.TreeTable),
+			"expandAll": false,
+			"collapseAll": false
+		};
+	};
+
+	/**
+	 * Gets the p13n modes that are supported by the combination of this delegate and the current table state (e.g. type).
+	 *
+	 * @param {sap.ui.mdc.Table} oTable Instance of the MDC table.
+	 * @returns {sap.ui.mdc.TableP13nMode[]} The supported p13n modes.
+	 * @private
+	 */
 	TableDelegate.getSupportedP13nModes = function(oTable) {
 		var aSupportedModes = [P13nMode.Column, P13nMode.Sort, P13nMode.Filter];
 
-		if (oTable._getStringType() === TableType.ResponsiveTable) {
+		if (oTable._isOfType(TableType.ResponsiveTable)) {
 			aSupportedModes.push(P13nMode.Group);
 		}
 

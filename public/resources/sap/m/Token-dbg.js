@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -50,7 +50,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -164,7 +164,8 @@ sap.ui.define([
 				id : this.getId() + "-icon",
 				src : "sap-icon://decline",
 				noTabStop: true,
-				press : this._fireDeleteToken.bind(this)
+				press : this._fireDeleteToken.bind(this),
+				tooltip: Core.getLibraryResourceBundle("sap.m").getText("TOKEN_ICON_TOOLTIP")
 			});
 
 		oDeleteIcon.addStyleClass("sapMTokenIcon");
@@ -193,14 +194,7 @@ sap.ui.define([
 	 * @return {string} The tooltip text
 	 */
 	Token.prototype._getTooltip = function (oControl, bEditable) {
-		var sTooltip = oControl.getTooltip_AsString(),
-			sDeletableTooltip = Core.getLibraryResourceBundle("sap.m").getText("TOKEN_ARIA_DELETABLE");
-
-		if (bEditable && !sTooltip) {
-			return sDeletableTooltip;
-		}
-
-		return sTooltip;
+		return oControl.getTooltip_AsString();
 	};
 
 	/**

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,7 +12,7 @@ sap.ui.define([
 	"sap/m/library",
 	"sap/ui/mdc/enum/ActionToolbarActionAlignment",
 	"sap/ui/mdc/p13n/subcontroller/ActionToolbarController",
-	"sap/ui/mdc/p13n/Engine"
+	"sap/m/p13n/Engine"
 ], function(OverflowToolbar, OverflowToolbarRenderer, ToolbarSpacer, ToolbarSeparator, mobileLibrary, ActionToolbarActionAlignment, ActionToolbarController, Engine) {
 	"use strict";
 
@@ -31,7 +31,7 @@ sap.ui.define([
 	 * @class The column for the metadata driven table, that hold the template to be shown when the rows has data.
 	 * @extends sap.m.OverflowToolbar
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.58
@@ -132,9 +132,9 @@ sap.ui.define([
 
 		this.setUseAsHeader(true);
 
-		Engine.getInstance().registerAdaptation(this, {
+		Engine.getInstance().register(this, {
 			controller: {
-				actionsKey: ActionToolbarController
+				actionsKey: new ActionToolbarController({control: this})
 			}
 		});
 	};

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -29,7 +29,7 @@ sap.ui.define([
 	 * @class The Remove allows trigger remove operations on the overlay
 	 * @extends sap.ui.rta.plugin.Plugin
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.34
@@ -174,7 +174,7 @@ sap.ui.define([
 	 * @private
 	 */
 	Remove.prototype._onKeyDown = function(oEvent) {
-		if (oEvent.keyCode === KeyCodes.DELETE) {
+		if (oEvent.keyCode === KeyCodes.DELETE || oEvent.keyCode === KeyCodes.BACKSPACE) {
 			oEvent.stopPropagation();
 			this.removeElement();
 		}

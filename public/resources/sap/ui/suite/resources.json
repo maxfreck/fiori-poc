@@ -226,7 +226,7 @@
 		},
 		{
 			"name": "resources.json",
-			"size": 8512
+			"size": 8514
 		},
 		{
 			"name": "themes/base/.theming",
@@ -258,7 +258,7 @@
 		},
 		{
 			"name": "themes/base/css_variables.source.less",
-			"size": 113742,
+			"size": 122873,
 			"designtime": true,
 			"theme": "base"
 		},
@@ -330,13 +330,13 @@
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.less",
-			"size": 99692,
+			"size": 109485,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.source.less",
-			"size": 99392,
+			"size": 109185,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},

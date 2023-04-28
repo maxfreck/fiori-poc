@@ -1,7 +1,7 @@
 
 /*!
 * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 sap.ui.define([
@@ -23,6 +23,9 @@ sap.ui.define([
 	// shortcut for sap.m.ListKeyboardMode
 	var ListKeyboardMode = mLibrary.ListKeyboardMode;
 
+	// shortcut for sap.m.FlexJustifyContent
+	var FlexJustifyContent = mLibrary.FlexJustifyContent;
+
 	/**
 	 * Constructor for a new <code>FilterPanel</code>.
 	 *
@@ -36,7 +39,7 @@ sap.ui.define([
 	 * @extends sap.m.p13n.QueryPanel
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @public
 	 * @experimental Since 1.107.
@@ -45,6 +48,7 @@ sap.ui.define([
 	 */
 	var FilterPanel = QueryPanel.extend("sap.ui.mdc.p13n.panels.FilterPanel", {
 		metadata: {
+			library: "sap.ui.mdc",
 			properties: {
 				/**
 				 * A factory function that will be called whenever the user selects a new entry from the <code>ComboBox</code>.
@@ -54,20 +58,22 @@ sap.ui.define([
 				 * current set of active factory controls.
 				 *
 				 * <b>Note:</b>: The Panel will not handle the lifecylce of the provided factory control instance, in case the row is going to be
-				 * removed, the according consumer needs to decide about destroying or keeping the control instance.
+				 * removed, the according consumer needs to decide about destroying or keeping the control instance. In addition, the <code>getIdForLabel</code>
+				 * method can be used to return a focusable children control to provide the <code>labelFor</code> reference.
 				 */
 				itemFactory: {
 					type: "function"
 				}
 			}
 		},
-		renderer: {}
+		renderer: {
+			apiVersion: 2
+		}
 	});
 
 	/**
 	 * P13n <code>FilterItem</code> object type.
 	 *
-	 * @type {sap.ui.mdc.p13n.panels.FilterItem}
 	 * @static
 	 * @constant
 	 * @typedef {object} sap.ui.mdc.p13n.panels.FilterItem
@@ -80,13 +86,12 @@ sap.ui.define([
 
 	/**
 	 * Sets the personalization state of the panel instance.
-	 * @name sap.ui.mdc.p13n.panels.FilterPanel.setP13nData
+	 * @name sap.ui.mdc.p13n.panels.FilterPanel.prototype.setP13nData
 	 * @public
 	 * @function
 	 *
-	 * @param {sap.ui.mdc.p13n.panels.FilterItem} aP13nData An array containing the personalization state
-	 * @returns {sap.ui.mdc.p13n.panels.FilterPanel} The SortPanel instance
-	 *
+	 * @param {sap.ui.mdc.p13n.panels.FilterItem[]} aP13nData An array containing the personalization state
+	 * @returns {this} The FilterPanel instance
 	 */
 
 	FilterPanel.prototype.PRESENCE_ATTRIBUTE = "active";
@@ -144,6 +149,7 @@ sap.ui.define([
 
 	FilterPanel.prototype._createRemoveButton = function (bVisible) {
 		var oRemoveBtn = QueryPanel.prototype._createRemoveButton.apply(this, arguments);
+		oRemoveBtn.setJustifyContent(FlexJustifyContent.Start);//avoid remove button overlapping with input field
 		oRemoveBtn.setLayoutData(new GridData({
 			span: "XL1 L1 M1 S1"
 		}));
@@ -152,12 +158,16 @@ sap.ui.define([
 
 	FilterPanel.prototype._createRowContainer = function(sText, sKey) {
 		// var sKey = oSelect._key;
-		var oLabel = new Label({text: sText, showColon: true});
+		var oLabel = new Label({text: sText, showColon: true, wrapping: true});
 		var oFieldBox = new VBox({
-			items:[ oLabel.addStyleClass("sapUiTinyMarginTop").addStyleClass("sapUiTinyMarginBegin")]
+			items:[oLabel.addStyleClass("sapUiTinyMarginBegin")]
 		});
 		oFieldBox._key = sKey;
 		return oFieldBox;
+	};
+
+	FilterPanel.prototype._setLabelForOnBox = function(oFilterItem, oFieldBox) {
+		oFieldBox.getItems()[0].setLabelFor(oFilterItem);
 	};
 
 	FilterPanel.prototype._selectKey = function(oComboBox) {
@@ -183,7 +193,8 @@ sap.ui.define([
 				oQueryRowGrid.insertContent(oFieldBox,0);
 
 				var oFilterItem = this._createFactoryControl({name: sKey}); //Create the actual filterable control and insert it in the grid
-				//oFieldBox.getItems()[0].setLabelFor(oFilterItem.getItems()[0]);
+				this._setLabelForOnBox(oFilterItem, oFieldBox);
+
 				oQueryRowGrid.insertContent(oFilterItem, 1);
 
 			}

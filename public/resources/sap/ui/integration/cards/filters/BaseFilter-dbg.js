@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -37,7 +37,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -126,7 +126,7 @@ sap.ui.define([
 	BaseFilter.prototype.isLoading = function () {
 		var oLoadingProvider = this.getAggregation("_loadingProvider");
 
-		return !oLoadingProvider.isDataProviderJson() && oLoadingProvider.getLoading();
+		return oLoadingProvider.getLoading();
 	};
 
 	BaseFilter.prototype.getField = function () {
@@ -148,7 +148,9 @@ sap.ui.define([
 	 * @ui5-restricted
 	 */
 	BaseFilter.prototype.showLoadingPlaceholders = function () {
-		this.getAggregation("_loadingProvider").setLoading(true);
+		if (!this._isDataProviderJson()) {
+			this.getAggregation("_loadingProvider").setLoading(true);
+		}
 	};
 
 	/**
@@ -235,8 +237,6 @@ sap.ui.define([
 
 		this._oDataProvider = oCard.getDataProviderFactory().create(oDataConfig, null, true);
 
-		this.getAggregation("_loadingProvider").setDataProvider(this._oDataProvider);
-
 		if (oDataConfig.name) {
 			oModel = oCard.getModel(oDataConfig.name);
 		} else if (this._oDataProvider) {
@@ -244,25 +244,34 @@ sap.ui.define([
 			this.setModel(oModel);
 		}
 
+		if (!oModel) {
+			this.fireEvent("_dataReady");
+			return;
+		}
+
 		oModel.attachEvent("change", function () {
 			this.onDataChanged();
 		}.bind(this));
 
-		this._oDataProvider.attachDataRequested(function () {
-			this.showLoadingPlaceholders();
-		}.bind(this));
+		if (this._oDataProvider) {
+			this._oDataProvider.attachDataRequested(function () {
+				this.showLoadingPlaceholders();
+			}.bind(this));
 
-		this._oDataProvider.attachDataChanged(function (oEvent) {
-			oModel.setData(oEvent.getParameter("data"));
-			this._onDataRequestComplete();
-		}.bind(this));
+			this._oDataProvider.attachDataChanged(function (oEvent) {
+				oModel.setData(oEvent.getParameter("data"));
+				this._onDataRequestComplete();
+			}.bind(this));
 
-		this._oDataProvider.attachError(function (oEvent) {
-			this._handleError(oEvent.getParameter("message"));
-			this._onDataRequestComplete();
-		}.bind(this));
+			this._oDataProvider.attachError(function (oEvent) {
+				this._handleError(oEvent.getParameter("message"));
+				this._onDataRequestComplete();
+			}.bind(this));
 
-		this._oDataProvider.triggerDataUpdate();
+			this._oDataProvider.triggerDataUpdate();
+		} else {
+			this.fireEvent("_dataReady");
+		}
 	};
 
 	BaseFilter.prototype._syncValue = function () {
@@ -279,6 +288,10 @@ sap.ui.define([
 			oCard._fireConfigurationChange(mParams);
 			oCard.resetPaginator();
 		}
+	};
+
+	BaseFilter.prototype._isDataProviderJson = function () {
+		return this._oDataProvider && this._oDataProvider.getSettings() && this._oDataProvider.getSettings()["json"];
 	};
 
 	return BaseFilter;

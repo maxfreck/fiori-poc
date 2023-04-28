@@ -1,6 +1,6 @@
 /*
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -23,7 +23,7 @@ sap.ui.define([
 	 *
 	 * @class Implements the selection methods for a Table
 	 * @extends sap.ui.table.plugins.SelectionPlugin
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.plugins.SelectionModelSelection
@@ -313,7 +313,8 @@ sap.ui.define([
 
 		this.fireSelectionChange({
 			rowIndices: aRowIndices,
-			selectAll: bSelectAll
+			selectAll: bSelectAll,
+			_internalTrigger: this._bInternalTrigger
 		});
 	}
 
@@ -343,7 +344,9 @@ sap.ui.define([
 		// If rows are added or removed, the index-based selection of the SelectionModel is invalid and needs to be cleared.
 		// Changes from 0 are ignored for compatibility, so it is possible to select something before the initial rows update is done.
 		if (this._iTotalRowCount > 0 && this._iTotalRowCount !== iTotalRowCount) {
+			this._bInternalTrigger = true;
 			this.clearSelection();
+			delete this._bInternalTrigger;
 		}
 
 		this._iTotalRowCount = iTotalRowCount;

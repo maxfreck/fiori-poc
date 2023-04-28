@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -24,7 +24,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.45
 	 *
 	 * @constructor
@@ -62,14 +62,16 @@ sap.ui.define([
 				 * The <code>press</code> is fired when the user triggers the corresponding action.
 				 */
 				press: {
-					/**
-					 * The item which was pressed.
-					 */
-					item: {type: "sap.ui.table.RowActionItem"},
-					/**
-					 * The table row to which the pressed item belongs to.
-					 */
-					row: {type: "sap.ui.table.Row"}
+					parameters: {
+						/**
+						 * The item which was pressed.
+						 */
+						item: {type: "sap.ui.table.RowActionItem"},
+						/**
+						 * The table row to which the pressed item belongs to.
+						 */
+						row: {type: "sap.ui.table.Row"}
+					}
 				}
 			}
 		}

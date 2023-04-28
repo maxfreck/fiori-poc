@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -339,19 +339,22 @@ sap.ui.define([
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID to be canceled
+	 * @param {boolean} [bResetInactive]
+	 *   Whether an edited inactive entity should be reset to its initial state instead of being
+	 *   removed.
 	 * @throws {Error}
 	 *   If change requests for the given group ID are running
 	 *
 	 * @public
 	 */
-	_Requestor.prototype.cancelChanges = function (sGroupId) {
+	_Requestor.prototype.cancelChanges = function (sGroupId, bResetInactive) {
 		if (this.mRunningChangeRequests[sGroupId]) {
 			throw new Error("Cannot cancel the changes for group '" + sGroupId
 				+ "', the batch request is running");
 		}
 		this.cancelChangesByFilter(function () {
 			return true;
-		}, sGroupId);
+		}, sGroupId, bResetInactive);
 		this.cancelGroupLocks(sGroupId);
 	};
 
@@ -367,12 +370,15 @@ sap.ui.define([
 	 * @param {string} [sGroupId]
 	 *   The ID of the group from which the requests shall be canceled; if not given all groups
 	 *   are processed
+	 * @param {boolean} [bResetInactive]
+	 *   Whether an edited inactive entity should be reset to its initial state instead of being
+	 *   removed.
 	 * @returns {boolean}
 	 *   Whether at least one request has been canceled
 	 *
 	 * @private
 	 */
-	_Requestor.prototype.cancelChangesByFilter = function (fnFilter, sGroupId) {
+	_Requestor.prototype.cancelChangesByFilter = function (fnFilter, sGroupId, bResetInactive) {
 		var bCanceled = false,
 			that = this;
 
@@ -390,13 +396,14 @@ sap.ui.define([
 					for (i = aChangeSet.length - 1; i >= 0; i -= 1) {
 						oChangeRequest = aChangeSet[i];
 						if (oChangeRequest.$cancel && fnFilter(oChangeRequest)) {
-							oChangeRequest.$cancel();
-							oError = new Error("Request canceled: " + oChangeRequest.method + " "
-								+ oChangeRequest.url + "; group: " + sGroupId0);
-							oError.canceled = true;
-							oChangeRequest.$reject(oError);
-							aChangeSet.splice(i, 1);
-							bCanceled = true;
+							if (!oChangeRequest.$cancel(bResetInactive)) {
+								oError = new Error("Request canceled: " + oChangeRequest.method
+									+ " " + oChangeRequest.url + "; group: " + sGroupId0);
+								oError.canceled = true;
+								oChangeRequest.$reject(oError);
+								aChangeSet.splice(i, 1);
+								bCanceled = true;
+							}
 						}
 					}
 				}
@@ -827,7 +834,7 @@ sap.ui.define([
 	 * @param {string} sMetaPath
 	 *   The meta path of the resource + navigation or key path (which may lead to an entity or
 	 *   complex type)
-	 * @returns {SyncPromise<object>}
+	 * @returns {sap.ui.base.SyncPromise<object>}
 	 *   A promise resolving with the type
 	 */
 	 _Requestor.prototype.fetchType = function (mTypeForMetaPath, sMetaPath) {
@@ -1173,13 +1180,16 @@ sap.ui.define([
 	};
 
 	/**
-	 * Merges all GET requests that are marked as mergeable and have the same owner, resource path,
-	 * and query options besides $expand and $select. One request with the merged $expand and
-	 * $select is left in the queue and all merged requests get the response of this one remaining
-	 * request. For $mergeRequests, see parameter fnMergeRequests of {@link #request}.
+	 * Merges all GET requests that are marked as mergeable (via parameter mQueryOptions of
+	 * {@link #request}) and have the same owner, resource path, and query options besides $expand
+	 * and $select. One request with the merged $expand and $select is left in the queue and all
+	 * merged requests get the response of this one remaining request. For $mergeRequests, see
+	 * parameter fnMergeRequests of {@link #request}.
 	 *
 	 * @param {object[]} aRequests The batch queue
 	 * @returns {object[]} The adjusted batch queue
+	 *
+	 * @private
 	 */
 	_Requestor.prototype.mergeGetRequests = function (aRequests) {
 		var aResultingRequests = [],
@@ -1208,9 +1218,13 @@ sap.ui.define([
 			}
 		});
 		aResultingRequests.forEach(function (oRequest) {
-			if (oRequest.$queryOptions) {
-				oRequest.url
-					= that.addQueryString(oRequest.url, oRequest.$metaPath, oRequest.$queryOptions);
+			var mQueryOptions = oRequest.$queryOptions;
+
+			if (mQueryOptions) {
+				if (mQueryOptions.$expand && !mQueryOptions.$select.length) {
+					mQueryOptions.$select = Object.keys(mQueryOptions.$expand).sort().slice(0, 1);
+				}
+				oRequest.url = that.addQueryString(oRequest.url, oRequest.$metaPath, mQueryOptions);
 			}
 		});
 		aResultingRequests.iChangeSet = aRequests.iChangeSet;
@@ -1726,10 +1740,11 @@ sap.ui.define([
 	 * @param {function} [fnSubmit]
 	 *   A function that is called when the request has been submitted, either immediately (when
 	 *   the group ID is "$direct") or via {@link #submitBatch}
-	 * @param {function} [fnCancel]
+	 * @param {function(boolean):boolean} [fnCancel]
 	 *   A function that is called for clean-up if the request is canceled while waiting in a batch
 	 *   queue, ignored for GET requests; {@link #cancelChanges} cancels this request only if this
-	 *   callback is given
+	 *   callback is given and a falsy value was returned. A boolean parameter is passed to the
+	 *   callback which indicates if inactive entities should be reset instead of being removed.
 	 * @param {string} [sMetaPath]
 	 *   The meta path corresponding to the resource path; needed in case V2 response does not
 	 *   contain <code>__metadata.type</code>, for example "2.2.7.2.4 RetrievePrimitiveProperty
@@ -1744,7 +1759,8 @@ sap.ui.define([
 	 * @param {object} [mQueryOptions]
 	 *   Query options if it is allowed to merge this request with another request having the same
 	 *   sResourcePath (only allowed for GET requests); the resulting resource path is the path from
-	 *   sResourcePath plus the merged query options; may only contain $expand and $select
+	 *   sResourcePath plus the merged query options; must contain $select (even if empty), may also
+	 *   contain $expand
 	 * @param {any} [vOwner]
 	 *   An additional precondition for the merging of GET requests: the owner must be identical.
 	 * @param {function(string[]):string[]} [fnMergeRequests]
@@ -1847,7 +1863,10 @@ sap.ui.define([
 			JSON.stringify(oPayload), sOriginalResourcePath
 		).then(function (oResponse) {
 			that.reportHeaderMessages(oResponse.resourcePath, oResponse.messages);
-			return that.doConvertResponse(oResponse.body, sMetaPath);
+			return that.doConvertResponse(
+				// Note: "text/plain" used for $count
+				typeof oResponse.body === "string" ? JSON.parse(oResponse.body) : oResponse.body,
+				sMetaPath);
 		});
 	};
 
@@ -1864,7 +1883,8 @@ sap.ui.define([
 		var oBatchRequest = _Batch.serializeBatchRequest(aRequests,
 				this.getGroupSubmitMode(sGroupId) === "Auto"
 					? "Group ID: " + sGroupId
-					: "Group ID (API): " + sGroupId
+					: "Group ID (API): " + sGroupId,
+				this.oModelInterface.isIgnoreETag()
 			);
 
 		return this.processOptimisticBatch(aRequests, sGroupId)
@@ -1942,7 +1962,8 @@ sap.ui.define([
 					headers : Object.assign({},
 						that.mPredefinedRequestHeaders,
 						that.mHeaders,
-						_Helper.resolveIfMatchHeader(mHeaders)),
+						_Helper.resolveIfMatchHeader(mHeaders,
+							that.oModelInterface.isIgnoreETag())),
 					method : sMethod
 				}).then(function (/*{object|string}*/vResponse, _sTextStatus, jqXHR) {
 					var sETag = jqXHR.getResponseHeader("ETag"),
@@ -2068,8 +2089,8 @@ sap.ui.define([
 	 * Waits until all group locks for the given group ID have been unlocked and submits the
 	 * requests associated with this group ID in one batch request. If only PATCH requests are
 	 * enqueued (see {@link #hasOnlyPatchesWithoutSideEffects}), this will delay the execution to
-	 * wait for potential side effect requests triggered by
-	 * {@link sap.ui.core.Control#event:validateFieldGroup}.
+	 * wait for potential side effect requests triggered by a
+	 * {@link sap.ui.core.Control#event:validateFieldGroup 'validateFieldGroup'} event.
 	 *
 	 * @param {string} sGroupId
 	 *   The group ID
@@ -2130,7 +2151,7 @@ sap.ui.define([
 	 */
 	_Requestor.prototype.waitForBatchResponseReceived = function (sGroupId) {
 		// Note: this currently works only in case there is at least one change request already
-		return this.mBatchQueue[sGroupId][0][0].$promise;
+		return SyncPromise.resolve(this.mBatchQueue[sGroupId][0][0].$promise);
 	};
 
 	/**
@@ -2221,6 +2242,8 @@ sap.ui.define([
 	 *   A catch handler function expecting an <code>Error</code> instance. This function will call
 	 *   {@link sap.ui.model.odata.v4.ODataModel#reportError} if the error has not been reported
 	 *   yet
+	 * @param {function():boolean} oModelInterface.isIgnoreETag
+	 *   Tells whether an entity's ETag should be actively ignored (If-Match:*) for PATCH requests.
 	 * @param {function} oModelInterface.onCreateGroup
 	 *   A callback function that is called with the group name as parameter when the first
 	 *   request is added to a group

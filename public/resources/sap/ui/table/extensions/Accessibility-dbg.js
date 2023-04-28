@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -224,23 +224,32 @@ sap.ui.define([
 		},
 
 		/*
-		 * Returns the tooltip of the column or the contained label, if any.
+		 * Returns the tooltip of the column or the contained label, if any and if it differs from the label itself.
 		 */
 		getColumnTooltip: function(oColumn) {
 			if (!oColumn) {
 				return null;
 			}
 
+			var oLabel = oColumn.getLabel();
+
+			function isTooltipEqualToLabel(sTooltip) {
+				if (!sTooltip) {
+					return false;
+				}
+				var sText = oLabel && oLabel.getText ? oLabel.getText() : "";
+				return sTooltip == sText;
+			}
+
 			var sTooltip = oColumn.getTooltip_AsString();
-			if (sTooltip) {
+			if (!isTooltipEqualToLabel(sTooltip)) {
 				return sTooltip;
 			}
 
-			var oLabel = oColumn.getLabel();
 			if (TableUtils.isA(oLabel, "sap.ui.core.Control")) {
 				sTooltip = oLabel.getTooltip_AsString();
 			}
-			if (sTooltip) {
+			if (!isTooltipEqualToLabel(sTooltip)) {
 				return sTooltip;
 			}
 
@@ -257,7 +266,7 @@ sap.ui.define([
 			var bHasRowHeader = TableUtils.hasRowHeader(oTable);
 			var bHasRowActions = TableUtils.hasRowActions(oTable);
 			var iColumnCount = TableUtils.getVisibleColumnCount(oTable) + (bHasRowHeader ? 1 : 0) + (bHasRowActions ? 1 : 0);
-			var iContentRowCount = TableUtils.isNoDataVisible(oTable) ? 0 : Math.max(oTable._getTotalRowCount(), oTable._getRowCounts().count);
+			var iContentRowCount = TableUtils.isNoDataVisible(oTable) ? 0 : Math.max(oTable._getTotalRowCount(), oTable._getRowCounts()._fullsize);
 
 			return {
 				columnCount: iColumnCount,
@@ -665,9 +674,6 @@ sap.ui.define([
 							}
 						}
 					}
-					if (!oTable._getShowStandardTooltips() && mRenderConfig.headerSelector.type === "toggle") {
-						mAttributes["aria-labelledby"] = [sTableId + "-ariaselectall"];
-					}
 					break;
 
 				case AccExtension.ELEMENTTYPES.ROWHEADER:
@@ -853,12 +859,9 @@ sap.ui.define([
 						if (oTable.getBinding()) {
 							if (mParams && mParams.row) {
 								if (mParams.row.isExpandable()) {
-									var sText = TableUtils.getResourceText(mParams.row.isExpanded() ? "TBL_COLLAPSE" : "TBL_EXPAND");
-									if (oTable._getShowStandardTooltips()) {
-										mAttributes["title"] = sText;
-									} else {
-										mAttributes["aria-label"] = sText;
-									}
+									var sText = TableUtils.getResourceText("TBL_COLLAPSE_EXPAND");
+									mAttributes["title"] = sText;
+
 									mAttributes["aria-expanded"] = "" + (!!mParams.row.isExpanded());
 									mAttributes["aria-hidden"] = "false";
 									mAttributes["role"] = "button";
@@ -929,7 +932,7 @@ sap.ui.define([
 	 * @class Extension for sap.ui.table.Table which handles ACC related things.
 	 * @extends sap.ui.table.extensions.ExtensionBase
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.extensions.Accessibility
@@ -1218,7 +1221,7 @@ sap.ui.define([
 		}
 
 		var oTable = this.getTable();
-		var bShowRowTooltips = !oRow.isEmpty() && !oRow.isGroupHeader() && !oRow.isSummary() && oTable._getShowStandardTooltips();
+		var bShowRowTooltips = !oRow.isEmpty() && !oRow.isGroupHeader() && !oRow.isSummary() && !oTable._getHideStandardTooltips();
 
 		if ($Ref.row) {
 			if (bShowRowTooltips && TableUtils.isRowSelectionAllowed(oTable) && !$Ref.row.hasClass("sapUiTableRowHidden")) {
@@ -1394,7 +1397,7 @@ sap.ui.define([
 			sSelectionMode = oTable.getSelectionMode();
 		}
 
-		var bShowTooltips = oTable._getShowStandardTooltips();
+		var bShowTooltips = !oTable._getHideStandardTooltips();
 		var mTooltipTexts = {
 			mouse: {
 				rowSelect: "",

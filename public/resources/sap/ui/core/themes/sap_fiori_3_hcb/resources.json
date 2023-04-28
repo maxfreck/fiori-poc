@@ -18,6 +18,12 @@
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
+			"name": "Icon.less",
+			"size": 276,
+			"designtime": true,
+			"theme": "sap_fiori_3_hcb"
+		},
+		{
 			"name": "LocalBusyIndicator.less",
 			"size": 567,
 			"designtime": true,
@@ -31,24 +37,24 @@
 		},
 		{
 			"name": "base.less",
-			"size": 70282,
+			"size": 93299,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "css_variables.css",
-			"size": 204722,
+			"size": 219348,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "css_variables.less",
-			"size": 228319,
+			"size": 246012,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 227943,
+			"size": 245636,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
@@ -104,55 +110,55 @@
 		},
 		{
 			"name": "global.less",
-			"size": 64495,
+			"size": 68712,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 125925,
+			"size": 133636,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library-parameters.json",
 			"module": "sap/ui/core/themes/sap_fiori_3_hcb/library-parameters.json",
-			"size": 73770,
+			"size": 79003,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library.css",
-			"size": 125912,
+			"size": 133623,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library.less",
-			"size": 9369,
+			"size": 9596,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library.source.less",
-			"size": 350,
+			"size": 371,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 28044,
+			"size": 29186,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 28032,
+			"size": 29174,
 			"theme": "sap_fiori_3_hcb"
 		},
 		{
 			"name": "resources.json",
-			"size": 2937
+			"size": 3039
 		},
 		{
 			"name": "shared.less",
-			"size": 7386,
+			"size": 7289,
 			"designtime": true,
 			"theme": "sap_fiori_3_hcb"
 		}

@@ -1,12 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
         "sap/ui/core/Core",
-        "sap/ui/mdc/library",
         "sap/ui/mdc/ActionToolbar",
         "sap/m/OverflowToolbarRenderer",
         "sap/m/OverflowToolbarButton",
@@ -14,13 +13,15 @@ sap.ui.define([
         "sap/m/Title",
         "sap/ui/mdc/library",
         "sap/ui/mdc/chart/ChartTypeButton",
-        "sap/ui/mdc/chart/ChartSettings",
         "./ChartSelectionDetails",
-        "sap/m/ToolbarSeparator"
+        "sap/m/ToolbarSeparator",
+        "sap/m/OverflowToolbarLayoutData",
+        "sap/ui/core/library",
+        "sap/ui/Device",
+        "sap/ui/core/ShortcutHintsMixin"
     ],
     function (
         Core,
-        Control,
         ActionToolbar,
         OverflowToolbarRenderer,
         OverflowButton,
@@ -28,11 +29,17 @@ sap.ui.define([
         Title,
         MDCLib,
         ChartTypeButton,
-        ChartSettings,
         ChartSelectionDetails,
-        ToolbarSeparator
+        ToolbarSeparator,
+        OverflowToolbarLayoutData,
+        coreLibrary,
+        Device,
+        ShortcutHintsMixin
     ) {
         "use strict";
+
+		// shortcut for sap.ui.core.aria.HasPopup
+		var AriaHasPopup = coreLibrary.aria.HasPopup;
 
         /**
          * Constructor for a new ChartToolbar.
@@ -42,7 +49,7 @@ sap.ui.define([
          * @class The ChartToolbar control is a sap.m.OverflowToolbar based on metadata and the configuration specified.
          * @extends sap.ui.mdc.ActionToolbar
          * @author SAP SE
-         * @version 1.108.2
+         * @version 1.113.0
          * @constructor
          * @experimental As of version 1.88
          * @private
@@ -90,13 +97,14 @@ sap.ui.define([
             /**add beginning**/
             this._oTitle = new Title(oMDCChart.getId() + "-title", {
                 text: oMDCChart.getHeader(),
-                level: oMDCChart.getHeaderLevel()
+                level: oMDCChart.getHeaderLevel(),
+                width: oMDCChart.getHeaderVisible() ? undefined : "0px"
             });
             this.addBegin(this._oTitle);
 
             /** variant management */
-            if (oMDCChart.getVariant()){
-                this.addVariantManagement(oMDCChart.getVariant());
+            if (oMDCChart.getAggregation("variant")){
+                this.addVariantManagement(oMDCChart.getAggregation("variant"));
             }
 
             /**add end **/
@@ -118,6 +126,10 @@ sap.ui.define([
                     tooltip: MDCRb.getText("chart.CHART_DRILLDOWN_TITLE"),
 					text: MDCRb.getText("chart.CHART_DRILLDOWN_TITLE"),
                     enabled: false,
+                    ariaHasPopup: AriaHasPopup.ListBox,
+                    layoutData: new OverflowToolbarLayoutData({
+                        closeOverflowOnInteraction: false
+                    }),
                     press: function (oEvent) {
                         oMDCChart._showDrillDown(this._oDrillDownBtn);
                     }.bind(this)
@@ -166,10 +178,11 @@ sap.ui.define([
                 //Enabled via toggleZoomButtons()
             }
 
-            if (aP13nMode.indexOf("Sort") > -1 || aP13nMode.indexOf("Item") > -1) {
+            if (aP13nMode.indexOf("Sort") > -1 || aP13nMode.indexOf("Item") > -1 || aP13nMode.indexOf("Filter") > -1) {
                 this._oSettingsBtn = new OverflowButton(oMDCChart.getId() + "-chart_settings", {
                     icon: "sap-icon://action-settings",//TODO the right icon for P13n chart dialog
                     tooltip: MDCRb.getText('chart.SETTINGS'),
+                    text: MDCRb.getText('chart.SETTINGS'),
                     enabled: false,
                     press: function (oEvent) {
                         var aP13nMode = oMDCChart.getP13nMode();
@@ -188,12 +201,25 @@ sap.ui.define([
                         }
                     }
                 });
+
+                ShortcutHintsMixin.addConfig(this._oSettingsBtn, {
+					addAccessibilityLabel: true,
+					messageBundleKey: Device.os.macintosh ? "mdc.PERSONALIZATION_SHORTCUT_MAC" : "mdc.PERSONALIZATION_SHORTCUT" // Cmd+, or Ctrl+,
+				},
+				this
+                );
+
                 this.addEnd(this._oSettingsBtn);
                 this._chartInternalButtonsToEnable.push(this._oSettingsBtn);
             }
 
             if (oMDCChart._getTypeBtnActive()) {
-                this._oChartTypeBtn = new ChartTypeButton(oMDCChart);
+                this._oChartTypeBtn = new ChartTypeButton(oMDCChart, {
+                    ariaHasPopup: AriaHasPopup.ListBox,
+                    layoutData: new OverflowToolbarLayoutData({
+                        closeOverflowOnInteraction: false
+                    })
+                });
                 this._oChartTypeBtn.setEnabled(false);
                 this.addEnd(this._oChartTypeBtn);
                 this._chartInternalButtonsToEnable.push(this._oChartTypeBtn);
@@ -271,6 +297,10 @@ sap.ui.define([
             }
         };
 
+        ChartToolbar.prototype._getVariantReference = function() {
+            return this._oVariantManagement;
+        };
+
         ChartToolbar.prototype._getZoomEnablement = function (oMDCChart) {
             var zoomInfo;
 
@@ -336,6 +366,20 @@ sap.ui.define([
 
         ChartToolbar.prototype._setHeaderLevel = function(sHeaderLevel) {
             this._oTitle.setLevel(sHeaderLevel);
+        };
+
+        ChartToolbar.prototype.setHeaderVisible = function(bVisible) {
+            if (this._oTitle) {
+                this._oTitle.setWidth(bVisible ? undefined : "0px");
+            }
+        };
+
+        /**
+         * @private
+         * @ui5-restricted sap.ui.mdc
+         */
+        ChartToolbar.prototype.getSettingsButton = function() {
+            return this._oSettingsBtn;
         };
 
         return ChartToolbar;

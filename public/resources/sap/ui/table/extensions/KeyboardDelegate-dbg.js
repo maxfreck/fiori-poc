@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -65,7 +65,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.base.Object
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.extensions.KeyboardDelegate
@@ -154,7 +154,10 @@ sap.ui.define([
 			}
 		}
 
-		if (oCellInfo.rowIndex === oTable.getRows().length - 1) {
+		if (oCellInfo.rowIndex === oTable.getRows().length - 1
+			|| (TableUtils.isVariableRowHeightEnabled(oTable) // ignore empty buffer row
+				&& oCellInfo.rowIndex === oTable.getRows().length - 2
+				&& oTable.getRows()[oCellInfo.rowIndex + 1].getRowBindingContext() === null)) {
 			// Leave the action mode when trying to navigate down on the last row.
 			if (!bActionMode && $ParentCell) {
 				$ParentCell.trigger("focus"); // A non-interactive element inside a cell is focused, focus the cell this element is inside.
@@ -993,7 +996,11 @@ sap.ui.define([
 
 		} else if ($Target.hasClass("sapUiTableCtrlAfter")) {
 			if (!TableUtils.isNoDataVisible(this)) {
-				restoreFocusOnLastFocusedDataCell(this, oEvent);
+				if (this._getRowMode().getHideEmptyRows && this._getRowMode().getHideEmptyRows()) {
+					setFocusOnColumnHeaderOfLastFocusedDataCell(this, oEvent);
+				} else {
+					restoreFocusOnLastFocusedDataCell(this, oEvent);
+				}
 			}
 		}
 
@@ -1154,7 +1161,7 @@ sap.ui.define([
 	};
 
 	KeyboardDelegate.prototype.oncontextmenu = function(oEvent) {
-		if (oEvent.isMarked("handledByPointerExtension")) {
+		if (oEvent.isMarked("sapUiTableHandledByPointerExtension")) {
 			return;
 		}
 
@@ -1268,7 +1275,9 @@ sap.ui.define([
 			}
 
 		} else if (oCellInfo.isOfType(CellType.ANYCOLUMNHEADER)) {
-			if (TableUtils.isNoDataVisible(this)) {
+			if (this.getCreationRow() && this.getCreationRow().getVisible() && !TableUtils.hasData(this)) {
+				forwardFocusToTabDummy(this, "sapUiTableCtrlAfter");
+			} else if (TableUtils.isNoDataVisible(this)) {
 				this.$("noDataCnt").trigger("focus");
 				oEvent.preventDefault();
 			} else if (this.getRows().length > 0) {

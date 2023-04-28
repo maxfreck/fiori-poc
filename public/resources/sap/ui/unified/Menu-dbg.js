@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -61,7 +61,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IContextMenu
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.21.0
 	 *
 	 * @constructor
@@ -413,6 +413,8 @@ sap.ui.define([
 	 */
 	Menu.prototype.open = function(bWithKeyboard, oOpenerRef, my, at, of, offset, collision){
 		var oNextSelectableItem;
+
+		this._bLeavingMenu = false;
 
 		if (this.bOpen) {
 			return;
@@ -795,6 +797,7 @@ sap.ui.define([
 	Menu.prototype.onsapbackspacemodifiers = Menu.prototype.onsapbackspace;
 
 	Menu.prototype.onsapescape = function(oEvent){
+		this._bLeavingMenu = true;
 		this.close(true);
 		oEvent.preventDefault();
 		oEvent.stopPropagation();
@@ -804,6 +807,7 @@ sap.ui.define([
 		if (this.isSubMenu()){
 			oEvent.preventDefault();
 		}
+		this._bLeavingMenu = true;
 		this.close(true);
 		oEvent.stopPropagation();
 	};
@@ -1100,53 +1104,31 @@ sap.ui.define([
 	};
 
 	Menu.prototype.getNextSelectableItem = function(iIdx){
-		var oItem = null;
 		var aItems = this.getItems();
+		var oItem = aItems[iIdx];
 
 		// At first, start with the next index
 		for (var i = iIdx + 1; i < aItems.length; i++) {
 			if (aItems[i].getVisible() && this.checkEnabled(aItems[i])) {
-				oItem = aItems[i];
-				break;
+				return aItems[i];
 			}
 		}
 
-		// If nothing found, start from the beginning
-		if (!oItem) {
-			for (var i = 0; i <= iIdx; i++) {
-				if (aItems[i].getVisible() && this.checkEnabled(aItems[i])) {
-					oItem = aItems[i];
-					break;
-				}
-			}
-		}
-
-		return oItem;
+		return oItem && oItem.getVisible() && this.checkEnabled(oItem) ? oItem : null;
 	};
 
 	Menu.prototype.getPreviousSelectableItem = function(iIdx){
-		var oItem = null;
 		var aItems = this.getItems();
+		var oItem = aItems[iIdx];
 
 		// At first, start with the previous index
 		for (var i = iIdx - 1; i >= 0; i--) {
 			if (aItems[i].getVisible() && this.checkEnabled(aItems[i])) {
-				oItem = aItems[i];
-				break;
+				return aItems[i];
 			}
 		}
 
-		// If nothing found, start from the end
-		if (!oItem) {
-			for (var i = aItems.length - 1; i >= iIdx; i--) {
-				if (aItems[i].getVisible() && this.checkEnabled(aItems[i])) {
-					oItem = aItems[i];
-					break;
-				}
-			}
-		}
-
-		return oItem;
+		return oItem && oItem.getVisible() && this.checkEnabled(oItem) ? oItem : null;
 	};
 
 	Menu.prototype.setRootMenuTopStyle = function(bUseTopStyle){

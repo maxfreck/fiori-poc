@@ -2,7 +2,7 @@
 
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -620,6 +620,29 @@ html.sap-tablet .sapUiCalYearPicker .sapUiCalItemSel:not(:focus) {
 .sapUiUnifiedLegendNonWorkingDay > .sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
 	background: @sapUiHcReducedBackground;
 }
+
+.sapUiUnifiedLegendItem {
+	position: relative;
+
+	&:focus {
+		outline: none;
+		&::after {
+			content: "";
+			position: absolute;
+			box-sizing: border-box;
+			left: 0.0625rem;
+			top: 0.0625rem;
+			right: 0.0625rem;
+			bottom: 0.0625rem;
+			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			pointer-events: none;
+		}
+	}
+
+	.sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
+		border-radius: 0;
+	}
+}
 /* END "CalendarLegend.less" */
 
 /* START "CalendarRow.less" */
@@ -762,6 +785,10 @@ html.sap-desktop .sapUiCalendarApp:hover:not(:active) > .sapUiCalendarAppCont{
 
 .sapUiMnuItm:focus {
 	outline: 2px dotted @sapUiContentFocusColor;
+}
+
+.sapUiMnuItm .sapUiMnuItmTxt {
+	padding-left: 2rem;
 }
 
 /* TODO remove after the end of support for Internet Explorer */

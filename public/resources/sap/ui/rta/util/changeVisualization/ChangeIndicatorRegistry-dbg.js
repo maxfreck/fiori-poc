@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -39,7 +39,7 @@ sap.ui.define([
 	 * @alias sap.ui.rta.util.changeVisualization.ChangeIndicatorRegistry
 	 * @author SAP SE
 	 * @since 1.86.0
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 */
 	var ChangeIndicatorRegistry = ManagedObject.extend("sap.ui.rta.util.changeVisualization.ChangeIndicatorRegistry", {
@@ -145,6 +145,18 @@ sap.ui.define([
 		return oChangeIndicators;
 	};
 
+	ChangeIndicatorRegistry.prototype.getRelevantChangesWithSelector = function () {
+		var oSelectors = this.getSelectorsWithRegisteredChanges();
+		var aRelevantChanges = [];
+		Object.keys(oSelectors).forEach(function(sSelectorId) {
+			var aRelevantChangesForSelector = oSelectors[sSelectorId].filter(function (oChange) {
+				return !oChange.dependent;
+			});
+			aRelevantChanges = aRelevantChanges.concat(aRelevantChangesForSelector);
+		});
+		return aRelevantChanges;
+	};
+
 	/**
 	 * Returns the registered change indicator for the given element ID.
 	 *
@@ -195,8 +207,8 @@ sap.ui.define([
 			}
 
 			if (oChange.getState() === "NEW") {
-				aChangeStates = [ChangeStates.DIRTY, ChangeStates.DRAFT];
-			} else if (aDraftChangesList && aDraftChangesList.includes(oChange.getFileName())) {
+				aChangeStates = ChangeStates.getDraftAndDirtyStates();
+			} else if (aDraftChangesList && aDraftChangesList.includes(oChange.getId())) {
 				aChangeStates = [ChangeStates.DRAFT];
 			} else {
 				aChangeStates = [ChangeStates.ACTIVATED];
@@ -230,7 +242,7 @@ sap.ui.define([
 		return getInfoFromChangeHandler(oAppComponent, oChange)
 			.then(function(oInfoFromChangeHandler) {
 				var mVisualizationInfo = oInfoFromChangeHandler || {};
-				var aAffectedElementIds = getSelectorIds(mVisualizationInfo.affectedControls || [oChange.getSelector()]);
+				var aAffectedElementIds = getSelectorIds(mVisualizationInfo.affectedControls || oChange.getSelector && [oChange.getSelector()] || []);
 
 				return {
 					affectedElementIds: aAffectedElementIds,
@@ -243,7 +255,7 @@ sap.ui.define([
 	}
 
 	function getInfoFromChangeHandler(oAppComponent, oChange) {
-		var oControl = JsControlTreeModifier.bySelector(oChange.getSelector(), oAppComponent);
+		var oControl = oChange.getSelector && JsControlTreeModifier.bySelector(oChange.getSelector(), oAppComponent);
 		if (oControl) {
 			return ChangesWriteAPI.getChangeHandler({
 				changeType: oChange.getChangeType(),
@@ -252,7 +264,10 @@ sap.ui.define([
 				layer: oChange.getLayer()
 			})
 				.then(function(oChangeHandler) {
-					if (oChangeHandler && typeof oChangeHandler.getChangeVisualizationInfo === "function") {
+					if (
+						oChangeHandler && typeof oChangeHandler.getChangeVisualizationInfo === "function"
+						&& oChange.isSuccessfullyApplied && oChange.isSuccessfullyApplied()
+					) {
 						return oChangeHandler.getChangeVisualizationInfo(oChange, oAppComponent);
 					}
 					return undefined;
@@ -306,6 +321,18 @@ sap.ui.define([
 	ChangeIndicatorRegistry.prototype.removeOutdatedRegisteredChanges = function () {
 		this.getAllRegisteredChanges().forEach(function(oChange) {
 			if (oChange.visualizationInfo && oChange.visualizationInfo.updateRequired) {
+				this.removeRegisteredChange(oChange.change.getId());
+			}
+		}.bind(this));
+	};
+
+	/**
+	 * Removes changes without any displayElementIds from the registry so the change can be re-registered and
+	 * the visualizationInfo is updated => if an element is inside a dialog which hasn't been opened yet
+	 */
+	ChangeIndicatorRegistry.prototype.removeRegisteredChangesWithoutVizInfo = function () {
+		this.getAllRegisteredChanges().forEach(function(oChange) {
+			if (oChange.visualizationInfo && oChange.visualizationInfo.displayElementIds.length === 0) {
 				this.removeRegisteredChange(oChange.change.getId());
 			}
 		}.bind(this));

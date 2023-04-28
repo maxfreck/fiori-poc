@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,7 +26,7 @@ sap.ui.define([
 	 * @extends sap.ui.mdc.util.PropertyHelper
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @experimental
@@ -37,7 +37,40 @@ sap.ui.define([
 		constructor: function(aProperties, oParent) {
 			PropertyHelperBase.call(this, aProperties, oParent, {
 				filterable: true,
-				sortable: true
+				sortable: true,
+				propertyInfos: true,
+
+				//Additional attributes
+				groupable: {
+					type: "boolean"
+				},
+				aggregatable: {
+					type: "boolean"
+				},
+				propertyPath: {
+					type: "string"
+				},
+				aggregationMethod : {
+					type: "string"
+				},
+				role : {
+					type: "string"
+				},
+				datapoint : {
+					type: "object"
+				},
+				criticality : {
+					type: "object"
+				},
+				textProperty : {
+					type: "string"
+				},
+				availableRoles : {
+					type: "object"
+				},
+				kind: {
+					type: "string"
+				}
 			});
 		}
 	});
@@ -68,12 +101,12 @@ sap.ui.define([
 		};
 	};
 
-		/**
-		 * This returns the layout options for a specific type of Item (measure/dimension,groupable/aggregatable)
-		 * It is used by p13n to determine which layout options to show in the p13n panel
-		 * @param {string} sType the type for which the layout options are requested
-		 */
-		PropertyHelper.prototype._getLayoutOptionsForType = function(sType){
+	/**
+	 * This returns the layout options for a specific type of Item (measure/dimension,groupable/aggregatable)
+	 * It is used by p13n to determine which layout options to show in the p13n panel
+	 * @param {string} sType the type for which the layout options are requested
+	 */
+	PropertyHelper.prototype._getLayoutOptionsForType = function(sType){
 		var MDCRb = sap.ui.getCore().getLibraryResourceBundle("sap.ui.mdc");
 		var oAvailableRoles = {
 			groupable: [

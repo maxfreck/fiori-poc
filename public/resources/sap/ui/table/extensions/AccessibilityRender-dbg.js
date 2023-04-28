@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,7 +42,7 @@ sap.ui.define([
 	 * @class Extension for sap.ui.table.TableRenderer which handles ACC related things.
 	 * @extends sap.ui.table.extensions.ExtensionBase
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.extensions.AccessibilityRender
@@ -82,16 +82,6 @@ sap.ui.define([
 			_writeAccText(oRm, sTableId, "ariacount");
 			// aria description for toggling the edit mode
 			_writeAccText(oRm, sTableId, "toggleedit", TableUtils.getResourceText("TBL_TOGGLE_EDIT_KEY"));
-			// aria description for select all button
-			var bAllRowsSelected = TableUtils.areAllRowsSelected(oTable);
-			var mRenderConfig = oTable._getSelectionPlugin().getRenderConfig();
-			var sSelectAllResourceTextID;
-			if (mRenderConfig.headerSelector.type === "toggle") {
-				sSelectAllResourceTextID = bAllRowsSelected ? "TBL_DESELECT_ALL" : "TBL_SELECT_ALL";
-			} else if (mRenderConfig.headerSelector.type === "clear") {
-				sSelectAllResourceTextID = "TBL_DESELECT_ALL";
-			}
-			_writeAccText(oRm, sTableId, "ariaselectall", TableUtils.getResourceText(sSelectAllResourceTextID));
 			// aria label for group rows
 			_writeAccText(oRm, sTableId, "ariarowgrouplabel", TableUtils.getResourceText("TBL_ROW_GROUP_LABEL"));
 			// aria label for grand total sums

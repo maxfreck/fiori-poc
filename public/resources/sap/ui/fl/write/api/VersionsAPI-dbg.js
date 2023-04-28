@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -157,11 +157,13 @@ sap.ui.define([
 		if (!mPropertyBag.layer) {
 			return Promise.reject("No layer was provided");
 		}
-		if (mPropertyBag.version === undefined) {
-			var oModel = getVersionsModel(mPropertyBag);
-			if (oModel) {
+		var oModel = getVersionsModel(mPropertyBag);
+		if (oModel) {
+			if (mPropertyBag.version === undefined) {
 				mPropertyBag.version = oModel.getProperty("/activeVersion");
 			}
+			oModel.setProperty("/displayedVersion", mPropertyBag.version);
+			oModel.setProperty("/persistedVersion", mPropertyBag.version);
 		}
 
 		var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);

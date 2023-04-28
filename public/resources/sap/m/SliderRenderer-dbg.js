@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -61,6 +61,10 @@ sap.ui.define(['./SliderUtilities', "sap/ui/core/InvisibleText", "sap/ui/core/Co
 
 			oRm.openEnd();
 
+			if (oSlider.getEnableTickmarks()) {
+				this.renderTickmarks(oRm, oSlider);
+			}
+
 			if (oSlider.getProgress()) {
 				this.renderProgressIndicator(oRm, oSlider, sSliderLabels);
 			}
@@ -68,9 +72,6 @@ sap.ui.define(['./SliderUtilities', "sap/ui/core/InvisibleText", "sap/ui/core/Co
 			this.renderHandles(oRm, oSlider, sSliderLabels);
 			oRm.close("div");
 
-			if (oSlider.getEnableTickmarks()) {
-				this.renderTickmarks(oRm, oSlider);
-			}
 
 			this.renderLabels(oRm, oSlider);
 

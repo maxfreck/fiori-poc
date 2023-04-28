@@ -1,14 +1,21 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	"sap/ui/rta/command/BaseCommand",
 	"sap/ui/rta/library",
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/Utils"
-], function(BaseCommand, rtaLibrary, JsControlTreeModifier, flUtils) {
+], function(
+	BaseCommand,
+	rtaLibrary,
+	JsControlTreeModifier,
+	ControlVariantApplyAPI,
+	flUtils
+) {
 	"use strict";
 
 	/**
@@ -17,7 +24,7 @@ sap.ui.define([
 	 * @class
 	 * @extends sap.ui.rta.command.BaseCommand
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.50
@@ -65,7 +72,7 @@ sap.ui.define([
 		var oVariantManagementControlBinding = oVariantManagementControl.getTitle().getBinding("text");
 
 		this.oAppComponent = flUtils.getAppComponentForControl(oVariantManagementControl);
-		this.oModel = this.oAppComponent.getModel(flUtils.VARIANT_MODEL_NAME);
+		this.oModel = this.oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 		this.sVariantManagementReference = JsControlTreeModifier.getSelector(oVariantManagementControl, this.oAppComponent).id;
 		this.sCurrentVariant = this.oModel.getCurrentVariantReference(this.sVariantManagementReference);
 

@@ -1,12 +1,13 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"sap/ui/core/Core"
-], function (Core) {
+	"sap/ui/core/Core",
+	"sap/base/Log"
+], function (Core, Log) {
 	"use strict";
 
 	/**
@@ -43,7 +44,7 @@ sap.ui.define([
 	 * </ul>
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @alias sap.ui.mdc.mixin.FilterIntegrationMixin
 	 * @namespace
 	 * @since 1.82.0
@@ -175,7 +176,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 * @ui5-restricted sap.fe
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.98
 	 */
 	FilterIntegrationMixin.rebind = function() {
@@ -221,11 +222,37 @@ sap.ui.define([
 
 	};
 
+	FilterIntegrationMixin._getLabelsFromFilterConditions = function() {
+		var aLabels = [];
+
+		if (this.getFilterConditions) {
+			var aFilterConditions = this.getFilterConditions();
+			Object.keys(aFilterConditions).forEach(function(oConditionKey){
+
+				if (!aFilterConditions[oConditionKey] || aFilterConditions[oConditionKey].length < 1) {
+					return;
+				}
+
+				var sLabel = this.getPropertyHelper().getProperty(oConditionKey) ? this.getPropertyHelper().getProperty(oConditionKey).label : oConditionKey; //TODO the property for the filter might not exitst when you select a variant
+
+				if (sLabel) {
+					aLabels.push(sLabel);
+				}
+				if (!sLabel || sLabel === oConditionKey) {
+					Log.error("No valid property found for filter with key " + oConditionKey + ". Check your metadata.");
+				}
+			}.bind(this));
+		}
+
+		return aLabels;
+	};
+
 	return function () {
 
         this.setFilter = FilterIntegrationMixin.setFilter;
 		this._validateFilter = FilterIntegrationMixin._validateFilter;
         this.rebind = FilterIntegrationMixin.rebind;
+		this._getLabelsFromFilterConditions = FilterIntegrationMixin._getLabelsFromFilterConditions;
 	};
 
 });

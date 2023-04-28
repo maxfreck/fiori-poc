@@ -1,6 +1,6 @@
 /*!
 * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
 */
 
@@ -26,6 +26,9 @@ sap.ui.require([
 	});
 	CustomElementCardEditor.prototype.getCurrentSettings = function () {
 		return this._getControl().getCurrentSettings();
+	};
+	CustomElementCardEditor.prototype.getSeparatePreview = function () {
+		return this._getControl().getSeparatePreview();
 	};
 	var aDependencies = ["ui-integration-card"];
 	CustomElementBase.define("ui-integration-card-editor", CustomElementCardEditor, aDependencies);

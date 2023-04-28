@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -19,7 +19,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -32,9 +32,9 @@ sap.ui.define([
 			properties: {
 
 				/**
-				 * The maximum number of items (table rows) set to the table
+				 * The minimum number of items (table rows) set to the table
 				 */
-				maxItems: {
+				minItems: {
 					type : "int",
 					group : "Misc"
 				},
@@ -52,7 +52,7 @@ sap.ui.define([
 		renderer: {
 			apiVersion: 2,
 			render: function (oRm, oControl) {
-				var iMaxItems = oControl.getMaxItems(),
+				var iMinItems = oControl.getMinItems(),
 					iColumns = oControl.getColumns(),
 					bHasActualContent = oControl.getParent()._getTable().getColumns().length,
 					// set title for screen reader
@@ -77,7 +77,7 @@ sap.ui.define([
 
 				oRm.openEnd();
 
-				for (var i = 0; i < iMaxItems + 1; i++) { // number of rows + header
+				for (var i = 0; i < iMinItems + 1; i++) { // number of rows + header
 					oRm.openStart("div")
 						.class("sapFCardTablePlaceholderItem")
 						.style("height", oControl.getItemHeight())

@@ -8,7 +8,13 @@
 		},
 		{
 			"name": "Calendar.less",
-			"size": 20143,
+			"size": 21457,
+			"designtime": true,
+			"theme": "sap_horizon_hcb"
+		},
+		{
+			"name": "CalendarLegend.less",
+			"size": 652,
 			"designtime": true,
 			"theme": "sap_horizon_hcb"
 		},
@@ -61,13 +67,13 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 138174,
+			"size": 147305,
 			"designtime": true,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 137798,
+			"size": 146929,
 			"designtime": true,
 			"theme": "sap_horizon_hcb"
 		},
@@ -78,7 +84,7 @@
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 174828,
+			"size": 176769,
 			"theme": "sap_horizon_hcb"
 		},
 		{
@@ -89,34 +95,34 @@
 		},
 		{
 			"name": "library.css",
-			"size": 174693,
+			"size": 176630,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "library.less",
-			"size": 41666,
+			"size": 43700,
 			"designtime": true,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "library.source.less",
-			"size": 551,
+			"size": 582,
 			"designtime": true,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 186483,
+			"size": 188517,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 186348,
+			"size": 188378,
 			"theme": "sap_horizon_hcb"
 		},
 		{
 			"name": "resources.json",
-			"size": 2218
+			"size": 2330
 		}
 	]
 }

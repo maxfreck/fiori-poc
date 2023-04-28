@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -71,6 +71,7 @@ sap.ui.define([
 					}
 				});
 
+				// TODO: need to update wording or add description
 				var oModel = new JSONModel({
 					publishVersionEnabled: bPublishVersionEnabled,
 					versioningEnabled: bVersioningEnabled,
@@ -174,7 +175,7 @@ sap.ui.define([
 	 *
 	 * @namespace sap.ui.fl.write._internal.Versions
 	 * @since 1.74
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl
 	 */
@@ -196,6 +197,9 @@ sap.ui.define([
 		return Settings.getInstance()
 			.then(function (oSettings) {
 				var bVersionsEnabled = oSettings.isVersioningEnabled(sLayer);
+				if (_mInstances && _mInstances[sReference] && _mInstances[sReference][sLayer]) {
+					return _mInstances[sReference][sLayer];
+				}
 				var aVersionsPromise = bVersionsEnabled ? Storage.versions.load(mPropertyBag) : Promise.resolve([]);
 				return aVersionsPromise
 					.then(function (aVersions) {
@@ -249,15 +253,22 @@ sap.ui.define([
 	 * @param {object} mPropertyBag - Property Bag
 	 * @param {string} mPropertyBag.reference - ID of the application for which the versions are requested (this reference must not contain the ".Component" suffix)
 	 * @param {string} mPropertyBag.layer - Layer for which the versions should be retrieved
+	 * @param {boolean} [mPropertyBag.contextBasedAdaptation] - Parameter that indicates whether or not a new backend draft was triggered via contextBasedAdaptationsAPI
+	 * @param {array} [mPropertyBag.draftFilenames] - Array with filesnames which was saved as draft
 	 */
 	Versions.onAllChangesSaved = function (mPropertyBag) {
 		mPropertyBag.reference = Utils.normalizeReference(mPropertyBag.reference);
 		var oModel = Versions.getVersionsModel(mPropertyBag);
 		var bVersioningEnabled = oModel.getProperty("/versioningEnabled");
 		var bDirtyChanges = oModel.getProperty("/dirtyChanges");
+		var aDraftFilenames = oModel.getProperty("/draftFilenames");
+		oModel.setProperty("/draftFilenames", aDraftFilenames.concat(mPropertyBag.draftFilenames));
 		oModel.setProperty("/dirtyChanges", true);
-		oModel.setProperty("/backendDraft", bVersioningEnabled && bDirtyChanges);
+		oModel.setProperty("/backendDraft", bVersioningEnabled && bDirtyChanges || !!mPropertyBag.contextBasedAdaptation);
 		oModel.updateDraftVersion();
+		// Save can happen without a reload and the model must be kept up-to-date
+		oModel.setProperty("/persistedVersion", Version.Number.Draft);
+		oModel.updateBindings(true);
 	};
 
 	/**
@@ -342,7 +353,8 @@ sap.ui.define([
 			oModel.setProperty("/dirtyChanges", false);
 			oModel.setProperty("/draftAvailable", false);
 			oModel.setProperty("/activateEnabled", false);
-			oModel.setProperty("/displayedVersion", oModel.getProperty("/persistedVersion"));
+			oModel.setProperty("/displayedVersion", oModel.getProperty("/activeVersion"));
+			oModel.setProperty("/persistedVersion", oModel.getProperty("/activeVersion"));
 			oModel.updateBindings(true);
 			// in case of a existing draft known by the backend;
 			// we remove dirty changes only after successful DELETE request

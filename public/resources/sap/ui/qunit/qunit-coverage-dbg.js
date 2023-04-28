@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -132,12 +132,17 @@
 		// add a QUnit configuration option in the Toolbar to enable/disable
 		// client-side instrumentation via blanket (done manually because in
 		// this case blanket will not be loaded and executed)
-		QUnit.config.urlConfig.push({
-			id: "coverage",
-			label: "Enable coverage",
-			tooltip: "Enable code coverage."
+		var bHasCoverageCheckbox = QUnit.config.urlConfig.some(function (oConf) {
+			return oConf.id === "coverage";
 		});
 
+		if (!bHasCoverageCheckbox) {
+			QUnit.config.urlConfig.push({
+				id: "coverage",
+				label: "Enable coverage",
+				tooltip: "Enable code coverage."
+			});
+		}
 	}
 
 })();

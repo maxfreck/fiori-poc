@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -58,7 +58,7 @@ sap.ui.define([
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @public
 	 * @alias sap.m.Image
@@ -237,6 +237,7 @@ sap.ui.define([
 
 				/**
 				 * Event is fired when the user clicks on the control. (This event is deprecated, use the press event instead)
+				 * @deprecated As of version 1.107.0
 				 */
 				tap : {},
 
@@ -534,7 +535,11 @@ sap.ui.define([
 	 * @private
 	 */
 	Image.prototype.ontouchstart = function(oEvent) {
+		/**
+		 * @deprecated event
+		 */
 		if (oEvent.srcControl.mEventRegistry["press"] || oEvent.srcControl.mEventRegistry["tap"]) {
+
 			// mark the event for components that needs to know if the event was handled by the Image
 			oEvent.setMarked();
 		}
@@ -596,6 +601,9 @@ sap.ui.define([
 	 * @private
 	 */
 	Image.prototype.ontap = function(oEvent) {
+		/**
+		 * @deprecated event
+		 */
 		this.fireTap({/* no parameters */}); //	(This event is deprecated, use the press event instead)
 		this.firePress({/* no parameters */});
 	};
@@ -847,7 +855,8 @@ sap.ui.define([
 	 *
 	 * @see sap.ui.core.Control#getAccessibilityInfo
 	 * @protected
-	 * @returns {object} The <code>sap.m.Image</code> accessibility information
+	 * @returns {sap.ui.core.AccessibilityInfo}
+	 * The object contains the accessibility information for <code>sap.m.Image</code>
 	 */
 	Image.prototype.getAccessibilityInfo = function() {
 		var bHasPressListeners = this.hasListeners("press");

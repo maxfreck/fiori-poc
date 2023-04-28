@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -19,7 +19,7 @@ sap.ui.define(["./PluginBase", "sap/ui/core/Core", "sap/ui/base/ManagedObjectObs
 	 *
 	 * @extends sap.ui.core.Element
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @public
 	 * @since 1.73
@@ -57,7 +57,7 @@ sap.ui.define(["./PluginBase", "sap/ui/core/Core", "sap/ui/base/ManagedObjectObs
 					 */
 					dataState: {type: "sap.ui.model.DataState"},
 					/**
-					 * The messages (@see sap.ui.core.message.Message) from the current <code>dataState</code> object filtered by the given <code>filter</code> function.
+					 * The messages ({@link sap.ui.core.message.Message}) from the current <code>dataState</code> object filtered by the given <code>filter</code> function.
 					 */
 					filteredMessages: {type: "object[]"}
 				}

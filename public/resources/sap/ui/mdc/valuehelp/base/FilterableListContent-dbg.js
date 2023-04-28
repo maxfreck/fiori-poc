@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,7 +11,7 @@ sap.ui.define([
 	'sap/ui/mdc/enum/ConditionValidated',
 	'sap/ui/mdc/util/Common',
 	'sap/ui/mdc/enum/PersistenceMode',
-	'sap/ui/mdc/p13n/Engine',
+	'sap/m/p13n/Engine',
 	'sap/base/util/merge',
 	'sap/ui/mdc/p13n/StateUtil'
 ], function(
@@ -30,15 +30,18 @@ sap.ui.define([
 	/**
 	 * Constructor for a new <code>FilterableListContent</code>.
 	 *
+	 * This is the basis for different value help list contents with filter functionality. It cannot be used directly.
+	 *
 	 * @param {string} [sId] ID for the new element, generated automatically if no ID is given
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element.
 	 * @extends sap.ui.mdc.valuehelp.base.ListContent
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.base.FilterableListContent
@@ -130,8 +133,10 @@ sap.ui.define([
 	};
 
 	FilterableListContent.prototype._handleFilterValueUpdate = function (oChanges) {
-		if (this.isContainerOpen()) { // TODO: only visible content if multiple contens on dialog
-			this.applyFilters(this._getPriorityFilterValue());
+		if (this.isContainerOpening() || this.isContainerOpen()) {
+			Promise.resolve(this.applyFilters()).finally(function () {
+				ListContent.prototype._handleFilterValueUpdate.apply(this, arguments);
+			}.bind(this));
 		}
 	};
 
@@ -141,7 +146,7 @@ sap.ui.define([
 		return oDelegate ? oDelegate.reduceIFilterConditions(oPayload, this, oConditions) : oConditions;
 	};
 
-	FilterableListContent.prototype.applyFilters = function (sSearch) {
+	FilterableListContent.prototype.applyFilters = function () {
 
 	};
 
@@ -231,7 +236,7 @@ sap.ui.define([
 			var FilterBar = aModules[0];
 			var oFilterBar = new FilterBar(this.getId() + "-FB", {
 				liveMode: false, // !oWrapper.isSuspended(), // if suspended, no live search
-				showGoButton: false
+				showGoButton: true
 			});
 			_setBasicSearch.call(this, oFilterBar);
 			this.setAggregation("_defaultFilterBar", oFilterBar, true);
@@ -242,7 +247,7 @@ sap.ui.define([
 	FilterableListContent.prototype._handleSearch = function (oEvent) {
 		var oFilterBar = oEvent.getSource();
 		this._setLocalFilterValue(oFilterBar.getSearch());
-		this.applyFilters(this._getPriorityFilterValue());
+		this.applyFilters();
 
 	};
 
@@ -338,10 +343,6 @@ sap.ui.define([
 		return this._oCollectiveSearchSelect && this._oCollectiveSearchSelect.getSelectedItemKey();
 	};
 
-	FilterableListContent.prototype.getListBinding = function () {
-		throw new Error("FilterableListContent: Every filterable listcontent must implement this method.");
-	};
-
 	FilterableListContent.prototype._getListBindingInfo = function () {
 		throw new Error("FilterableListContent: Every filterable listcontent must implement this method.");
 	};
@@ -349,6 +350,10 @@ sap.ui.define([
 	FilterableListContent.prototype._getListItemBindingContext = function (oItem) {
 		var sModelName = this._getListBindingInfo().model;
 		return oItem && oItem.getBindingContext(sModelName);
+	};
+
+	FilterableListContent.prototype.getInitialFocusedControl = function() {
+		return this._getPriorityFilterBar().getInitialFocusedControl();
 	};
 
 	FilterableListContent.prototype._getTypesForConditions = function (oConditions) {
@@ -415,6 +420,20 @@ sap.ui.define([
 		}
 	};
 
+	FilterableListContent.prototype._applyFiltersIfNecessary = function () {
+		var oListBinding = this.getListBinding();
+		var oListBindingInfo = this._getListBindingInfo();
+		var bBindingSuspended = oListBinding && oListBinding.isSuspended();
+		var bBindingWillBeSuspended = !oListBinding && oListBindingInfo && oListBindingInfo.suspended;
+
+		if ((bBindingSuspended || bBindingWillBeSuspended) && !this.isTypeahead()) { // in dialog case do not resume suspended table on opening
+			return undefined;
+		}
+
+		// apply filters before opening
+		return this.applyFilters();
+	};
+
 	FilterableListContent.prototype.onBeforeShow = function(bInitial) {
 		if (bInitial) {
 			var oDelegate = this._getValueHelpDelegate();
@@ -422,39 +441,23 @@ sap.ui.define([
 				this._oInitialFilterConditions = oConditions;
 
 				var oFilterBar = this._getPriorityFilterBar();
-				if (oFilterBar) {
-					var sFilterFields =  this.getFilterFields();
-					var oNewConditions = merge({}, this._oInitialFilterConditions), oStateBefore;
+				if (oFilterBar) { // apply initial conditions to filterbar if existing
+					var sFilterFields = this.getFilterFields();
+					var oNewConditions = merge({}, this._oInitialFilterConditions);
 					return Promise.resolve(!oNewConditions[sFilterFields] && StateUtil.retrieveExternalState(oFilterBar).then(function (oState) {
-						oStateBefore = oState;
 						if (bInitial) {
+							_addSearchConditionToConditionMap(oNewConditions, sFilterFields, this._getPriorityFilterValue());
 							return StateUtil.diffState(oFilterBar, oState, {filter: oNewConditions});
 						}
-					})).then(function (oStateDiff) {
-						_addSearchConditionToConditionMap(oStateDiff.filter, sFilterFields, this._getPriorityFilterValue(), oStateBefore.filter);
+					}.bind(this))).then(function (oStateDiff) {
 						return StateUtil.applyExternalState(oFilterBar, oStateDiff);
-					}.bind(this));
+					}).then(this._applyFiltersIfNecessary.bind(this));
+				} else {
+					return this._applyFiltersIfNecessary();
 				}
 			}.bind(this));
 		}
 		return undefined;
-	};
-
-	FilterableListContent.prototype.onShow = function (bInitial) {
-		ListContent.prototype.onShow.apply(this, arguments);
-
-		if (bInitial) {
-			var oListBinding = this.getListBinding();
-			var oListBindingInfo = this._getListBindingInfo();
-			var bBindingSuspended = oListBinding && oListBinding.isSuspended();
-			var bBindingWillBeSuspended = !oListBinding && oListBindingInfo && oListBindingInfo.suspended;
-
-			if ((bBindingSuspended || bBindingWillBeSuspended) && !this.isTypeahead()) {
-				return; // in dialog case do not resume suspended table on opening
-			}
-
-			this.applyFilters(this._getPriorityFilterValue());
-		}
 	};
 
 	FilterableListContent.prototype._fireSelect = function (oChange) {
@@ -510,38 +513,12 @@ sap.ui.define([
 		return this.getFilterValue();
 	};
 
-	function _getSearchCondition (sFilterValue) {
-		return Condition.createCondition("Contains", [sFilterValue], undefined, undefined, ConditionValidated.NotValidated);
-	}
-
-	function _addSearchConditionToConditionMap(oConditions, sFilterFields, sFilterValue, oCurrentConditions) {
-		if (sFilterFields) {
-			oCurrentConditions = oCurrentConditions || oConditions;
-			var aCurrentSearchConditions = oCurrentConditions[sFilterFields];
-
-			//1) Only create condition for truthy value (e.g. have a string) if no $search path exists in the CM
-			if (!aCurrentSearchConditions) {
-				if (sFilterValue) {
-					oConditions[sFilterFields] = (oConditions[sFilterFields] || []).concat([_getSearchCondition(sFilterValue)]);
-				}
-				return;
-			}
-
-			//2) Only modifiy existing $search condition to new value if its value has changed --> there is an existing condition
-			if (aCurrentSearchConditions.length === 1  && aCurrentSearchConditions[0].values[0] !== sFilterValue) {
-				oConditions[sFilterFields] = (oConditions[sFilterFields] || []).concat([_getSearchCondition(sFilterValue)]);
-				return;
-			}
-
-			//3) Path is existing, but its containing of an empty array --> if its still empty array, don't do anything
-			if (aCurrentSearchConditions.length === 0) {
-				oConditions[sFilterFields] = sFilterValue ? (oConditions[sFilterFields] || []).concat([_getSearchCondition(sFilterValue)]) : [];
-				return;
-			}
-		}
+	function _addSearchConditionToConditionMap(oConditions, sFilterFields, sFilterValue) {
+		oConditions[sFilterFields] = sFilterValue ? [Condition.createCondition("Contains", [sFilterValue], undefined, undefined, ConditionValidated.NotValidated)] : [];
 		return;
 	}
 
 	return FilterableListContent;
 
 });
+

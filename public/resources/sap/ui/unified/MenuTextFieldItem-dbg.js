@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -52,7 +52,7 @@ sap.ui.define([
 	 * @extends sap.ui.unified.MenuItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.21.0
 	 *
 	 * @constructor
@@ -124,12 +124,12 @@ sap.ui.define([
 		// Left border
 		rm.openStart("div").class("sapUiMnuItmL").openEnd().close("div");
 
-		// icon/check column
-		rm.openStart("div").class("sapUiMnuItmIco").openEnd();
 		if (oItem.getIcon()) {
+			// icon/check column
+			rm.openStart("div").class("sapUiMnuItmIco").openEnd();
 			rm.icon(oItem.getIcon(), null, {title: null});
+			rm.close("div");
 		}
-		rm.close("div");
 
 		// Text filed column
 		rm.openStart("div", itemId + "-txt").class("sapUiMnuItmTxt").openEnd();
@@ -148,11 +148,10 @@ sap.ui.define([
 		}
 		if (oInfo.bAccessible) {
 			rm.accessibilityState(oItem, {
-				role: "textbox",
 				disabled: null, // Prevent aria-disabled as a disabled attribute is enough
 				multiline: false,
 				autocomplete: "none",
-				describedby: itemId + "-lbl " + oItem._fnInvisibleCountInformationFactory(oInfo).getId()
+				describedby: itemId + "-lbl " + oItem._fnInvisibleDescriptionFactory(oInfo).getId()
 			});
 		}
 		rm.voidEnd().close("div").close("div");
@@ -164,9 +163,9 @@ sap.ui.define([
 	};
 
 	MenuTextFieldItem.prototype.exit = function() {
-		if (this._invisibleCountInformation) {
-			this._fnInvisibleCountInformationFactory().destroy();
-			this._invisibleCountInformation = null;
+		if (this._invisibleDescription) {
+			this._fnInvisibleDescriptionFactory().destroy();
+			this._invisibleDescription = null;
 		}
 	};
 
@@ -363,17 +362,19 @@ sap.ui.define([
 		return true;
 	};
 
-	MenuTextFieldItem.prototype._fnInvisibleCountInformationFactory = function(oInfo) {
-		if (!this._invisibleCountInformation) {
-			this._invisibleCountInformation = new InvisibleText({
-				text: Core.getLibraryResourceBundle("sap.ui.unified").getText("UNIFIED_MENU_ITEM_COUNT_TEXT", [
-					oInfo.iItemNo,
-					oInfo.iTotalItems
-				])
+	MenuTextFieldItem.prototype._fnInvisibleDescriptionFactory = function(oInfo) {
+		var sCountInfo, sTypeInfo, oUnifiedBundle;
+
+		if (!this._invisibleDescription) {
+			oUnifiedBundle = Core.getLibraryResourceBundle("sap.ui.unified");
+			sCountInfo = oUnifiedBundle.getText("UNIFIED_MENU_ITEM_COUNT_TEXT", [oInfo.iItemNo, oInfo.iTotalItems]);
+			sTypeInfo = oUnifiedBundle.getText("UNIFIED_MENU_ITEM_HINT_TEXT");
+			this._invisibleDescription = new InvisibleText({
+				text: sCountInfo + " " + sTypeInfo
 			}).toStatic();
 		}
 
-		return this._invisibleCountInformation;
+		return this._invisibleDescription;
 	};
 
 

@@ -1,19 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
 	"sap/base/Log",
 	"sap/base/util/merge",
 	"sap/base/util/restricted/_pick",
-	"sap/ui/fl/Utils",
+	"sap/ui/fl/requireAsync",
 	"sap/ui/core/util/reflection/JsControlTreeModifier"
 ], function(
 	Log,
 	merge,
 	_pick,
-	flUtils,
+	requireAsync,
 	JsControlTreeModifier
 ) {
 	"use strict";
@@ -25,7 +25,7 @@ sap.ui.define([
 	 *
 	 * @private
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @experimental Since 1.80 This class is experimental and provides only limited functionality. Also the API might be
 	 *               changed in future.
@@ -72,7 +72,7 @@ sap.ui.define([
 		var aPromises = [];
 		aDelegates.forEach(function (mDelegateInfo) {
 			aPromises.push(function (aLoadedDelegates) {
-				return flUtils.requireAsync(mDelegateInfo.name)
+				return requireAsync(mDelegateInfo.name)
 					.then(function (oDelegate) {
 						mDelegateInfo.instance = oDelegate || {};
 						aLoadedDelegates.push(mDelegateInfo);

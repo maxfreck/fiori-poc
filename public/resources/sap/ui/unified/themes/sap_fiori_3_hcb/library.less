@@ -2,7 +2,7 @@
 
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -204,6 +204,18 @@ html.sap-desktop .sapUiCalItemSel:not(.sapUiCalItemNow):not(.sapUiCalItemSelBetw
 	border-bottom-right-radius: 0;
 }
 
+.sapUiSizeCompact .sapUiCalItem {
+	&.sapUiCalItemSelBetween .sapUiCalItemText {
+		position: relative;
+	}
+}
+.sapUiSizeCompact .sapUiCalMonthSecType .sapUiCalItem {
+	&.sapUiCalItemSelBetween .sapUiCalItemText {
+		position: relative;
+		line-height: 0.875rem;
+	}
+}
+
 .sapUiCalItem {
 	position: relative;
 	&:focus > .sapUiCalItemText {
@@ -369,6 +381,14 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover){
 }
 
 /* 2 calendar types */
+.sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemSelBetween > .sapUiCalItemText{
+	line-height: 2.125rem;
+}
+
+.sapUiCalItem.sapUiCalItemSel.sapUiCalItemSelBetween:not(.sapUiCalItemNow) > .sapUiCalItemText{
+	line-height: 2.125rem;
+}
+
 .sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemNow  > .sapUiCalItemText{
 	line-height: 1.875rem;
 }
@@ -391,9 +411,22 @@ html.sap-desktop .sapUiCalItemSelBetween:focus:not(:hover){
 	.sapUiCalItemNow > .sapUiCalItemText > .sapUiCalItemTextAmPm {
 		line-height: 1.5rem;
 	}
+	.sapUiCalMonthSecType .sapUiCalItem  > .sapUiCalItemText {
+		line-height: 0.875rem;
+	}
 	.sapUiCalItemSelBetween .sapUiCalItemText,
 	.sapUiCalItemSel.sapUiCalItemSelBetween:not(.sapUiCalItemNow) > .sapUiCalItemText {
-		line-height: 1.875rem;
+		line-height: 1.75rem;
+	}
+	.sapUiCalMonthSecType .sapUiCalItemSel.sapUiCalItemSelBetween .sapUiCalItemText,
+	.sapUiCalMonthSecType .sapUiCalItemSel.sapUiCalItemSelBetween:not(.sapUiCalItemNow) > .sapUiCalItemText {
+		line-height: 0.875rem;
+	}
+	.sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemNow.sapUiCalItemSel > .sapUiCalItemText {
+		line-height: 0.875rem;
+	}
+	.sapUiCalMonthSecType .sapUiCalItem.sapUiCalItemNow  > .sapUiCalItemText{
+		line-height: 0.875rem;
 	}
 }
 
@@ -587,6 +620,37 @@ and (orientation: landscape) {
 .dayColorMixIn(sapUiCalItemType19, @_sap_ui_unified_Calendar_sapUiCalItemType19);
 .dayColorMixIn(sapUiCalItemType20, @_sap_ui_unified_Calendar_sapUiCalItemType20);
 /* END "Calendar.less" */
+
+/* START "CalendarLegend.less" */
+/* ============================================== */
+/* CSS for control sap.ui.unified/CalendarLegend  */
+/* Quartz High Contrast Black theme               */
+/* ============================================== */
+
+.sapUiUnifiedLegendItem {
+	position: relative;
+
+	&:focus {
+		outline: none;
+		&::after {
+			content: "";
+			position: absolute;
+			box-sizing: border-box;
+			left: 0.0625rem;
+			top: 0.0625rem;
+			right: 0.0625rem;
+			bottom: 0.0625rem;
+			border: @sapContent_FocusWidth @sapContent_FocusStyle @sapUiContentFocusColor;
+			pointer-events: none;
+		}
+	}
+
+	.sapUiUnifiedLegendSquare > .sapUiUnifiedLegendSquareColor {
+		border-radius: 0;
+	}
+}
+
+/* END "CalendarLegend.less" */
 
 /* START "CalendarRow.less" */
 /* =========================================== */

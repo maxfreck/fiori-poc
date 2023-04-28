@@ -5,7 +5,7 @@
     "type": "library",
     "embeds": [],
     "applicationVersion": {
-      "version": "1.108.2"
+      "version": "1.113.0"
     },
     "title": "The main UI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.",
     "description": "The main UI5 control library, with responsive controls that can be used in touch devices as well as desktop browsers.",
@@ -29,17 +29,17 @@
   },
   "sap.ui5": {
     "dependencies": {
-      "minUI5Version": "1.108",
+      "minUI5Version": "1.113",
       "libs": {
         "sap.ui.core": {
-          "minVersion": "1.108.2"
+          "minVersion": "1.113.0"
         },
         "sap.ui.layout": {
-          "minVersion": "1.108.2",
+          "minVersion": "1.113.0",
           "lazy": true
         },
         "sap.ui.unified": {
-          "minVersion": "1.108.2",
+          "minVersion": "1.113.0",
           "lazy": true
         }
       }
@@ -196,6 +196,7 @@
           "sap.m.OverflowToolbar",
           "sap.m.OverflowToolbarButton",
           "sap.m.OverflowToolbarToggleButton",
+          "sap.m.OverflowToolbarMenuButton",
           "sap.m.P13nColumnsPanel",
           "sap.m.P13nGroupPanel",
           "sap.m.P13nSelectionPanel",
@@ -352,6 +353,7 @@
           "sap.m.ViewSettingsItem",
           "sap.m.plugins.CellSelector",
           "sap.m.plugins.ColumnResizer",
+          "sap.m.plugins.CopyProvider",
           "sap.m.plugins.DataStateIndicator",
           "sap.m.plugins.PasteProvider",
           "sap.m.plugins.PluginBase",
@@ -386,6 +388,7 @@
           "sap.m.semantic.SortAction",
           "sap.m.semantic.SortSelect",
           "sap.m.table.columnmenu.Entry",
+          "sap.m.table.columnmenu.ActionItem",
           "sap.m.table.columnmenu.Item",
           "sap.m.table.columnmenu.ItemBase",
           "sap.m.table.columnmenu.QuickAction",
@@ -508,6 +511,7 @@
           "sap.m.ObjectHeaderContainer",
           "sap.m.IOverflowToolbarContent",
           "sap.m.IOverflowToolbarFlexibleContent",
+          "sap.m.IToolbarInteractiveControl",
           "sap.m.IHyphenation"
         ]
       }

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,11 +28,11 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 * @class The <code>TokenizerDisplay</code> control is used to render a Tokenizer inside a control based on {@link sap.ui.mdc.field.FieldBase FieldBase}.
 	 * @extends sap.m.Tokenizer
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.field.TokenizerDisplay
+	 * @ui5-restricted sap.ui.mdc.field.FieldBase
 	 * @since 1.99.0
 	 * @alias sap.ui.mdc.field.TokenizerDisplay
 	 */

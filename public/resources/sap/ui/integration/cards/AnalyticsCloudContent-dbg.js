@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,8 +10,16 @@ sap.ui.define([
 	"sap/ui/integration/library",
 	"sap/ui/core/HTML",
 	"sap/ui/integration/util/BindingResolver",
+	"sap/m/IllustratedMessageType",
 	"sap/base/Log"
-], function (AnalyticsCloudContentRenderer, BaseContent, library, HTML, BindingResolver, Log) {
+], function (
+	AnalyticsCloudContentRenderer,
+	BaseContent,
+	library,
+	HTML,
+	BindingResolver,
+	IllustratedMessageType,
+	Log) {
 	"use strict";
 
 	var ActionArea = library.CardActionArea;
@@ -30,7 +38,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -83,11 +91,10 @@ sap.ui.define([
 	};
 
 	/**
-	 * @inheritdoc
+	 * @override
 	 */
-	AnalyticsCloudContent.prototype.setConfiguration = function (oConfiguration) {
-		BaseContent.prototype.setConfiguration.apply(this, arguments);
-		oConfiguration = this.getParsedConfiguration();
+	AnalyticsCloudContent.prototype.applyConfiguration = function () {
+		var oConfiguration = this.getParsedConfiguration();
 
 		//workaround until actions refactor
 		this.fireEvent("_actionContentReady");
@@ -145,7 +152,11 @@ sap.ui.define([
 
 		// is Highcharts library available
 		if (!window.Highcharts) {
-			this.handleError("There was a problem with loading Highcharts library. Could not initialize AnalyticsCloud card content.");
+			this.handleError({
+				type: IllustratedMessageType.ErrorScreen,
+				title: oCard.getTranslatedText("CARD_DATA_LOAD_ERROR"),
+				description: oCard.getTranslatedText("CARD_ERROR_HIGHCHARTS_DESCRIPTION")
+			});
 			return;
 		}
 

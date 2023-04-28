@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -64,6 +64,9 @@ sap.ui.define([
 
 			oRm.openEnd(); // div element
 
+			var oHeader = oCal.getAggregation("header");
+			oRm.renderControl(oHeader);
+
 			oRm.openStart("div", sId + "-content");
 			oRm.class("sapUiCalContent");
 			oRm.openEnd();
@@ -84,9 +87,6 @@ sap.ui.define([
 			}
 
 			oRm.close("div");
-
-			var oHeader = oCal.getAggregation("header");
-			oRm.renderControl(oHeader);
 
 			//when used in a DatePicker, in mobile there is no cancel button
 			if (!oCal._bSkipCancelButtonRendering) {

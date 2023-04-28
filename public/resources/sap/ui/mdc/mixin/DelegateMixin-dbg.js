@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -61,7 +61,7 @@ sap.ui.define(["sap/ui/mdc/util/loadModules", "sap/base/Log"], function (loadMod
 	 * </ul>
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @alias sap.ui.mdc.mixin.DelegateMixin
 	 * @namespace
 	 * @since 1.76.0
@@ -112,7 +112,7 @@ sap.ui.define(["sap/ui/mdc/util/loadModules", "sap/base/Log"], function (loadMod
 	 * Loads and initializes the delegate module related to the enhanced control.
 	 *
 	 * @protected
-	 * @param {object} [oPreloadedModule] Preloaded delegate module
+	 * @param {sap.ui.mdc.BaseDelegate} [oPreloadedModule] Preloaded delegate module
 	 * @returns {Promise<sap.ui.mdc.BaseDelegate>} Returns a <code>Promise</code> that resolves the delegate module, if available
 	 */
 	DelegateMixin.initControlDelegate = function (oPreloadedModule) {
@@ -131,6 +131,16 @@ sap.ui.define(["sap/ui/mdc/util/loadModules", "sap/base/Log"], function (loadMod
 		}
 
 		return this._oDelegateInitialized;
+	};
+
+	/**
+	 * Checks whether the delegate module related to the enhanced control is loaded.
+	 *
+	 * @protected
+	 * @returns {boolean} Whether the delegate module is loaded
+	 */
+	DelegateMixin.isControlDelegateInitialized = function() {
+		return this.bDelegateInitialized;
 	};
 
 	/**
@@ -186,7 +196,7 @@ sap.ui.define(["sap/ui/mdc/util/loadModules", "sap/base/Log"], function (loadMod
 	 * <b>Note:</b> <code>initControlDelegate</code> must be called to start the delegate initialization
 	 *
 	 * @protected
-	 * @returns {Promise} Returns a <code>Promise</code> reflecting the delegate initialization
+	 * @returns {Promise<sap.ui.mdc.BaseDelegate>} Returns a <code>Promise</code> reflecting the delegate initialization
 	 * @throws Throws an error if the delegate module is not available
 	 */
 	DelegateMixin.awaitControlDelegate = function () {
@@ -221,6 +231,7 @@ sap.ui.define(["sap/ui/mdc/util/loadModules", "sap/base/Log"], function (loadMod
 
 		// additional methods
 		this.awaitControlDelegate = DelegateMixin.awaitControlDelegate;
+		this.isControlDelegateInitialized = DelegateMixin.isControlDelegateInitialized;
 		this.getControlDelegate = DelegateMixin.getControlDelegate;
 		this.getPayload = DelegateMixin.getPayload;
 		this.getTypeUtil = DelegateMixin.getTypeUtil;

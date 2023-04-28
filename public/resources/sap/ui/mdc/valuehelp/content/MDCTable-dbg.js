@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,14 +11,12 @@ sap.ui.define([
 	'sap/ui/mdc/enum/SelectType',
 	'sap/ui/mdc/library',
 	'sap/m/library',
-	"sap/ui/table/library",
-	"sap/ui/thirdparty/jquery",
-	// "sap/ui/mdc/p13n/Engine",
-	// "sap/ui/mdc/enum/PersistenceMode",
+	'sap/ui/table/library',
 	'sap/ui/mdc/condition/FilterConverter',
 	'sap/base/util/restricted/_throttle',
 	'sap/ui/mdc/util/Common',
-	"sap/base/Log"
+	'sap/base/Log',
+	'sap/ui/core/Element'
 ], function(
 	FilterableListContent,
 	loadModules,
@@ -27,13 +25,11 @@ sap.ui.define([
 	library,
 	mLibrary,
 	uiTableLibrary,
-	jQuery,
-	// Engine,
-	// PersistenceMode,
 	FilterConverter,
 	throttle,
 	Common,
-	Log
+	Log,
+	Element
 ) {
 	"use strict";
 
@@ -173,8 +169,10 @@ sap.ui.define([
 				handleItemPress: function (oEvent) {
 				},
 				handleSelectionChange: function (oEvent) {
+					var bIsMultiSelectionPlugin = oEvent.getSource().isA('sap.ui.table.plugins.MultiSelectionPlugin');
+					var oParameters = oEvent.getParameters();
 
-					if (this._bScrolling || this._bBusy) {
+					if (bIsMultiSelectionPlugin ? oParameters._internalTrigger : !oParameters.userInteraction) { // Ignore internal events
 						return;
 					}
 
@@ -221,8 +219,13 @@ sap.ui.define([
 					} else if (oRowMode.isA("sap.ui.table.rowmodes.AutoRowMode")) {
 						oRowMode.setMinRowCount(3);
 					}
+
+					var sMDCTableSelectionMode = oTable.getSelectionMode();
 					var sSelectionMode = this._isSingleSelect() ? UITableSelectionMode.Single : UITableSelectionMode.MultiToggle;
-					oInnerTable.setSelectionBehavior(UITableSelectionBehavior.Row);
+					if (sMDCTableSelectionMode !== MDCSelectionMode.SingleMaster) {
+						// only for multi we can set selectionBehavior to Row
+						oInnerTable.setSelectionBehavior(UITableSelectionBehavior.Row);
+					}
 					_getUITableSelectionHandler().setSelectionMode(sSelectionMode);
 				},
 				handleScrolling: function (iIndex) {
@@ -274,11 +277,12 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element using a {@link sap.ui.mdc.Table}.
 	 * @extends sap.ui.mdc.valuehelp.base.FilterableListContent
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.content.MDCTable
@@ -352,19 +356,11 @@ sap.ui.define([
 		_updateSelectionThrottled.call(this);
 	};
 	MDCTable.prototype._handleUpdateFinished = function (oEvent) {
-
-		this._bScrolling = false;
 		_updateSelectionThrottled.call(this);
 	};
-
 
 	MDCTable.prototype._handleFirstVisibleRowChanged = function (oEvent) {
-		this._bScrolling = true;
 		_updateSelectionThrottled.call(this);
-	};
-
-	MDCTable.prototype._handleBusyStateChanged = function (oEvent) {
-		this._bBusy = oEvent.getParameter("busy");
 	};
 
 	var handleInnerTable = function (oInnerTable, sMutation) {
@@ -379,7 +375,6 @@ sap.ui.define([
 				oInnerTable.detachEvent("rowSelectionChange", this._handleSelectionChange, this);
 				oInnerTable.detachEvent("rowsUpdated", this._handleUpdateFinished, this);
 				oInnerTable.detachEvent("firstVisibleRowChanged", this._handleFirstVisibleRowChanged, this);
-				oInnerTable.detachEvent("busyStateChanged", this._handleBusyStateChanged, this);
 				if (this._oUITableSelectionPlugin) {
 					this._oUITableSelectionPlugin.detachEvent("selectionChange", this._handleSelectionChange, this);
 				}
@@ -398,7 +393,6 @@ sap.ui.define([
 				oInnerTable.attachEvent("rowSelectionChange", this._handleSelectionChange, this);
 				oInnerTable.attachEvent("rowsUpdated", this._handleUpdateFinished, this);
 				oInnerTable.attachEvent("firstVisibleRowChanged", this._handleFirstVisibleRowChanged, this);
-				oInnerTable.attachEvent("busyStateChanged", this._handleBusyStateChanged, this);
 				this._oUITableSelectionPlugin = oInnerTable.getPlugins().find(function (oPlugin) {
 					return oPlugin.isA("sap.ui.table.plugins.SelectionPlugin");
 				});
@@ -439,7 +433,7 @@ sap.ui.define([
 				this._oObserver.observe(oTable, {aggregations: ["_content"]});
 				this._sTableType = _getMDCTableType(oTable);
 				oTable.addDelegate({ onmouseover: function (oEvent) {	// Fix m.Table itemPress
-					var oItem = jQuery(oEvent.target).control(0);
+					var oItem = Element.closestTo(oEvent.target);
 					if (oItem && oItem.isA("sap.m.ColumnListItem")) {
 						oItem.setType("Active");
 					}
@@ -567,22 +561,31 @@ sap.ui.define([
 		return this._oTableHelper && this._oTableHelper.getListBindingInfo();
 	};
 
-	MDCTable.prototype.onBeforeShow = function() {
+	MDCTable.prototype.onBeforeShow = function (bInitial) {
 		return Promise.resolve(FilterableListContent.prototype.onBeforeShow.apply(this, arguments)).then(function () {
 			var oTable = this.getTable();
-			var bOverlay = oTable && oTable.isTableBound() && oTable._oTable.getShowOverlay();
-			var bForceRebind = oTable && this._bRebindTable;
-			if (bForceRebind || bOverlay) {
-				oTable.rebind();
-				this._bRebindTable = false;
+			if (oTable) {
+				var bTableBound = oTable.isTableBound();
+				var bOverlay = bTableBound && oTable._oTable.getShowOverlay();
+				if (this._bRebindTable || bOverlay) {
+					oTable.rebind();
+					this._bRebindTable = false;
+				} else if (bInitial) {
+					if (this._sTableType === "ResponsiveTable") {
+						this._oScrollContainer.scrollTo(0, 0);
+					} else if (bTableBound) { //scrollToIndex throws error if internal table doesn't exist
+						return oTable.scrollToIndex(0);
+					}
+				}
 			}
 		}.bind(this));
 	};
 
-	MDCTable.prototype.onShow = function () {
+	MDCTable.prototype.onShow = function (bInitial) {
 		if (this._oTable) {
+			_adjustTable.call(this);
 			// check if selection mode is fine
-			var sSelectionMode = FilterableListContent.prototype._isSingleSelect.apply(this) ? MDCSelectionMode.Single : MDCSelectionMode.Multi;
+			var sSelectionMode = FilterableListContent.prototype._isSingleSelect.apply(this) ? MDCSelectionMode.SingleMaster : MDCSelectionMode.Multi;
 			if (this._oTable.getSelectionMode() === MDCSelectionMode.None) { // only set automatically if not provided from outside (and do it only once)
 				this._oTable.setSelectionMode(sSelectionMode);
 			}
@@ -648,8 +651,6 @@ sap.ui.define([
 			"_oScrollContainer",
 			"_oTableHelper",
 			"_bSelectionIsUpdating",
-			"_bScrolling",
-			"_bBusy",
 			"_sTableType",
 			"_oUITableSelectionPlugin",
 			"_oTable",

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -2903,7 +2903,9 @@ sap.ui.define([
 				}
 			}
 			if (iCurrentAnalyticalInfoVersion != that.iAnalyticalInfoVersionNumber) {
-				// discard responses for outdated analytical infos
+				// discard responses for outdated analytical infos but fire dataReceived event
+				// because it is expected that dataRequested and dataReceived events are sent as pairs
+				that.fireDataReceived();
 				return;
 			}
 
@@ -4590,6 +4592,8 @@ sap.ui.define([
 			this.mMultiUnitKey = {};
 
 			this.mEntityKey = {};
+			// clear also the pending request queue because the contained requests are obsolete
+			this.aBatchRequestQueue = [];
 		}
 	};
 
@@ -4833,14 +4837,24 @@ sap.ui.define([
 	 * @private
 	 */
 	AnalyticalBinding.prototype._addSorters = function (oSortExpression, aGroupingSorters) {
-		var aSorters = this._canApplySortersToGroups()
-				? [].concat(this.aSorter).concat(aGroupingSorters)
+		var bCanApplySortersToGroups = this._canApplySortersToGroups(),
+			aSorters = bCanApplySortersToGroups
+				? this.aSorter
 				: [].concat(aGroupingSorters).concat(this.aSorter);
 
-		aSorters.forEach(function (oSorter) {
-			oSortExpression.addSorter(oSorter.sPath, oSorter.bDescending
-				? odata4analytics.SortOrder.Descending : odata4analytics.SortOrder.Ascending);
-		});
+		function addSorter(bIgnoreIfAlreadySorted, oSorter) {
+			oSortExpression.addSorter(oSorter.sPath,
+				oSorter.bDescending
+					? odata4analytics.SortOrder.Descending
+					: odata4analytics.SortOrder.Ascending,
+				bIgnoreIfAlreadySorted);
+		}
+
+		aSorters.forEach(addSorter.bind(null, false));
+		if (bCanApplySortersToGroups) {
+			// grouping sorters must not overwrite sort order
+			aGroupingSorters.forEach(addSorter.bind(null, true));
+		}
 	};
 
 	/**

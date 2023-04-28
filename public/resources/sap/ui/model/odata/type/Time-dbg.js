@@ -1,18 +1,19 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/base/Log",
 	"sap/base/util/extend",
+	"sap/ui/core/date/UI5Date",
 	"sap/ui/core/format/DateFormat",
 	"sap/ui/model/FormatException",
 	"sap/ui/model/ParseException",
 	"sap/ui/model/ValidateException",
 	"sap/ui/model/odata/type/ODataType"
-], function (Log, extend, DateFormat, FormatException, ParseException, ValidateException,
+], function (Log, extend, UI5Date, DateFormat, FormatException, ParseException, ValidateException,
 		ODataType) {
 	"use strict";
 
@@ -104,6 +105,7 @@ sap.ui.define([
 			throw new FormatException("Illegal sap.ui.model.odata.type.Time value: "
 				+ toString(oTime));
 		}
+		// no need to use UI5Date.getInstance as only the UTC timestamp is relevant
 		return new Date(oTime.ms);
 	}
 
@@ -154,11 +156,11 @@ sap.ui.define([
 	 * @extends sap.ui.model.odata.type.ODataType
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @alias sap.ui.model.odata.type.Time
 	 * @param {object} [oFormatOptions]
-	 *   format options as defined in {@link sap.ui.core.format.DateFormat}
+	 *   Format options as defined in {@link sap.ui.core.format.DateFormat.getTimeInstance}
 	 * @param {object} [oConstraints]
 	 *   constraints; {@link #validateValue validateValue} throws an error if any constraint is
 	 *   violated
@@ -212,6 +214,37 @@ sap.ui.define([
 	};
 
 	/**
+	 * Returns a date object for a given model value.
+	 *
+	 * @param {object|null} oModelValue
+	 *   The model value of this type. Can be retrieved via {@link sap.ui.model.odata.type.Time#getModelValue}.
+	 * @param {int} oModelValue.ms
+	 *   The time in milliseconds, ranging from 0 (1970-01-01T00:00:00.000Z) to 86399999 (1970-01-01T23:59:59.999Z)
+	 * @returns {Date|module:sap/ui/core/date/UI5Date|null}
+	 *   An instance of <code>Date</code> for which the local getters <code>getHours()</code>,
+	 *   <code>getMinutes()</code>, <code>getSeconds()</code>, and <code>getMilliseconds()</code> can be used to get the
+	 *   corresponding hours, minutes, seconds, and milliseconds of the given model value
+	 *
+	 * @since 1.113.0
+	 * @private
+	 * @ui5-restricted sap.fe, sap.suite.ui.generic.template, sap.ui.comp, sap.ui.generic
+	 */
+	Time.prototype.getDateValue = function (oModelValue) {
+		var oResult;
+
+		if (!oModelValue) {
+			return null;
+		}
+
+		oResult = UI5Date.getInstance(oModelValue.ms);
+		oResult.setFullYear(1970, 0, 1);
+		oResult.setHours(oResult.getUTCHours(), oResult.getUTCMinutes(), oResult.getUTCSeconds(),
+			oResult.getUTCMilliseconds());
+
+		return oResult;
+	};
+
+	/**
 	 * Returns a formatter that converts between the model format and a Javascript Date. It has two
 	 * methods: <code>format</code> takes a Date and returns an object as described in
 	 * {@link sap.ui.model.odata.type.Time}, <code>parse</code> converts from the object to a Date.
@@ -224,6 +257,40 @@ sap.ui.define([
 	 */
 	Time.prototype.getModelFormat = function () {
 		return oModelFormat;
+	};
+
+	/**
+	 * Gets the model value according to this type's constraints and format options for the given
+	 * date object representing a time. Validates the resulting value against the constraints of
+	 * this type instance.
+	 *
+	 * @param {Date|module:sap/ui/core/date/UI5Date|null} oDate
+	 *   The date object considering the configured time zone. Must be created via
+	 *   {@link module:sap/ui/core/date/UI5Date.getInstance}
+	 * @returns {{__edmType: string, ms: int}|null}
+	 *   The model representation of the time
+	 * @throws {Error}
+	 *   If the given date object is not valid or does not consider the configured time zone
+	 * @throws {sap.ui.model.ValidateException}
+	 *   If the constraints of this type instance are violated
+	 *
+	 * @public
+	 * @since 1.111.0
+	 */
+	Time.prototype.getModelValue = function (oDate) {
+		var oResult;
+
+		if (oDate === null) {
+			oResult = null;
+		} else {
+			UI5Date.checkDate(oDate);
+			oResult = UI5Date.getInstance(0);
+			oResult.setUTCHours(oDate.getHours(), oDate.getMinutes(), oDate.getSeconds(), oDate.getMilliseconds());
+			oResult = toModel(oResult);
+		}
+		this.validateValue(oResult);
+
+		return oResult;
 	};
 
 	/**

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -22,17 +22,12 @@ sap.ui.define([], function() {
 	 */
     ActionToolbarActionRenderer.render = function(rm, oActionToolbarAction) {
         var oAction = oActionToolbarAction.getAction();
-        var mAriaProps = { role: oAction && oAction.getAccessibilityInfo ? oAction.getAccessibilityInfo().role : "button" };
-
-        rm.openStart("div", oActionToolbarAction);
-
-        rm.accessibilityState(oActionToolbarAction, mAriaProps);
-
-        rm.openEnd();
-
-        rm.renderControl(oAction);
-
-        rm.close("div");
+        if (oAction) {
+            if (oActionToolbarAction.hasStyleClass("sapMBarChild")) {
+                oAction.addStyleClass("sapMBarChild");
+            }
+            rm.renderControl(oAction);
+        }
     };
 
     return ActionToolbarActionRenderer;

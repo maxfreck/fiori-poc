@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -203,7 +203,7 @@ sap.ui.define([
 	 * Static collection of utility functions related to the sap.ui.table.Table, ...
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @namespace
 	 * @alias sap.ui.table.utils.TableUtils
 	 * @private
@@ -366,16 +366,7 @@ sap.ui.define([
 		 * @returns {boolean} Whether the table has data.
 		 */
 		hasData: function(oTable) {
-			var oBinding = oTable.getBinding();
-			var iTotalRowCount = oTable._getTotalRowCount();
-			var bHasData = iTotalRowCount > 0;
-
-			if (oBinding && oBinding.providesGrandTotal) { // Analytical Binding
-				var bHasTotal = oBinding.providesGrandTotal() && oBinding.hasTotaledMeasures();
-				bHasData = (bHasTotal && iTotalRowCount > 1) || (!bHasTotal && iTotalRowCount > 0);
-			}
-
-			return bHasData;
+			return oTable._getTotalRowCount() > 0;
 		},
 
 		/**

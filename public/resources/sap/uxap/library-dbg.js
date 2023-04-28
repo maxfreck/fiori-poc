@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,7 @@ sap.ui.define([
 	 * @namespace
 	 * @alias sap.uxap
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.36
 	 * @public
 	 */
@@ -68,7 +68,7 @@ sap.ui.define([
 			"sap.uxap.ObjectPageHeaderLayoutData",
 			"sap.uxap.ObjectPageLazyLoader"
 		],
-		version: "1.108.2",
+		version: "1.113.0",
 		extensions: {
 			flChangeHandlers: {
 				"sap.uxap.ObjectPageHeader": "sap/uxap/flexibility/ObjectPageHeader",
@@ -172,6 +172,7 @@ sap.ui.define([
 	 * @enum {string}
 	 * @public
 	 */
+
 	thisLib.ObjectPageHeaderDesign = {
 
 		/**

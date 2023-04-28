@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -107,19 +107,13 @@ sap.ui.define([
 					AppVariantUtils.closeOverviewDialog();
 				};
 
-				var oUriParameters = UriParameters.fromQuery(window.location.search);
-				var sAppContextsEnabled = oUriParameters.get("sap-ui-xx-rta-adaptations");
-
 				var sOverviewPath = "sap/ui/rta/appVariant/AppVariantOverviewDialog";
 				var oProperties = {
 					idRunningApp: oDescriptor["sap.app"].id,
 					isOverviewForKeyUser: bAsKeyUser,
 					layer: sLayer
 				};
-				if (sAppContextsEnabled === "true") {
-					sOverviewPath = "sap/ui/rta/appContexts/AppContextsOverviewDialog";
-					oProperties = {layer: sLayer};
-				}
+
 				sap.ui.require([sOverviewPath], function(AppVariantOverviewDialog) {
 					if (!oAppVariantOverviewDialog) {
 						oAppVariantOverviewDialog = new AppVariantOverviewDialog(oProperties);

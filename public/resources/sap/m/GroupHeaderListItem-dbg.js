@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -30,7 +30,7 @@ sap.ui.define(["sap/ui/core/library", "./library", "./ListItemBase", "./GroupHea
 	 * @extends sap.m.ListItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -103,7 +103,7 @@ sap.ui.define(["sap/ui/core/library", "./library", "./ListItemBase", "./GroupHea
 	};
 
 	GroupHeaderListItem.prototype.getAccessibilityType = function(oBundle) {
-		var sType = this.getTable() ? "ROW" : "OPTION";
+		var sType = this.getTable() ? "ROW" : "LISTITEM";
 		return oBundle.getText("LIST_ITEM_GROUP_HEADER") + " " + oBundle.getText("ACC_CTR_TYPE_" + sType);
 	};
 

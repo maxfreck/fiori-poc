@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -159,6 +159,10 @@ sap.ui.define([
 			ResizeHandler.deregister(this._iResizeHandlerId);
 			this._iResizeHandlerId = null;
 		}
+
+		if (ObjectPageSectionBase.prototype.exit) {
+			ObjectPageSectionBase.prototype.exit.call(this);
+		}
 	};
 
 	ObjectPageSection.prototype._onResize = function () {
@@ -294,7 +298,11 @@ sap.ui.define([
 
 	ObjectPageSection.prototype._onGridContentChange = function (oEvent) {
 		var sMutation;
-		if (oEvent.type === "aggregation" && oEvent.name === "content") {
+		// both aggregation names are required
+		// because the first ("content") is the actual
+		// and the second ("subSections") is the publicly visible
+		// due to aggregation forwarding
+		if (oEvent.type === "aggregation" && ["content", "subSections"].indexOf(oEvent.name) > -1) {
 			this.invalidate();
 			sMutation = oEvent.mutation;
 			if (sMutation === "add" || sMutation === "insert") {

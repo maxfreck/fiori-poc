@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -94,7 +94,7 @@ sap.ui.define([
 	 * @implements sap.m.IconTab
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -240,7 +240,6 @@ sap.ui.define([
 	 * @private
 	 */
 	IconTabFilter.prototype.init = function () {
-
 		this._oDragEventDelegate = {
 			onlongdragover: this._handleOnLongDragOver,
 			ondragover: this._handleOnDragOver,
@@ -437,9 +436,10 @@ sap.ui.define([
 			bTextOnly = oIconTabHeader._bTextOnly,
 			bInLine = oIconTabHeader._bInLine || oIconTabHeader.isInlineMode(),
 			bShowAll = this.getShowAll(),
-			sTextDir = this.getTextDirection();
+			sTextDir = this.getTextDirection(),
+			bIsUnselectable = oIconTabHeader._isUnselectable(this);
 
-		if (this._isOverflow()){
+		if (this._isOverflow()) {
 			mAriaParams.role = "button";
 		}
 
@@ -504,7 +504,7 @@ sap.ui.define([
 			oRM.class("sapMITBFilter" + sIconColor);
 		}
 
-		if (oIconTabHeader._isUnselectable(this)) {
+		if (bIsUnselectable) {
 			oRM.class("sapMITHUnselectable");
 		}
 
@@ -526,7 +526,7 @@ sap.ui.define([
 			oRM.attr("title", sTooltip);
 		}
 
-		if (this._isOverflow() || this.getItems().length) {
+		if (this._isOverflow() || bIsUnselectable) {
 			oRM.attr("aria-haspopup", "menu");
 		}
 
@@ -616,7 +616,7 @@ sap.ui.define([
 				.text(oIconTabHeader._getDisplayText(this))
 				.close("span");
 
-			if (this._isOverflow() || this.getItems().length && oIconTabHeader._isUnselectable(this)) {
+			if (this._isOverflow() || this.getItems().length && bIsUnselectable) {
 				oRM.openStart("span", this.getId() + "-expandButton").class("sapMITHShowSubItemsIcon").openEnd();
 				oRM.icon(IconPool.getIconURI("slim-arrow-down"), null, {
 					"title": null,
@@ -635,7 +635,7 @@ sap.ui.define([
 		oRM.openStart("div").class("sapMITBContentArrow").openEnd().close("div");
 		oRM.close("div");
 
-		if (this.getItems().length && !oIconTabHeader._isUnselectable(this)) {
+		if (this.getItems().length && !bIsUnselectable) {
 			oRM.openStart("span")
 				.accessibilityState({ role: "separator" })
 				.openEnd()

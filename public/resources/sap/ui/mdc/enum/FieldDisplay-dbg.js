@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,11 +8,11 @@ sap.ui.define(function() {
 	"use strict";
 
 	/**
-	 * Defines the output of a <code>Field</code> or <code>FilterField</code> control.
+	 * Defines the output of a {@link sap.ui.mdc.Field Field}, {@link sap.ui.mdc.FilterField FilterField} or {@link sap.ui.mdc.MultiValueField MultiValueField} control.
 	 *
-	 * For the <code>Field</code> control it defines how the <code>value</code> and <code>additionalValue</code> properties are formatted.
+	 * For the {@link sap.ui.mdc.Field Field} control it defines how the <code>value</code> and <code>additionalValue</code> properties are formatted.
 	 *
-	 * For the <code>FilterField</code> control it defines how key and description of equal conditions are formatted.
+	 * For the {@link sap.ui.mdc.FilterField FilterField} control it defines how key and description of equal conditions are formatted.
 	 *
 	 * @enum {string}
 	 * @private

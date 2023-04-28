@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -41,7 +41,7 @@ sap.ui.define([
 			return [null];
 		},
 		getEdit: function() {
-			return ["sap/m/DynamicDateRange", "sap/ui/mdc/condition/OperatorDynamicDateOption", "sap/ui/mdc/field/DynamicDateRangeConditionsType", "sap/m/StandardDynamicDateRangeKeys", "sap/m/DynamicDateUtil", "sap/m/DynamicDateFormat"];
+			return ["sap/m/DynamicDateRange", "sap/ui/mdc/condition/OperatorDynamicDateOption", "sap/ui/mdc/field/DynamicDateRangeConditionsType", "sap/m/library", "sap/m/DynamicDateUtil", "sap/m/DynamicDateFormat"];
 		},
 		getEditOperator: function() {
 			return {
@@ -79,6 +79,7 @@ sap.ui.define([
 				valueStateText: "{$field>/valueStateText}",
 				width: "100%",
 				tooltip: "{$field>/tooltip}",
+				liveChange: oContentFactory.getHandleContentLiveChange(),
 				change: oContentFactory.getHandleContentChange()
 			});
 
@@ -93,7 +94,6 @@ sap.ui.define([
 
 			oDatePicker._setPreferUserInteraction(true);
 			oContentFactory.setAriaLabelledBy(oDatePicker);
-			oContentFactory.setBoundProperty("value");
 
 			return [oDatePicker];
 		},
@@ -119,12 +119,12 @@ sap.ui.define([
 				valueStateText: "{$field>/valueStateText}",
 				width: "100%",
 				tooltip: "{$field>/tooltip}",
+				liveChange: oContentFactory.getHandleContentLiveChange(),
 				change: oContentFactory.getHandleContentChange()
 			});
 
 			oDateRangeSelection._setPreferUserInteraction(true);
 			oContentFactory.setAriaLabelledBy(oDateRangeSelection);
-			oContentFactory.setBoundProperty("value");
 
 			return [oDateRangeSelection];
 		},
@@ -186,9 +186,10 @@ sap.ui.define([
 			var DynamicDateRange = aControlClasses[0];
 			var OperatorDynamicDateOption = aControlClasses[1];
 			var DynamicDateRangeConditionsType = aControlClasses[2];
+			var mLibrary = aControlClasses[3];
 
 			if (!StandardDynamicDateRangeKeys || !DynamicDateUtil || !DynamicDateFormat) {
-				StandardDynamicDateRangeKeys = aControlClasses[3];
+				StandardDynamicDateRangeKeys = mLibrary.StandardDynamicDateRangeKeys;
 				DynamicDateUtil = aControlClasses[4];
 				DynamicDateFormat = aControlClasses[5];
 			}
@@ -219,10 +220,10 @@ sap.ui.define([
 				tooltip: "{$field>/tooltip}",
 				// enableGroupHeaders: false,	// disable the grouping of the options
 				options: vOptions,
+				// liveChange: oContentFactory.getHandleContentLiveChange(), this event does not exist for DynamicDateRange
 				change: oContentFactory.getHandleContentChange()
 			});
 
-			oContentFactory.setBoundProperty("value");
 			oContentFactory.setAriaLabelledBy(DynamicDateRange);
 
 			return [oDynamicDateRange];
@@ -280,7 +281,7 @@ sap.ui.define([
 			var oType = oContentFactory.retrieveDataType(); // TODO: do we need to create data type right now?
 			var sBaseType = oContentFactory.getField().getBaseType();
 			var oFormatOptions = oType.getFormatOptions();
-			var oUsedFormatOptions = {UTC: true}; // we always work with UTC dates
+			var oUsedFormatOptions = {};
 			var oDateRangeFormatOptions = {};
 
 			if (oFormatOptions.style) {
@@ -291,7 +292,6 @@ sap.ui.define([
 
 			if (sBaseType === BaseType.DateTime) {
 				oDateRangeFormatOptions.datetime = oUsedFormatOptions;
-				oDateRangeFormatOptions.datetime.UTC =  oType.getFormatOptions().UTC === true; // for DateTime we have to set it depending on the type UTC setting
 			}
 
 			// use Date FormatOptions anyhow for Operations supporting only dates

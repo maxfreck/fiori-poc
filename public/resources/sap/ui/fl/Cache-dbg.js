@@ -1,17 +1,17 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/ui/fl/apply/_internal/flexState/FlexState",
-	"sap/ui/fl/Utils",
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/base/Log"
 ],
 function(
 	FlexState,
-	Utils,
+	ControlVariantApplyAPI,
 	Log
 ) {
 	"use strict";
@@ -24,7 +24,7 @@ function(
 	 * @alias sap.ui.fl.Cache
 	 * @experimental Since 1.25.0
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.fl
@@ -32,6 +32,7 @@ function(
 	var Cache = function() {};
 
 	function _getArray(sComponentName, oChange) {
+		// FIXME Don't mutate the storage response
 		var mStorageResponse = FlexState.getFlexObjectsFromStorageResponse(sComponentName);
 
 		if (oChange.fileType === "variant") {
@@ -77,6 +78,7 @@ function(
 	 * @param {string} mComponent.name - Name of the component
 	 * @param {object} [mPropertyBag] - Contains additional data needed for reading changes
 	 * @param {string} [mPropertyBag.componentId] - ID of the current component, needed if bInvalidataCache is set
+	 * @param {string} [mPropertyBag.version] - Number of the version being processed
 	 * @param {boolean} bInvalidateCache - should the cache be invalidated
 	 * @returns {Promise} resolves with the change file for the given component, either from cache or back end
 	 */
@@ -121,8 +123,21 @@ function(
 			})
 			.then(function(sCacheKey) {
 				// concat current control variant ids to cachekey if available
-				var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
-				var aCurrentControlVariantIds = oVariantModel ? oVariantModel.getCurrentControlVariantIds() : [];
+				var oVariantModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
+				if (!oVariantModel) {
+					return sCacheKey;
+				}
+				// If there are no changes, the standard variant is created after the variant management control is instantiated
+				// When the cache key is calculated before this happens, the standard variant id is unknown
+				// To avoid inconsistencies between page load and navigation scenarios, all standard variants are filtered
+				var aVariantManagementControlIds = oVariantModel.getVariantManagementControlIds();
+				var aCurrentControlVariantIds = oVariantModel.getCurrentControlVariantIds()
+					.filter(function(sVariantId) {
+						// FIXME: The standard variant flag should be part of the variant instance
+						// This can be changed once the variant data selector is ready
+						// For now rely on the fact that standard variants have the same name as the vm control
+						return !aVariantManagementControlIds.includes(sVariantId);
+					});
 				return _concatControlVariantIdWithCacheKey(sCacheKey, aCurrentControlVariantIds.join("-"));
 			});
 	};

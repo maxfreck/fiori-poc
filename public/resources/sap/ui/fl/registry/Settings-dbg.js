@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -112,7 +112,6 @@ sap.ui.define([
 						isAtoEnabled: false,
 						isAppVariantSaveAsEnabled: false,
 						isContextSharingEnabled: true,
-						isContextSharingEnabledForComp: true,
 						isContextBasedAdaptationEnabled: false,
 						isCondensingEnabled: false,
 						isProductiveSystem: true,
@@ -245,8 +244,8 @@ sap.ui.define([
 	 */
 	Settings.prototype.isContextBasedAdaptationEnabled = function() {
 		var oUriParameters = UriParameters.fromQuery(window.location.search);
-		var isContextBasedAdaptationEnabled = oUriParameters.get("sap-ui-xx-rta-adaptations");
-		return isContextBasedAdaptationEnabled === "true" || this._getBooleanProperty("isContextBasedAdaptationEnabled");
+		var bIsContextBasedAdaptationEnabled = oUriParameters.get("sap-ui-xx-rta-adaptations");
+		return bIsContextBasedAdaptationEnabled === "true" || this._getBooleanProperty("isContextBasedAdaptationEnabled");
 	};
 
 	/**
@@ -326,15 +325,6 @@ sap.ui.define([
 
 
 	/**
-	 * Checks whether sharing of <code>sap.ui.comp</code> variants can be based on contexts.
-	 *
-	 * @returns {boolean} <code>true</code> if context based sharing of <code>sap.ui.comp</code> variants is enabled
-	 */
-	Settings.prototype.isContextSharingEnabledForComp = function() {
-		return this._getBooleanProperty("isContextSharingEnabledForComp");
-	};
-
-	/**
 	 * Checks whether personalization of variants is enabled or not.
 	 *
 	 * @returns {boolean} <code>true</code> if personalization of variants is enabled
@@ -350,6 +340,15 @@ sap.ui.define([
 	 */
 	Settings.prototype.isCondensingEnabled = function() {
 		return this._getBooleanProperty("isCondensingEnabled");
+	};
+
+	/**
+	 * Checks whether the personalization connector is used.
+	 *
+	 * @returns {boolean} <code>true</code> if personalization connector is used
+	 */
+	Settings.prototype.hasPersoConnector = function() {
+		return this._getBooleanProperty("hasPersoConnector");
 	};
 
 	/**
@@ -424,8 +423,7 @@ sap.ui.define([
 			? bIsCustomerSystem
 			// Fallback if back end has no info, guess based on hostname
 			: !(
-				sHostname.endsWith(".sap" + ".corp") // Prevent SEC-236 violation
-				|| sHostname === "localhost"
+				sHostname === "localhost"
 				|| sHostname === "127.0.0.1"
 			);
 	};

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -63,7 +63,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -468,7 +468,7 @@ sap.ui.define([
 	 * Defines custom completer - object implementing a getCompletions method.
 	 * The method has two parameters - fnCallback method and context object.
 	 * Context object provides details about oPos and sPrefix as provided by the third-party code editor.
-	 * @param {object} oCustomCompleter Object with getCompletions method
+	 * @param {{getCompletions: function}} oCustomCompleter Object with getCompletions method
 	 * @public
 	 * @since 1.52
 	 */

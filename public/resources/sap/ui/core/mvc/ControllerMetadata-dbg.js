@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -39,10 +39,11 @@ sap.ui.define([
 	ControllerMetadata.prototype.constructor = ControllerMetadata;
 
 	ControllerMetadata.prototype.applySettings = function(oClassInfo) {
-		// property 'override' needs to be handled separately and must not be attached to the prototype
-		if (oClassInfo.override) {
-			this._override = oClassInfo.override;
+		// property 'overrides' needs to be handled separately and must not be attached to the prototype
+		if (oClassInfo.overrides || oClassInfo.override) { // also consider the deprecated 'override' property
+			this._override = oClassInfo.overrides || oClassInfo.override; // ...but only when the new property is not set
 			delete oClassInfo.override;
+			delete oClassInfo.overrides;
 		}
 
 		Metadata.prototype.applySettings.call(this, oClassInfo);

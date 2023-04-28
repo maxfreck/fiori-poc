@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -18,11 +18,13 @@ sap.ui.define([
 	'sap/ui/mdc/condition/Condition',
 	'sap/ui/mdc/condition/ConditionConverter',
 	'sap/ui/mdc/util/IdentifierUtil',
+	'sap/ui/mdc/util/FilterUtil',
 	"sap/ui/mdc/filterbar/PropertyHelper",
+	"sap/ui/mdc/enum/ReasonMode",
+	"sap/ui/mdc/enum/FilterBarValidationStatus",
 	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/m/library",
 	"sap/m/Button",
-	'sap/m/MessageBox',
 	"./FilterBarBaseRenderer"
 ],
 	function(
@@ -40,11 +42,13 @@ sap.ui.define([
 		Condition,
 		ConditionConverter,
 		IdentifierUtil,
+		FilterUtil,
 		PropertyHelper,
+		ReasonMode,
+		FilterBarValidationStatus,
 		ControlVariantApplyAPI,
 		mLibrary,
 		Button,
-		MessageBox,
 		FilterBarBaseRenderer
 	) {
 	"use strict";
@@ -58,7 +62,7 @@ sap.ui.define([
 	 * @class The <code>FilterBarBase</code> control is used as a faceless base class for common functionality of any MDC FilterBar derivation.
 	 * @extends sap.ui.mdc.Control
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @ui5-restricted sap.ui.mdc
@@ -118,6 +122,7 @@ sap.ui.define([
 				/**
 				 * Displays possible errors during the search in a message box.
 				 * @since 1.74
+				 * @deprecated Since version 1.111 replaced by the new validation handling through {@link sap.ui.mdc.FilterBarDelegate#determineValidationState determineValidationState} and {@link sap.ui.mdc.FilterBarDelegate#visualizeValidationState visualizeValidationState}.
 				 */
 				showMessages: {
 					type: "boolean",
@@ -224,8 +229,19 @@ sap.ui.define([
 				 * <b>Note</b>: this event should never be executed programmatically. It is triggered internally by the filter bar after a <code>triggerSearch</code> is executed
 				 */
 				search: {
-					conditions: {
-						type: "object"
+					/**
+					 * Indicates the initial reason for the search. This can either be:<br>
+					 * <ul>
+					 *     <li><code>{@link sap.ui.mdc.enum.ReasonMode.Variant}</code>: Search is triggered based on variant settings</li>
+					 *     <li><code>{@link sap.ui.mdc.enum.ReasonMode.Enter}</code>: Search is triggered based on pressing Enter in a filter field</li>
+					 *     <li><code>{@link sap.ui.mdc.enum.ReasonMode.Go}</code>: Search is triggered based on pressing the Go button</li>
+					 *     <li><code>{@link sap.ui.mdc.enum.ReasonMode.Unclear}</code>: Any other reasons for the search</li>
+					 * </ul>
+					 *
+					 * @since 1.111.0
+					 */
+					reason: {
+						type: "sap.ui.mdc.enum.ReasonMode"
 					}
 				},
 
@@ -240,14 +256,25 @@ sap.ui.define([
 				 * @param {string} oControlEvent.getParameters.filtersTextExpanded Contains the filter summary text for the expanded scenario
 				 */
 				filtersChanged: {
-					conditionsBased: {
-						type: "boolean"
-					},
-					filtersText: {
-						type: "string"
-					},
-					filtersTextExpanded: {
-						type: "string"
+					parameters: {
+						/**
+						 * Indicates if the event is based on condition changes
+						 */
+						conditionsBased: {
+							type: "boolean"
+						},
+						/**
+						 * Display text for a collapsed header
+						 */
+						filtersText: {
+							type: "string"
+						},
+						/**
+						 * Display text for an expanded header
+						 */
+						filtersTextExpanded: {
+							type: "string"
+						}
 					}
 				}
 			}
@@ -260,14 +287,6 @@ sap.ui.define([
 
 	FilterBarBase.INNER_MODEL_NAME = "$sap.ui.filterbar.mdc.FilterBarBase";
 	FilterBarBase.CONDITION_MODEL_NAME = "$filters";
-
-	var ErrorState = {
-			NoError: -1,
-			RequiredHasNoValue: 0,
-			FieldInErrorState: 1,
-			AsyncValidation: 2,
-			OngoingChangeAppliance: 3
-	};
 
 	FilterBarBase.prototype.init = function() {
 
@@ -290,9 +309,9 @@ sap.ui.define([
 
 		this._bPersistValues = false;
 
-		this.getEngine().registerAdaptation(this, {
+		this.getEngine().register(this, {
 			controller: {
-				Filter: FilterController
+				Filter: new FilterController({control: this})
 			}
 		});
 
@@ -452,11 +471,30 @@ sap.ui.define([
 	};
 
 	/**
+	 * @typedef {object} sap.ui.mdc.State.XConditionValueRanges
+	 * @property {{string, string} | {integer, integer} | {float, float}} Range values for a condition
+	 */
+	/**
+	 * @typedef {object} sap.ui.mdc.State.XConditionValue
+	 * @property {string} Operator of the condition
+	 * @property {string[] | integer[] | float[] | boolean[] | sap.ui.mdc.State.XConditionValueRanges[]} Values of the condition
+	 */
+	/**
+	 * @typedef {object} sap.ui.mdc.State.XCondition
+	 * @property {string} Name of the condition
+	 * @property {sap.ui.mdc.State.XConditionValue[]} Values of the condition
+	 */
+	/**
+	 * @typedef {object} sap.ui.mdc.State
+	 * @property {sap.ui.mdc.State.XCondition[]} filter Describes the filter conditions
+	 * @property {string[]} items Describes the filter fields
+	 */
+	/**
 	 * Returns the externalized conditions of the inner condition model.
-	 * This method may only be called, once the <code>initialzed</code> is resolved.
-	 * <b>Note:</b> This API may return attributes corresponding to the <code>p13nMode</code> property configuration.
+	 * This method can only be called, once the <code>initialized</code> has been resolved.
+	 * <b>Note:</b> This API may return attributes related to the <code>p13nMode</code> property configuration.
 	 * @protected
-	 * @returns {object} object containing the current status of the FilterBarBase
+	 * @returns {sap.ui.mdc.State} Object containing the current status of the <code>FilterBarBase</code>
 	 */
 	FilterBarBase.prototype.getCurrentState = function() {
 		var oState = {};
@@ -620,15 +658,12 @@ sap.ui.define([
 			this._handleAssignedFilterNames(false);
 		}
 
-		if (this.getLiveMode() || mReportSettings.triggerSearch) {
+		if (this.getLiveMode() || mReportSettings.triggerSearch || this._bExecuteOnSelect) {
+			this._bExecuteOnSelect = false;
 			this.triggerSearch();
 		} else if (mReportSettings.recheckMissingRequired) {
 			this._recheckMissingRequiredFields();
 		}
-	};
-
-	FilterBarBase.prototype._isPersistenceSupported = function(oEvent) {
-		return this.getEngine().isModificationSupported(this);
 	};
 
 	FilterBarBase.prototype.getPropertyInfoSet = function() {
@@ -637,14 +672,6 @@ sap.ui.define([
 
 
 	FilterBarBase.prototype._addConditionChange = function(pConditionState) {
-
-		if (!this._oApplyingChanges) {
-			this._fResolveApplyingChanges = undefined;
-			this._oApplyingChanges = new Promise(function(resolve) {
-				this._fResolveApplyingChanges  = resolve;
-			}.bind(this));
-		}
-
 		this._aOngoingChangeAppliance.push(this.getEngine().createChanges({
 			control: this,
 			applySequentially: true,
@@ -672,7 +699,7 @@ sap.ui.define([
 
 				var sFieldPath = sPath.substring("/conditions/".length);
 
-				if (this._bPersistValues && this._isPersistenceSupported()) {
+				if (this._bPersistValues) {
 
 					var aConditions = oEvent.getParameter("value");
 
@@ -797,7 +824,7 @@ sap.ui.define([
 		Object.keys(mConditionsInternal).forEach(function(sKey){
 			mConditionsInternal[sKey].forEach(function(oCondition, iConditionIndex){
 				var oProperty = this._getPropertyByName(sKey);
-				this._toInternal(oProperty, oCondition);
+				mConditionsInternal[sKey][iConditionIndex] = this._toInternal(oProperty, oCondition);
 			}, this);
 		}, this);
 
@@ -835,6 +862,9 @@ sap.ui.define([
 	FilterBarBase.prototype.onSearch = function(oEvent) {
 		if (!this._bSearchPressed) {
 			this._bSearchPressed = true;
+
+			this._sReason = ReasonMode.Go;
+
 			this.triggerSearch().then(function() {
 				this._bSearchPressed = false;
 			}.bind(this), function(){
@@ -886,7 +916,6 @@ sap.ui.define([
 
 				var fDelayedFunction = function() {
 					this._validate(bFireSearch);
-					this._oValidationPromise = null;
 				};
 				setTimeout(fDelayedFunction.bind(this), 0);
 			}
@@ -912,33 +941,21 @@ sap.ui.define([
 		}
 	};
 
-	FilterBarBase.prototype._getRequiredFieldsWithoutValues = function() {
-		var aReqFiltersWithoutValue = [];
-		this._getRequiredPropertyNames().forEach(function(sName) {
-			var aConditions = this._getConditionModel().getConditions(sName);
-			if (!aConditions || aConditions.length === 0) {
-				aReqFiltersWithoutValue.push(sName);
-			}
-		}.bind(this));
-
-		return aReqFiltersWithoutValue;
-	};
-
 	FilterBarBase.prototype._checkAsyncValidation = function() {
-		var vRetErrorState = ErrorState.NoError;
+		var vRetErrorState = FilterBarValidationStatus.NoError;
 
 		if (this._aFIChanges && this._aFIChanges.length > 0) {
-			vRetErrorState = ErrorState.AsyncValidation;
+			vRetErrorState = FilterBarValidationStatus.AsyncValidation;
 		}
 
 		return vRetErrorState;
 	};
 
 	FilterBarBase.prototype._checkOngoingChangeAppliance = function() {
-		var vRetErrorState = ErrorState.NoError;
+		var vRetErrorState = FilterBarValidationStatus.NoError;
 
 		if (this._aOngoingChangeAppliance && this._aOngoingChangeAppliance.length > 0) {
-			vRetErrorState = ErrorState.OngoingChangeAppliance;
+			vRetErrorState = FilterBarValidationStatus.OngoingChangeAppliance;
 		}
 
 		return vRetErrorState;
@@ -952,7 +969,7 @@ sap.ui.define([
 					(oFilterField.getValueStateText() === this._oRb.getText("filterbar.REQUIRED_FILTER_VALUE_MISSING"))) {
 
 					if (!aReqFiltersWithoutValue) {
-						aReqFiltersWithoutValue = this._getRequiredFieldsWithoutValues();
+						aReqFiltersWithoutValue = FilterUtil.getRequiredFieldNamesWithoutValues(this);
 					}
 
 					if (aReqFiltersWithoutValue.indexOf(oFilterField.getFieldPath()) < 0) {
@@ -964,9 +981,9 @@ sap.ui.define([
 	};
 
 	FilterBarBase.prototype._checkRequiredFields = function() {
-		var vRetErrorState = ErrorState.NoError;
+		var vRetErrorState = FilterBarValidationStatus.NoError;
 
-		var aReqFiltersWithoutValue = this._getRequiredFieldsWithoutValues();
+		var aReqFiltersWithoutValue = FilterUtil.getRequiredFieldNamesWithoutValues(this);
 		aReqFiltersWithoutValue.forEach(function(sName) {
 			var oFilterField = this._getFilterField(sName);
 			if (oFilterField) {
@@ -978,22 +995,23 @@ sap.ui.define([
 				Log.error("Mandatory filter field '" + sName + "' not visible on FilterBarBase has no value.");
 			}
 
-			vRetErrorState = ErrorState.RequiredHasNoValue;
+			vRetErrorState = FilterBarValidationStatus.RequiredHasNoValue;
 		}.bind(this));
 
 		return vRetErrorState;
 	};
 
 	FilterBarBase.prototype._checkFieldsInErrorState = function() {
-		var vRetErrorState = ErrorState.NoError;
+		var vRetErrorState = FilterBarValidationStatus.NoError;
 
-		this._getNonRequiredPropertyNames().some(function(sName) {
-			var oFilterField = this._getFilterField(sName);
+		this.getFilterItems().some(function(oFilterField) {
 			if (oFilterField && (oFilterField.getValueState() !== ValueState.None)) {
-				vRetErrorState = ErrorState.FieldInErrorState;
+				if (oFilterField.getValueStateText() !== this._oRb.getText("filterbar.REQUIRED_FILTER_VALUE_MISSING")) {
+					vRetErrorState = FilterBarValidationStatus.FieldInErrorState;
+				}
 			}
 
-			return vRetErrorState !== ErrorState.NoError;
+			return vRetErrorState !== FilterBarValidationStatus.NoError;
 		}.bind(this));
 
 		return vRetErrorState;
@@ -1003,11 +1021,18 @@ sap.ui.define([
 
 		var oPromise = oEvent.getParameter("promise");
 		if (oPromise) {
+
+			this._sReason = ReasonMode.Enter;
+
 			oPromise.then(function() {
-				this.triggerSearch();
+				var oWaitPromises = (this._aOngoingChangeAppliance && (this._aOngoingChangeAppliance.length > 0)) ? this._aOngoingChangeAppliance.slice() : [Promise.resolve()];
+				Promise.all(oWaitPromises).then(function() {
+					this.triggerSearch();
+				}.bind(this));
 			}.bind(this)).catch(function(oEx) {
 				Log.error(oEx);
-			});
+				this.triggerSearch().catch(function(oEx) { }); // catch rejected and do nothing
+			}.bind(this));
 		}
 	};
 
@@ -1030,24 +1055,33 @@ sap.ui.define([
 		this._aFIChanges.push({ name: oFilterField.getFieldPath(), promise: oEvent.getParameter("promise")});
 	};
 
-	FilterBarBase.prototype._checkFilters = function() {
+	 /**
+	  * Checks the validation status of the filter fields.
+	  * <b>Note:</b><br>
+	  * This method returns the current inner state of the filter bar.
+	  * @private
+	  * @MDC_PUBLIC_CANDIDATE
+	  * @ui5-restricted sap.fe, sap.ui.mdc
+	  * @returns {sap.ui.mdc.enum.FilterBarValidationStatus} Returns the validation status
+	  */
+	FilterBarBase.prototype.checkFilters = function() {
 		var vRetErrorState = this._checkAsyncValidation();
-		if (vRetErrorState !== ErrorState.NoError) {
+		if (vRetErrorState !== FilterBarValidationStatus.NoError) {
 			return vRetErrorState;
 		}
 
 		vRetErrorState = this._checkOngoingChangeAppliance();
-		if (vRetErrorState !== ErrorState.NoError) {
-			return vRetErrorState;
-		}
-
-		vRetErrorState = this._checkRequiredFields();
-		if (vRetErrorState !== ErrorState.NoError) {
+		if (vRetErrorState !== FilterBarValidationStatus.NoError) {
 			return vRetErrorState;
 		}
 
 		vRetErrorState = this._checkFieldsInErrorState();
-		if (vRetErrorState !== ErrorState.NoError) {
+		if (vRetErrorState !== FilterBarValidationStatus.NoError) {
+			return vRetErrorState;
+		}
+
+		vRetErrorState = this._checkRequiredFields();
+		if (vRetErrorState !== FilterBarValidationStatus.NoError) {
 			return vRetErrorState;
 		}
 
@@ -1067,7 +1101,12 @@ sap.ui.define([
 		return oFilterField;
 	};
 
-	FilterBarBase.prototype._handleAsyncValidation = function(bFireSearch) {
+	FilterBarBase.prototype._handleAsyncValidation = function(bFireSearch, fnCallBack) {
+
+		if (!fnCallBack) {
+			fnCallBack = this._validate.bind(this);
+		}
+
 		if (this._aFIChanges && (this._aFIChanges.length > 0)) {
 
 			var aNamePromisesArray = this._aFIChanges.slice();
@@ -1086,14 +1125,19 @@ sap.ui.define([
 						oFF.setValueState(ValueState.None); //valid existing value -> clear missing required error
 					}
 				}, this);
-				this._validate(bFireSearch);
-			}.bind(this), function(aConditionsArray) {
-				this._validate(bFireSearch);
-			}.bind(this));
+				fnCallBack(bFireSearch);
+			}.bind(this)).catch(function(oEx) {
+				fnCallBack(bFireSearch);
+			});
 		}
 	};
 
-	FilterBarBase.prototype._handleOngoingChangeAppliance = function(bFireSearch) {
+	FilterBarBase.prototype._handleOngoingChangeAppliance = function(bFireSearch, fnCallBack) {
+
+		if (!fnCallBack) {
+			fnCallBack = this._validate.bind(this);
+		}
+
         if (this._aOngoingChangeAppliance && (this._aOngoingChangeAppliance.length > 0)) {
 
             var aChangePromises = this._aOngoingChangeAppliance.slice();
@@ -1104,24 +1148,88 @@ sap.ui.define([
             }
 
 			Promise.all(aChangePromises).then(function() {
-				this._validate(bFireSearch);
-			}.bind(this), function() {
-				this._validate(bFireSearch);
-			}.bind(this));
+				fnCallBack(bFireSearch);
+			}).catch(function(oEx) {
+				fnCallBack(bFireSearch);
+			});
 		}
 	};
 
+	 FilterBarBase.prototype._determineValidationState = function() {
+		 return this.awaitControlDelegate().then(function(oDelegate) {
+			 return oDelegate.determineValidationState(this, this.checkFilters());
+		 }.bind(this));
+	 };
+
+	 FilterBarBase.prototype._visualizeValidationState = function(nValidationStatus) {
+		 if (this._oDelegate) {
+			 this._oDelegate.visualizeValidationState(this, { status: nValidationStatus});
+		 }
+	 };
+
+	 /**
+	  * Returns the corresponding library text.
+	  * @private
+	  * @param {strings} sKey of the text
+	  * @returns {string} associated text from the message bundle
+	  */
+	 FilterBarBase.prototype.getText = function(sKey) {
+		 return this._oRb.getText(sKey);
+	 };
+
+
+	 FilterBarBase.prototype._restartCheckAndNotify = function(bFireSearch) {
+		 var vRetErrorState = this.checkFilters();
+		 this._checkAndNotify(bFireSearch, vRetErrorState);
+	 };
+
+	 FilterBarBase.prototype._checkAndNotify = function(bFireSearch, vRetErrorState) {
+		 var fnCheckAndFireSearch = function() {
+			 if (bFireSearch) {
+					var oObj = {
+						reason: this._sReason ? this._sReason : ReasonMode.Unclear
+					};
+					this._sReason = ReasonMode.Unclear;
+
+					this.fireSearch(oObj);
+			 }
+		 }.bind(this);
+
+		 var fnCleanup = function() {
+			 this._oValidationPromise = null;
+			 this._fRejectedSearchPromise = null;
+			 this._fResolvedSearchPromise = null;
+		 }.bind(this);
+
+		 if (vRetErrorState === FilterBarValidationStatus.AsyncValidation) {
+			 this._handleAsyncValidation(bFireSearch, this._restartCheckAndNotify.bind(this));
+			 return;
+		 }
+
+		 if (vRetErrorState === FilterBarValidationStatus.OngoingChangeAppliance) {
+			 this._handleOngoingChangeAppliance(bFireSearch, this._restartCheckAndNotify.bind(this));
+			 return;
+		 }
+
+		 if (vRetErrorState === FilterBarValidationStatus.NoError) {
+			 if (this._fResolvedSearchPromise) {
+				 fnCheckAndFireSearch();
+				 this._fResolvedSearchPromise();
+			 }
+		 } else if (this._fRejectedSearchPromise) {
+			 //this._setFocusOnFirstErroneousField();
+			 this._fRejectedSearchPromise();
+		 }
+
+		 this._visualizeValidationState(vRetErrorState);
+		 fnCleanup();
+	 };
+
 	 // Executes the search.
 	 FilterBarBase.prototype._validate = function(bFireSearch) {
-		var sErrorMessage, vRetErrorState;
-
-		var fnCheckAndFireSearch = function() {
-			if (bFireSearch) {
-				this.fireSearch();
-			}
-		}.bind(this);
 
 		var fnCleanup = function() {
+			this._oValidationPromise = null;
 			this._fRejectedSearchPromise = null;
 			this._fResolvedSearchPromise = null;
 		}.bind(this);
@@ -1131,45 +1239,9 @@ sap.ui.define([
 			return;
 		}
 
-		// First check for validation errors or if search should be prevented
-		vRetErrorState = this._checkFilters();
-
-		if (vRetErrorState === ErrorState.AsyncValidation) {
-			this._handleAsyncValidation(bFireSearch);
-			return;
-		}
-
-		if (vRetErrorState === ErrorState.OngoingChangeAppliance) {
-			this._handleOngoingChangeAppliance(bFireSearch);
-			return;
-		}
-
-		if (vRetErrorState === ErrorState.NoError) {
-			fnCheckAndFireSearch();
-			this._fResolvedSearchPromise();
-			fnCleanup();
-		} else {
-			if (vRetErrorState === ErrorState.RequiredHasNoValue) {
-				sErrorMessage = this._oRb.getText("filterbar.REQUIRED_CONDITION_MISSING");
-			} else {
-				sErrorMessage = this._oRb.getText("filterbar.VALIDATION_ERROR");
-			}
-
-			if (this.getShowMessages() && !this._isLiveMode()) {
-				try {
-					MessageBox.error(sErrorMessage, {
-						styleClass: (this.$() && this.$().closest(".sapUiSizeCompact").length) ? "sapUiSizeCompact" : "",
-						onClose: this._setFocusOnFirstErroneousField.bind(this)
-					});
-				} catch (x) {
-					Log.error(x.message);
-				}
-			} else {
-				Log.warning("search was not triggered. " + sErrorMessage);
-			}
-			this._fRejectedSearchPromise();
-			fnCleanup();
-		}
+		this._determineValidationState().then(function(vRetErrorState) {
+			this._checkAndNotify(bFireSearch, vRetErrorState);
+		}.bind(this));
 	};
 
 	/**
@@ -1376,17 +1448,27 @@ sap.ui.define([
 			// --> no filter changes have been done
 			return Promise.resolve();
 		}
+
+
+		var fResolveApplyingChanges;
+
+		if (!this._oApplyingChanges) {
+			this._oApplyingChanges = new Promise(function(resolve) {
+				fResolveApplyingChanges  = resolve;
+			});
+		}
+
 		return this._setXConditions(this.getFilterConditions()).then(function(){
+
 			this._reportModelChange({
 				triggerSearch: false,
 				triggerFilterUpdate: true,
 				recheckMissingRequired: true
 			});
 
-			if (this._oApplyingChanges) {
-				this._fResolveApplyingChanges();
-				this._oApplyingChanges = null;
-			}
+			fResolveApplyingChanges();
+			this._oApplyingChanges = null;
+
 		}.bind(this));
 	};
 
@@ -1579,7 +1661,7 @@ sap.ui.define([
 						this._filterItemRemoved(oFilterField);
 					}
 
-					this._oFilterBarLayout.rerender();
+					this._oFilterBarLayout.invalidate();
 				}
 			}
 		}
@@ -1639,7 +1721,7 @@ sap.ui.define([
 					this._fRejectMetadataApplied = null;
 				}.bind(this);
 
-				if (this.bDelegateInitialized) {
+				if (this.isControlDelegateInitialized()) {
 					this.finalizePropertyHelper().then(function() {
 						fnResolveMetadata(true);
 					});
@@ -1722,6 +1804,8 @@ sap.ui.define([
 
 	FilterBarBase.prototype._cleanUpAllFilterFieldsInErrorState = function() {
 
+		this._getConditionModel().checkUpdate(true);
+
 		var aFilterFields = this.getFilterItems();
 		aFilterFields.forEach( function(oFilterField) {
 			this._cleanUpFilterFieldInErrorState(oFilterField);
@@ -1743,7 +1827,7 @@ sap.ui.define([
 			this._bIgnoreChanges = false;
 			this._reportModelChange({
 				triggerFilterUpdate: true,
-				triggerSearch: this._bExecuteOnSelect
+				triggerSearch: false
 			});
 			this._bInitialFiltersApplied = true;
 			this._fResolveInitialFiltersApplied();
@@ -1783,19 +1867,21 @@ sap.ui.define([
 
 		this._bExecuteOnSelect = this._getExecuteOnSelectionOnVariant(oVariant);
 
+		this._sReason = this._bExecuteOnSelect ? ReasonMode.Variant : ReasonMode.Unclear;
+
 		this._bDoNotTriggerFiltersChangeEventBasedOnVariantSwitch = false;
 		if (oVariant.hasOwnProperty("createScenario") && (oVariant.createScenario === "saveAs")) {
 			//during SaveAs a switch occurs but the processing of related variants based changes may still be ongoing
 			this._bDoNotTriggerFiltersChangeEventBasedOnVariantSwitch = true;
 		}
 
-		return this.awaitPendingModification().then(function(){
+		return this.awaitPendingModification().then(function(aAffectedControllers){
 			//clean-up fields in error state
 			this._cleanUpAllFilterFieldsInErrorState();
 
-			// ensure that the initial filters are applied --> only trigger search & validate
-			// _onModifications updates the filters & fires filtersChanged
-			if (this._bInitialFiltersApplied) {
+			// ensure that the initial filters are applied --> only trigger search & validate when no filterbar changes exists.
+			// Filterbar specific changes will be handled via _onModifications.
+			if (this._bInitialFiltersApplied && (aAffectedControllers.indexOf("Filter") === -1)) {
 				this._reportModelChange({
 					triggerFilterUpdate: false,
 					triggerSearch: this._bExecuteOnSelect
@@ -1876,7 +1962,7 @@ sap.ui.define([
 			});
 		}
 
-		if (this.bDelegateInitialized && this.getControlDelegate().cleanup) {
+		if (this.isControlDelegateInitialized() && this.getControlDelegate().cleanup) {
 			this.getControlDelegate().cleanup(this);
 		}
 

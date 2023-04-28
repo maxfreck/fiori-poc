@@ -1,6 +1,6 @@
 /*
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -22,7 +22,7 @@ sap.ui.define([
 	 *
 	 * @class Implements the selection methods for TreeTable and AnalyticalTable
 	 * @extends sap.ui.table.plugins.SelectionPlugin
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @alias sap.ui.table.plugins.BindingSelection
@@ -175,7 +175,7 @@ sap.ui.define([
 
 		if (!oBinding) {
 			return 0;
-		} else if (oBinding.getGrandTotalContextInfo) { // AnalyticalBinding
+		} else if (oBinding.isA("sap.ui.model.analytics.AnalyticalBinding")) {
 			var oRootNode = oBinding.getGrandTotalContextInfo();
 			return oRootNode ? oRootNode.totalNumberOfLeafs : 0;
 		} else {
@@ -329,7 +329,15 @@ sap.ui.define([
 	 */
 	BindingSelection.prototype._getHighestSelectableIndex = function() {
 		var oBinding = this.getTableBinding();
-		return oBinding ? oBinding.getLength() - 1 : -1;
+
+		if (!oBinding) {
+			return -1;
+		} else if (oBinding.isA("sap.ui.model.analytics.AnalyticalBinding")) {
+			var bHasGrandTotal = oBinding.providesGrandTotal() && oBinding.hasTotaledMeasures();
+			return oBinding.getLength() - (bHasGrandTotal ? 2 : 1);
+		} else {
+			return oBinding.getLength() - 1;
+		}
 	};
 
 	/**

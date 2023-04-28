@@ -1,18 +1,20 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 		'sap/ui/mdc/enum/BaseType',
 		'sap/base/util/ObjectPath',
+		'sap/base/util/isEmptyObject',
+		'sap/base/util/merge',
 		'sap/ui/model/SimpleType',
 		'sap/ui/mdc/util/DateUtil'
-], function(BaseType, ObjectPath, SimpleType, DateUtil) {
+], function(BaseType, ObjectPath, isEmptyObject, merge, SimpleType, DateUtil) {
 	"use strict";
 
-	var sDateTimePattern = "yyyy-MM-ddTHH:mm:ssZ"; // milliseconds missing
+	// var sDateTimePattern = "yyyy-MM-ddTHH:mm:ssZ"; // milliseconds missing
 	var sDatePattern = "yyyy-MM-dd";
 	var sTimePattern = "HH:mm:ss";
 
@@ -23,7 +25,7 @@ sap.ui.define([
 	 * @namespace
 	 * @author SAP SE
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.ui.mdc, sap.fe
 	 * @experimental As of version 1.79
 	 * @since 1.79.0
 	 * @alias sap.ui.mdc.util.TypeUtil
@@ -119,6 +121,8 @@ sap.ui.define([
 		/**
 		 * Returns a dataType class based on given object path, formatoptions and constraints
 		 *
+		 * <b>Note:</b> The module of the data type needs to be loaded before.
+		 *
 		 * @param {string} sDataType Class path as string where each name is separated by '.'
 		 * @returns {sap.ui.model.SimpleType} creates returns a dataType class
 		 * @private
@@ -190,9 +194,12 @@ sap.ui.define([
 			var sBaseType = this.getBaseTypeForType(oTypeInstance);
 			switch (sBaseType) {
 				case BaseType.DateTime:
-					return DateUtil.stringToType(sValue, oTypeInstance, sDateTimePattern);
+					return DateUtil.ISOToType(sValue, oTypeInstance, sBaseType);
 
 				case BaseType.Date:
+					if (sValue.indexOf("T") >= 0) { // old variant with DateTime for DateValues
+						sValue = sValue.substr(0, sValue.indexOf("T")); // just take the date part
+					}
 					return DateUtil.stringToType(sValue, oTypeInstance, sDatePattern);
 
 				case BaseType.Time:
@@ -231,7 +238,7 @@ sap.ui.define([
 			var sBaseType = this.getBaseTypeForType(oTypeInstance);
 			switch (sBaseType) {
 				case BaseType.DateTime:
-					return DateUtil.typeToString(vValue, oTypeInstance, sDateTimePattern);
+					return DateUtil.typeToISO(vValue, oTypeInstance, sBaseType);
 
 				case BaseType.Date:
 					return DateUtil.typeToString(vValue, oTypeInstance, sDatePattern);
@@ -256,6 +263,35 @@ sap.ui.define([
 				return vType;
 			}
 			return this.getDataTypeInstance(vType, oFormatOptions, oConstraints); // string
+		},
+
+		/**
+		 * Returns a instance of a unit or currency type based on an existing type.
+		 *
+		 * This type is used fur the number and unit part of a field if the field itself is using a unit or currency type.
+		 *
+		 * @param {sap.ui.model.CompositeType} oOriginalType Original data type used by field
+  		 * @param {boolean} [bShowNumber] number should be shown
+ 		 * @param {boolean} [bShowMeasure] unit should be shown
+		 * @returns {sap.ui.model.CompositeType} creates returns an instance of the resolved dataType
+		 * @private
+		 * @ui5-restricted sap.ui.mdc
+		 */
+		 getUnitTypeInstance: function(oOriginalType, bShowNumber, bShowMeasure) {
+			var sName = oOriginalType.getMetadata().getName();
+			var oFormatOptions = merge({}, oOriginalType.getFormatOptions()); // for Unit/Currency always set - do not manipulate original object
+			var oConstraints = isEmptyObject(oOriginalType.getConstraints()) ? undefined : merge({}, oOriginalType.getConstraints()); // do not manipulate original object
+			var TypeClass = ObjectPath.get(sName);
+
+			this._adjustUnitFormatOptions(oFormatOptions, bShowNumber, bShowMeasure);
+
+			return new TypeClass(oFormatOptions, oConstraints);
+		},
+
+		_adjustUnitFormatOptions: function (oFormatOptions, bShowNumber, bShowMeasure) {
+			oFormatOptions.showNumber = bShowNumber;
+			oFormatOptions.showMeasure = bShowMeasure;
+			oFormatOptions.strictParsing = true; // do not allow to enter unit in number field
 		}
 	};
 

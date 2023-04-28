@@ -26,7 +26,7 @@
 		},
 		{
 			"name": "ToolHeader.less",
-			"size": 19325,
+			"size": 19356,
 			"designtime": true,
 			"theme": "sap_fiori_3"
 		},
@@ -43,19 +43,19 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 122269,
+			"size": 134271,
 			"designtime": true,
 			"theme": "sap_fiori_3"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 121907,
+			"size": 133909,
 			"designtime": true,
 			"theme": "sap_fiori_3"
 		},
 		{
 			"name": "library-RTL.css",
-			"size": 34800,
+			"size": 35749,
 			"theme": "sap_fiori_3"
 		},
 		{
@@ -66,12 +66,12 @@
 		},
 		{
 			"name": "library.css",
-			"size": 34796,
+			"size": 35745,
 			"theme": "sap_fiori_3"
 		},
 		{
 			"name": "library.less",
-			"size": 22605,
+			"size": 22636,
 			"designtime": true,
 			"theme": "sap_fiori_3"
 		},
@@ -83,12 +83,12 @@
 		},
 		{
 			"name": "library_skeleton-RTL.css",
-			"size": 37685,
+			"size": 38611,
 			"theme": "sap_fiori_3"
 		},
 		{
 			"name": "library_skeleton.css",
-			"size": 37681,
+			"size": 38607,
 			"theme": "sap_fiori_3"
 		},
 		{

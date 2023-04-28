@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -20,7 +20,7 @@ sap.ui.define([
 	 * The <code>loadFlexData</code> already ensures that all <code>sap.ui.fl</code>-internals are handled accordingly.
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.fl, SAPUI5 Visual Editor, UX Tools
+	 * @ui5-restricted sap.ui.fl, SAP Web IDE (Visual Editor), UX Tools
 	 * @abstract
 	 */
 	return {

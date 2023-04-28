@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -37,7 +37,6 @@ sap.ui.define([
 		 *
 		 * @param {object} mPropertyBag - Object with parameters as properties
 		 * @param {string} [mPropertyBag.layer] - Layer
-		 * @param {string} [mPropertyBag.isComp=true] - Flag if the control owning the Component is the comp.VariantManagement
 		 * @returns {Promise<sap.ui.core.ComponentContainer>} Promise resolving with the ComponentContainer or nothing depending on the availability of the feature in the used back end
 		 * @private
 		 * @ui5-restricted sap.ui.comp, sap.ui.fl
@@ -47,13 +46,18 @@ sap.ui.define([
 				return Promise.resolve();
 			}
 			return Settings.getInstance().then(function(oSettings) {
-				return (mPropertyBag.isComp) ? oSettings.isContextSharingEnabledForComp() : oSettings.isContextSharingEnabled();
+				return oSettings.isContextSharingEnabled();
 			}).then(function(bIsEnabled) {
 				if (bIsEnabled) {
 					if (!oComponentContainer || oComponentContainer.bIsDestroyed) {
 						var oComponent = new ContextSharingComponent("contextSharing");
+						oComponent.showMessageStrip(true);
 						oComponent.setSelectedContexts({role: []});
 						oComponentContainer = new ComponentContainer("contextSharingContainer", {component: oComponent});
+						// Ensure view is fully loaded
+						return oComponent.getRootControl().oAsyncState.promise.then(function() {
+							return oComponentContainer;
+						});
 					}
 					return oComponentContainer;
 				}

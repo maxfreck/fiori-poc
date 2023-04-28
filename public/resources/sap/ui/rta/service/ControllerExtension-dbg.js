@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -31,7 +31,7 @@ sap.ui.define([
 	 * @author SAP SE
 	 * @experimental Since 1.58
 	 * @since 1.58
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted
 	*/
@@ -117,7 +117,7 @@ sap.ui.define([
 				 *
 				 * @method sap.ui.rta.service.ControllerExtension.getTemplate
 				 * @param {string} sViewId - ID of the view whose template should be retrieved
-				 * @return {Promise} Promise that resolves with the template as string or rejects when the file was not found
+				 * @return {Promise<string>} Promise that resolves with the template as string or rejects when the file was not found
 				 * @public
 				 */
 				getTemplate: function(sViewId) {

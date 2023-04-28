@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -139,10 +139,18 @@ sap.ui.define([
 	ObjectPageSectionBase.prototype.onBeforeRendering = function () {
 		var sAriaLabeledBy = "ariaLabelledBy";
 
-		this.setInvisibleTextLabelValue(this._getTitle());
-
 		if (!this.getAggregation(sAriaLabeledBy)) {
 			this.setAggregation(sAriaLabeledBy, this._getAriaLabelledBy(), true); // this is called onBeforeRendering, so suppress invalidate
+		} else {
+			this.updateInvisibleTextLabelValue();
+		}
+	};
+
+
+	ObjectPageSectionBase.prototype.exit = function () {
+		if (this._oInvisibleText) {
+			this._oInvisibleText.destroy();
+			this._oInvisibleText = null;
 		}
 	};
 
@@ -160,7 +168,11 @@ sap.ui.define([
 			if (this._oGridContentObserver) {
 				this._oGridContentObserver.observe(this.getAggregation("_grid"), {
 					aggregations: [
-					"content"
+					 // both aggregation names are required
+					 // because the first ("content") is the actual
+					 // and the second ("subSections") is the publicly visible
+					 // due to aggregation forwarding
+					"content", "subSections"
 				]});
 			}
 		}
@@ -356,18 +368,15 @@ sap.ui.define([
 	};
 
 	/**
-	 * Returns the DOM Element that should get the focus.
-	 *
-	 * To be overwritten by the specific control method.
+	 * Performs the update of the invisible text label.
+	 * This method is called for example when the section title is changed.
 	 *
 	 * @return {this} this for chaining
 	 * @protected
 	 */
-	ObjectPageSectionBase.prototype.setInvisibleTextLabelValue = function (sValue) {
+	ObjectPageSectionBase.prototype.updateInvisibleTextLabelValue = function () {
 		var oAriaLabelledBy = this.getAggregation("ariaLabelledBy"),
-			sLabel = "";
-
-		sLabel = sValue || this.getSectionText();
+			sLabel = this._getAriaLabelledByText();
 
 		if (oAriaLabelledBy) {
 			sap.ui.getCore().byId(oAriaLabelledBy.getId()).setText(sLabel);
@@ -377,22 +386,46 @@ sap.ui.define([
 	};
 
 	/**
-	 * provide a default aria-labeled by text
+	 * Returns the invisible text control with the label already set to be for to the ariaLabelledBy aggregation.
 	 * @private
 	 * @returns {*} sap.ui.core.InvisibleText
 	 */
 	ObjectPageSectionBase.prototype._getAriaLabelledBy = function () {
+		var sLabel = this._getAriaLabelledByText();
+		return this._getInvisibleText().setText(sLabel);
+	};
+
+	/**
+	 * Returns the label string for the section.
+	 * @private
+	 * @returns {string} aria-labeled by text
+	 */
+	ObjectPageSectionBase.prototype._getAriaLabelledByText = function () {
 		// Each section should be labelled as:
 		// 'titleName' - if the section has a title
-		// 'Section' - if it does not have a title
+		// 'Section' - if it does not have a title or its hidden (for example, showTitle=false)
+		var sTitle = this._getShouldLabelTitle() && this._getTitle();
+		return sTitle || this.getSectionText();
+	};
 
-		var sLabel = "";
+	ObjectPageSectionBase.prototype._getInvisibleText = function () {
+		if (!this._oInvisibleText) {
+			this._oInvisibleText = new InvisibleText();
+			this._oInvisibleText.toStatic();
+		}
 
-		sLabel = this._getTitle() || this.getSectionText();
+		return this._oInvisibleText;
+	};
 
-		return new InvisibleText({
-			text: sLabel
-		}).toStatic();
+	/**
+	 * Returns a boolean value indicating whether the title should be added to the section's aria label.
+	 * Aware of whether the subsection is promoted or not.
+	 *
+	 * @returns {boolean} true if title should be part of the label
+	 * @private
+	 */
+	ObjectPageSectionBase.prototype._getShouldLabelTitle = function () {
+		return this.getShowTitle ? this.getShowTitle() : true;
 	};
 
 	/**
@@ -588,7 +621,7 @@ sap.ui.define([
 		this.setProperty("title", sValue, bSuppressInvalidate);
 		this._notifyObjectPageLayout();
 
-		this.setInvisibleTextLabelValue(sValue);
+		this.updateInvisibleTextLabelValue();
 
 		return this;
 	};
@@ -700,7 +733,10 @@ sap.ui.define([
 
 		if (oTarget.classList.contains('sapUxAPObjectPageSubSection')) {
 			// each subsection is wrapped in a div, so we need the subsection inside the sibling wrapper
-			oNextSibling = oTarget.parentElement.nextElementSibling.querySelector(".sapUxAPObjectPageSubSection");
+			var oParent = oTarget.parentElement;
+			if (oParent.nextElementSibling) {
+				oNextSibling = oParent.nextElementSibling.querySelector(".sapUxAPObjectPageSubSection");
+			}
 		}
 		this._handleFocusing(oEvent, oNextSibling);
 	};
@@ -741,7 +777,10 @@ sap.ui.define([
 
 		if (oTarget.classList.contains('sapUxAPObjectPageSubSection')) {
 			// each subsection is wrapped in a div, so we need the subsection inside the sibling wrapper
-			oPreviousSibling = oTarget.parentElement.previousElementSibling.querySelector(".sapUxAPObjectPageSubSection");
+			var oParent = oTarget.parentElement;
+			if (oParent.previousElementSibling) {
+				oPreviousSibling = oParent.previousElementSibling.querySelector(".sapUxAPObjectPageSubSection");
+			}
 		}
 		this._handleFocusing(oEvent, oPreviousSibling);
 	};

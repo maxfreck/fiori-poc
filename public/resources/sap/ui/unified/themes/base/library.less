@@ -2,7 +2,7 @@
 
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,9 +42,7 @@
 	overflow: hidden;
 	position: relative;
 	outline: none;
-	display: flex;
-	flex-direction: column-reverse;
-	justify-content: flex-end;
+	display: inline-block;
 	white-space: initial; /* To not inherit */
 	box-sizing: border-box;
 	text-align: center;
@@ -71,10 +69,6 @@
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
 	background-color: @sapUiListBackground;
-}
-
-.sapUiCal:not(.sapUiCalInt) > .sapUiCalHead {
-	max-width: 40rem;
 }
 
 .sapUiCalTwoMonthsTwoColumnsJaZh:not(.sapUiCalInt) > .sapUiCalHead,
@@ -456,6 +450,7 @@ html.sap-desktop .sapUiCalHead > button.sapUiCalDsbl:focus,
 	overflow: hidden;
 	white-space: nowrap;
 	line-height: 100%;
+	pointer-events: none;
 }
 
 .sapUiCalMonthPicker.sapUiCalMonthSecType,
@@ -675,7 +670,7 @@ html.sapUiMedia-Std-Phone .sapUiCalHeadB0{
 }
 
 .sapUiSizeCompact .sapMPlanCal .sapUiCalNoNameLine .sapUiCalItem.sapUiRelativeCalItem > .sapUiCalItemText {
-    padding-left: 25%;
+	padding-left: 25%;
 }
 
 .sapUiCalNoNameLine .sapUiCalItem.sapUiCalItemNow > .sapUiCalItemText{
@@ -1147,6 +1142,25 @@ html.sap-phone [data-sap-ui-popup] .sapUiCal > .sapUiCalContent > .sapUiCalYearP
 	background: @sapUiListBackground;
 	border: 2px solid @sapUiCalendarColorToday;
 
+}
+
+.sapUiUnifiedLegendItem {
+	position: relative;
+
+	&:focus {
+		outline: none;
+		&::after {
+			content: "";
+			position: absolute;
+			box-sizing: border-box;
+			left: 0;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			border: 0.0625rem dotted @sapUiContentFocusColor;
+			pointer-events: none;
+		}
+	}
 }
 
 /*** compact mode (desktop size) ***/
@@ -3177,6 +3191,10 @@ html.sap-desktop .sapMIP .sapUiCalItemSel:active{
 @_sap_ui_unified_Menu_ItmHeightCozy: 3rem;
 @_sap_ui_unified_Menu_ItmPaddingCozy: 1rem;
 
+.sapMMenu {
+	max-width: 100%;
+}
+
 .sapUiMnu {
 	/* initially hidden off the screen */
 	position: absolute;
@@ -3562,6 +3580,14 @@ html[data-sap-ui-browser*='ie'] {
 	right: 1rem;
 }
 
+.sapUiMnuItm {
+	.sapUiMnuItmTxt {
+		padding-left: 0.5rem;
+	}
+	.sapUiMnuItmIco + .sapUiMnuItmTxt {
+		padding-left: 0;
+	}
+}
 
 /** Cozy Mode **/
 

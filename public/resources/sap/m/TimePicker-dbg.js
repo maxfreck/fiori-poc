@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -21,7 +21,6 @@ sap.ui.define([
 	'./MaskEnabler',
 	'sap/ui/Device',
 	'sap/ui/core/format/DateFormat',
-	'sap/ui/core/format/TimezoneUtil',
 	'sap/ui/core/Locale',
 	'sap/m/library',
 	'sap/ui/core/LocaleData',
@@ -31,7 +30,8 @@ sap.ui.define([
 	"sap/ui/core/InvisibleText",
 	'./Button',
 	"sap/ui/thirdparty/jquery",
-	"sap/ui/core/Configuration"
+	"sap/ui/core/Configuration",
+	"sap/ui/core/date/UI5Date"
 ],
 function(
 	InputBase,
@@ -49,7 +49,6 @@ function(
 	MaskEnabler,
 	Device,
 	DateFormat,
-	TimezoneUtil,
 	Locale,
 	library,
 	LocaleData,
@@ -59,7 +58,8 @@ function(
 	InvisibleText,
 	Button,
 	jQuery,
-	Configuration
+	Configuration,
+	UI5Date
 ) {
 		"use strict";
 
@@ -144,7 +144,7 @@ function(
 		 * @extends sap.m.DateTimeField
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @public
@@ -356,7 +356,7 @@ function(
 		 * the <code>dateValue</code> will be instantiated according to the parsed
 		 * <code>value</code>.
 		 *
-		 * @returns {object} the value of property <code>dateValue</code>
+		 * @returns {Date} the value of property <code>dateValue</code>
 		 * @public
 		 * @name sap.m.TimePicker#getDateValue
 		 * @function
@@ -451,7 +451,7 @@ function(
 			var oValueHelpIcon = this._getValueHelpIcon();
 
 			if (oValueHelpIcon) {
-				oValueHelpIcon.setProperty("visible", this.getEditable(), true);
+				oValueHelpIcon.setProperty("visible", this.getEditable());
 			}
 		};
 
@@ -612,23 +612,17 @@ function(
 			/* Set the timevalues of the picker here to prevent user from seeing it */
 			var oClocks = this._getClocks(),
 				oDateValue = this.getDateValue(),
-				iDateValueMilliseconds = oDateValue ? oDateValue.getMilliseconds() : 0,
 				sFormat = this._getFormatter(true).oFormatOptions.pattern,
 				iIndexOfHH = sFormat.indexOf("HH"),
 				iIndexOfH = sFormat.indexOf("H"),
 				sInputValue = TimePickerInternals._isHoursValue24(this._$input.val(), iIndexOfHH, iIndexOfH) ?
-					TimePickerInternals._replace24HoursWithZero(this._$input.val(), iIndexOfHH, iIndexOfH) : this._$input.val(),
-				sFormattedDate;
+					TimePickerInternals._replace24HoursWithZero(this._$input.val(), iIndexOfHH, iIndexOfH) : this._$input.val();
 
 			var oCurrentDateValue = this._getFormatter(true).parse(sInputValue) || oDateValue;
-			var sDisplayFormattedValue = this._getFormatter(true).format(oCurrentDateValue);
-
-			oClocks.setValue(sDisplayFormattedValue);
-
-			sFormattedDate = this._getPickerParser().format(oDateValue || new Date(),
-				Configuration.getTimezone());
-			oDateValue = this._getPickerParser().parse(sFormattedDate, TimezoneUtil.getLocalTimezone())[ 0 ];
-			oDateValue.setMilliseconds(iDateValueMilliseconds);
+			if (oCurrentDateValue) {
+				var sDisplayFormattedValue = this._getFormatter(true).format(oCurrentDateValue);
+				oClocks.setValue(sDisplayFormattedValue);
+			}
 
 			if (this._shouldSetInitialFocusedDateValue()) {
 				oDateValue = this.getInitialFocusedDateValue() || oDateValue;
@@ -808,7 +802,7 @@ function(
 		 * Sets the minutes step of clocks and inputs.
 		 *
 		 * @param {int} step The step used to generate values for the minutes clock/input
-		 * @returns {*} this
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @public
 		 */
 		TimePicker.prototype.setMinutesStep = function(step) {
@@ -830,7 +824,7 @@ function(
 		 * Sets the seconds step of clocks and inputs.
 		 *
 		 * @param {int} step The step used to generate values for the seconds clock/input
-		 * @returns {this} <code>this</code> to allow method chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @public
 		 */
 		TimePicker.prototype.setSecondsStep = function(step) {
@@ -852,7 +846,7 @@ function(
 		 * Sets the title label inside the picker.
 		 *
 		 * @param {string} title A title
-		 * @returns {this} <code>this</code> to allow method chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 */
 		TimePicker.prototype.setTitle = function(title) {
 			var oClocks = this._getClocks();
@@ -869,7 +863,7 @@ function(
 		/**
 		 * Handles data validation.
 		 *
-		 * @param {object} oDate JavaScript date object
+		 * @param {Date} oDate JavaScript date object
 		 * @private
 		 */
 		 TimePicker.prototype._handleDateValidation = function (oDate) {
@@ -900,7 +894,7 @@ function(
 		 * Recommended usage is to not use it with am/pm format.
 		 *
 		 * @param {boolean} bSupport2400
-		 * @returns {this} this instance, used for chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @public
 		 */
 		TimePicker.prototype.setSupport2400 = function (bSupport2400) {
@@ -925,7 +919,7 @@ function(
 		 *
 		 * @param {string} sDisplayFormat display format to set
 		 * @public
-		 * @returns {this} this instance, used for chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 */
 		 TimePicker.prototype.setDisplayFormat = function (sDisplayFormat) {
 			var oClocks = this._getClocks(),
@@ -967,7 +961,7 @@ function(
 		 *
 		 * @override
 		 * @param {string} sValue New value
-		 * @returns {this} this instance, used for chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @public
 		 */
 		TimePicker.prototype.setValue = function(sValue) {
@@ -1059,8 +1053,8 @@ function(
 		 * Sets the value of the date.
 		 *
 		 * @public
-		 * @param {object} oDate date object
-		 * @returns {this} this instance, used for chaining
+		 * @param {Date} oDate A JavaScript date
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 */
 		 TimePicker.prototype.setDateValue = function(oDate) {
 			this._initMask();
@@ -1074,7 +1068,7 @@ function(
 		 * Necessary for translation and auto-complete of the day periods, such as AM and PM.
 		 *
 		 * @param {string} sLocaleId A locale identifier like 'en_US'
-		 * @returns {this} this instance, used for chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @public
 		 */
 		TimePicker.prototype.setLocaleId = function(sLocaleId) {
@@ -1659,11 +1653,7 @@ function(
 		 */
 		TimePicker.prototype._handleOkPress = function(oEvent) {
 			var oDate = this._getClocks().getTimeValues(),
-				sValue,
-				sFormattedDate = this._getPickerParser().format(oDate, TimezoneUtil.getLocalTimezone());
-
-			oDate = this._getPickerParser()
-				.parse(sFormattedDate, Configuration.getTimezone())[0];
+				sValue;
 
 			this._isClockPicker = true;
 			this._isNumericPicker = false;
@@ -1693,11 +1683,7 @@ function(
 		 */
 		 TimePicker.prototype._handleNumericOkPress = function(oEvent) {
 			var oDate = this._getInputs().getTimeValues(),
-				sValue,
-				sFormattedDate = this._getPickerParser().format(oDate, TimezoneUtil.getLocalTimezone());
-
-			oDate = this._getPickerParser()
-				.parse(sFormattedDate, Configuration.getTimezone())[0];
+				sValue;
 
 			this._isClockPicker = false;
 			this._isNumericPicker = true;
@@ -1814,7 +1800,7 @@ function(
 
 			if (oOldDate && this.getEditable() && this.getEnabled()) {
 				// use a new date object to have a real updated property
-				oDate = new Date(oOldDate.getTime());
+				oDate = UI5Date.getInstance(oOldDate.getTime());
 
 				switch (sUnit) {
 					case TimeParts.Hour:
@@ -1836,7 +1822,7 @@ function(
 				if (iNumber < 0 && oDate.getTime() - oOldDate.getTime() !== iNumber * iMsOffset) { //hour stays the same
 					// so decrease it with the milliseconds offset
 					// and let the hours adjust automatically
-					oDate = new Date(oOldDate.getTime() + iNumber * iMsOffset);
+					oDate = UI5Date.getInstance(oOldDate.getTime() + iNumber * iMsOffset);
 				}
 
 				this.setDateValue(oDate);
@@ -2252,7 +2238,7 @@ function(
 
 		/**
 		 * @see sap.ui.core.Control#getAccessibilityInfo
-		 * @returns {object} Current accessibility state of the control.
+		 * @returns {sap.ui.core.AccessibilityInfo} Current accessibility state of the control.
 		 * @protected
 		 */
 		TimePicker.prototype.getAccessibilityInfo = function() {
@@ -2320,14 +2306,6 @@ function(
 			this._setCursorPosition(Math.max(this._iUserInputStartPosition, iStart));
 		};
 
-		TimePicker.prototype._getPickerParser = function() {
-			if (!this._clocksParser) {
-				this._clocksParser = DateFormat.getDateTimeWithTimezoneInstance({ showTimezone: false });
-			}
-
-			return this._clocksParser;
-		};
-
 		/**
 		 * Fires when the input operation has finished and the value has changed.
 		 *
@@ -2352,7 +2330,7 @@ function(
 		 * </ul>
 		 *
 		 * @param {object} [mArguments] The arguments to pass along with the event
-		 * @return {this} <code>this</code> to allow method chaining
+		 * @returns {this} Reference to <code>this</code> for method chaining
 		 * @protected
 		 * @name sap.m.TimePicker#fireChange
 		 * @function

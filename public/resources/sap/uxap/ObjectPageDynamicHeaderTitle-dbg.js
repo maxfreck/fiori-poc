@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -42,7 +42,7 @@ sap.ui.define([
 		 * @implements sap.uxap.IHeaderTitle
 		 *
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 *
 		 * @constructor
 		 * @public
@@ -128,6 +128,8 @@ sap.ui.define([
 
 		/**
 		 * Required by the {@link sap.uxap.IHeaderTitle} interface.
+		 *
+		 * @deprecated As of version 1.40.1
 		 */
 		ObjectPageDynamicHeaderTitle.prototype.getHeaderDesign = function () {
 			return library.ObjectPageHeaderDesign.Light;

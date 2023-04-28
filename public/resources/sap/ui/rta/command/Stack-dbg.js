@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -59,7 +59,7 @@ sap.ui.define([
 	 * @class
 	 * @extends sap.ui.base.ManagedObject
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.34
@@ -70,7 +70,15 @@ sap.ui.define([
 	var Stack = ManagedObject.extend("sap.ui.rta.command.Stack", {
 		metadata: {
 			library: "sap.ui.rta",
-			properties: {},
+			properties: {
+				/**
+				 * If the stack was saved at least once
+				 */
+				saved: {
+					type: "boolean",
+					defaultValue: false
+				}
+			},
 			aggregations: {
 				commands: {
 					type: "sap.ui.rta.command.BaseCommand",
@@ -281,6 +289,12 @@ sap.ui.define([
 		return (this._toBeExecuted + 1) < this.getCommands().length;
 	};
 
+	Stack.prototype.canSave = function() {
+		return this.canUndo() && this.getAllExecutedCommands().some(function(oCommand) {
+			return oCommand.getRelevantForSave();
+		});
+	};
+
 	Stack.prototype.undo = function() {
 		return this._unExecute();
 	};
@@ -333,6 +347,21 @@ sap.ui.define([
 		}
 
 		return aCommands;
+	};
+
+	/**
+	 * Combines the last two commands into a composite command
+	 *
+	 * @private
+	 */
+	Stack.prototype.compositeLastTwoCommands = function() {
+		var oLastCommand = this.pop();
+		var oSecondLastCommand = this.pop();
+
+		var oCompositeCommand = new CompositeCommand();
+		oCompositeCommand.addCommand(oSecondLastCommand);
+		oCompositeCommand.addCommand(oLastCommand);
+		this.push(oCompositeCommand);
 	};
 
 	return Stack;

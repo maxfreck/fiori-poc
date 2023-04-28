@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -55,7 +55,7 @@ function(
 	 * @implements sap.ui.core.IFormContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -67,7 +67,8 @@ function(
 
 			interfaces : [
 				"sap.ui.core.IFormContent",
-				"sap.m.IOverflowToolbarContent"
+				"sap.m.IOverflowToolbarContent",
+				"sap.m.IToolbarInteractiveControl"
 			],
 			library : "sap.m",
 			designtime: "sap/m/designtime/SegmentedButton.designtime",
@@ -502,7 +503,7 @@ function(
 	 *
 	 * @param {string} sText
 	 *         Defines the title text of the newly created Button
-	 * @param {sap.ui.core.URI} sURI
+	 * @param {sap.ui.core.URI} [sURI]
 	 *         Icon to be displayed as graphical element within the Button.
 	 *         Density related image will be loaded if image with density awareness name in format [imageName]@[densityValue].[extension] is provided.
 	 * @param {boolean} [bEnabled=true]
@@ -635,6 +636,10 @@ function(
 		}
 		this.setProperty("selectedKey", sKey, true);
 		return this;
+	};
+
+	SegmentedButton.prototype.getButtons = function () {
+		return this.getAggregation("buttons") || [];
 	};
 
 	SegmentedButton.prototype.removeButton = function (oButton) {
@@ -794,6 +799,10 @@ function(
 		}
 	};
 
+	SegmentedButton.prototype.getSelectedButton = function () {
+		return this.getAssociation("selectedButton");
+	};
+
 	/**
 	 * Setter for association <code>selectedButton</code>.
 	 *
@@ -935,7 +944,7 @@ function(
 
 	/**
 	 * @see sap.ui.core.Control#getAccessibilityInfo
-	 * @returns {object} Current accessibility state of the control
+	 * @returns {sap.ui.core.AccessibilityInfo} Current accessibility state of the control
 	 * @protected
 	 */
 	 SegmentedButton.prototype.getAccessibilityInfo = function() {
@@ -1040,6 +1049,16 @@ function(
 		return this.getButtons().filter(function(oButton) {
 			return oButton.getVisible();
 		});
+	};
+
+	/**
+	 * Determines if it is interactive Control
+	 *
+	 * @private
+	 * @returns {boolean} If it is an interactive Control
+	 */
+	 SegmentedButton.prototype._getToolbarInteractive = function () {
+		return true;
 	};
 
 	SegmentedButton.prototype.clone = function () {

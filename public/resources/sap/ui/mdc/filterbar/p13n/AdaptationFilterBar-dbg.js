@@ -1,32 +1,48 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-	"sap/ui/mdc/p13n/subcontroller/FilterController", "sap/ui/mdc/p13n/subcontroller/AdaptFiltersController", "sap/ui/mdc/filterbar/p13n/GroupContainer", "sap/ui/mdc/filterbar/p13n/FilterColumnLayout", "sap/ui/mdc/filterbar/p13n/FilterGroupLayout","sap/ui/mdc/filterbar/p13n/TableContainer", "sap/ui/mdc/filterbar/FilterBarBase", "sap/ui/mdc/filterbar/FilterBarBaseRenderer", "sap/base/util/merge", "sap/ui/core/Core", "sap/ui/mdc/enum/PersistenceMode"
-], function(FilterController, AdaptFiltersController, GroupContainer, FilterColumnLayout, FilterGroupLayout, TableContainer, FilterBarBase, FilterBarBaseRenderer, merge, Core, PersistenceMode) {
+	"sap/ui/core/library", "sap/ui/mdc/p13n/subcontroller/FilterController", "sap/ui/mdc/p13n/subcontroller/AdaptFiltersController", "sap/ui/mdc/filterbar/p13n/GroupContainer", "sap/ui/mdc/filterbar/p13n/FilterColumnLayout", "sap/ui/mdc/filterbar/p13n/FilterGroupLayout","sap/ui/mdc/filterbar/p13n/TableContainer", "sap/ui/mdc/filterbar/FilterBarBase", "sap/ui/mdc/filterbar/FilterBarBaseRenderer", "sap/base/util/merge", "sap/ui/core/Core", "sap/ui/mdc/enum/PersistenceMode"
+], function(coreLibrary, FilterController, AdaptFiltersController, GroupContainer, FilterColumnLayout, FilterGroupLayout, TableContainer, FilterBarBase, FilterBarBaseRenderer, merge, Core, PersistenceMode) {
 	"use strict";
+
+	var ValueState = coreLibrary.ValueState;
 
 	/**
 	 * Constructor for a new AdaptationFilterBar.
 	 * @param {string} [sId] ID for the new control, generated automatically if no ID is given
 	 * @param {object} [mSettings] initial settings for the new control
 	 * @class The <code>AdaptationFilterBar</code> control is used for a lightweight FilterBar implementation for p13n use cases.
-	 * The <code>AdaptationFilterBar</code> should only be used if the consuming control implements atleast the <code>IFilterSource</code>
+	 * The <code>AdaptationFilterBar</code> should only be used if the consuming control implements at least the <code>IFilterSource</code>
 	 * interface to provide basic filter functionality.
 	 *
 	 * @extends sap.ui.mdc.filterbar.FilterBarBase
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
+	 * @ui5-restricted sap.ui.mdc
 	 * @since 1.80.0
 	 * @alias sap.ui.mdc.filterbar.p13n.AdaptationFilterBar
 	 */
 	var AdaptationFilterBar = FilterBarBase.extend("sap.ui.mdc.filterbar.p13n.AdaptationFilterBar", {
 		metadata: {
 			library: "sap.ui.mdc",
+			properties: {
+				/**
+				 * Determines whether the <code>AdaptationFilterBar</code> has a fixed width.
+				 *
+				 * @private
+				 * @ui5-restricted sap.ui.mdc
+				 */
+				_useFixedWidth: {
+					type: "boolean",
+					defaultValue: false,
+					visibility: "hidden"
+				}
+			},
 			associations: {
 				/**
 				 * Determines the parent on which the condition changes should be applied on.
@@ -47,6 +63,8 @@ sap.ui.define([
 		renderer: FilterBarBaseRenderer
 	});
 
+	AdaptationFilterBar.prototype.WIDTH = "30rem";
+
 	AdaptationFilterBar.prototype.init = function() {
 		FilterBarBase.prototype.init.apply(this,arguments);
 		this.addStyleClass("sapUIAdaptationFilterBar");
@@ -59,6 +77,18 @@ sap.ui.define([
 		}.bind(this));
 	};
 
+	/**
+	 * This method will be called whenever the <code>AdaptationFilterBar</code> will be instantiated in a Dialog using the
+	 * <code>sap.m.p13n.UIManager</code>. This flag determines whether the control should be destroyed or kept alive once the p13n
+	 * dialog closes.
+	 *
+	 * @private
+	 * @returns {boolean} determines if the control should be destroyed
+	 */
+	AdaptationFilterBar.prototype.keepAlive = function() {
+		return true;
+	};
+
 	AdaptationFilterBar.prototype._onModifications = function() {
 		var pModification = FilterBarBase.prototype._onModifications.apply(this, arguments);
 		if (this._oFilterBarLayout.getInner().isA("sap.ui.mdc.p13n.panels.FilterPanel")) {
@@ -67,6 +97,21 @@ sap.ui.define([
 			this._oFilterBarLayout.setP13nData({items: oP13nData});
 		}
 		return pModification;
+	};
+
+	AdaptationFilterBar.prototype.getInitialFocusedControl = function() {
+		return this._oFilterBarLayout.getInitialFocusedControl();
+	};
+
+	/**
+	 * Getter for the fixed width of the <code>AdaptationFilterBar</code>
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc
+	 * @returns {string} The fixed width of the <code>AdaptationFilterBar</code>
+	 */
+	AdaptationFilterBar.prototype.getWidth = function() {
+		return this.WIDTH;
 	};
 
 	AdaptationFilterBar.prototype.applySettings = function() {
@@ -132,9 +177,21 @@ sap.ui.define([
 		}.bind(this));
 	};
 
+	AdaptationFilterBar.prototype.awaitControlDelegate = function() {
+		return this._oAdaptationControlPromise.then(function() {
+			return this._getAdaptationControlInstance().awaitControlDelegate();
+		}.bind(this));
+	};
+
 	AdaptationFilterBar.prototype.initPropertyHelper = function() {
 		return this._oAdaptationControlPromise.then(function() {
 			return this._getAdaptationControlInstance().initPropertyHelper();
+		}.bind(this));
+	};
+
+	AdaptationFilterBar.prototype.finalizePropertyHelper = function() {
+		return this._oAdaptationControlPromise.then(function() {
+			return this._getAdaptationControlInstance().finalizePropertyHelper();
 		}.bind(this));
 	};
 
@@ -174,7 +231,6 @@ sap.ui.define([
 
 		return this._oAdaptationControlPromise.then(function() {
 			return this._getAdaptationControlInstance().awaitPropertyHelper().then(function(oPropertyHelper) {
-				this._oMetadataAppliedPromise = Promise.resolve();
 				if (!this._getAdaptationControlInstance().isPropertyHelperFinal()) {
 					return this.finalizePropertyHelper();
 				}
@@ -184,8 +240,12 @@ sap.ui.define([
 		}.bind(this));
 	};
 
+	AdaptationFilterBar.prototype.isControlDelegateInitialized = function() {
+		return this._getAdaptationControlInstance().isControlDelegateInitialized();
+	};
+
 	AdaptationFilterBar.prototype.createConditionChanges = function() {
-		return Promise.all([this._oAdaptationControlPromise, this._getAdaptationControlInstance().awaitControlDelegate()]).then(function() {
+		return Promise.all([this._oAdaptationControlPromise, this.awaitControlDelegate()]).then(function() {
 			var mConditions = this._getModelConditions(this._getConditionModel(), false, true);
 			if (this._bPersistValues) {
 				//this._getAdaptationControlInstance(), "Filter", mConditions, true, true
@@ -251,15 +311,6 @@ sap.ui.define([
 		return this.getEngine().waitForChanges(this._getAdaptationControlInstance());
 	};
 
-	AdaptationFilterBar.prototype.applyConditionsAfterChangesApplied = function(oControl) {
-		if (oControl === this._getAdaptationControlInstance()) {
-			this._getWaitForChangesPromise()
-			.then(function(){
-				this.triggerSearch();
-			}.bind(this));
-		}
-	};
-
 	/**
 	 * Method which will initialize the <code>AdaptationFilterBar</code> and create the required FilterFields
 	 *
@@ -306,6 +357,11 @@ sap.ui.define([
 							this._mOriginalsForClone[oFilterField.getFieldPath()] = oFilterField;
 						}
 						oFieldForDialog = oFilterField.clone();
+
+						if (oFieldForDialog.getValueState() !== ValueState.None) {
+							oFieldForDialog.setValueState(ValueState.None);
+							oFieldForDialog.setValueStateText();
+						}
 					} else {
 						oFieldForDialog = oFilterField;
 					}
@@ -319,11 +375,13 @@ sap.ui.define([
 			}.bind(this));
 
 			return Promise.all(aFieldPromises).then(function(){
-				this.getP13nData().items.forEach(function(oItem){
+				var oP13nData = this.getP13nData();
+				oP13nData.items.forEach(function(oItem){
 					this.addAggregation("filterItems", this.mFilterFields[oItem.name]);
 				}.bind(this));
 
-				this._oFilterBarLayout.setP13nData(this.getP13nData());
+				this._updateActiveStatus(oP13nData.items);
+				this._oFilterBarLayout.setP13nData(oP13nData);
 				this._bFilterFieldsCreated = true;
 
 				return this;

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,6 +16,7 @@ sap.ui.define([
 	"sap/m/Avatar",
 	"sap/m/AvatarShape",
 	"sap/m/AvatarSize",
+	"sap/ui/util/openWindow",
 	"sap/ui/core/Configuration"
 ],
 function(
@@ -30,6 +31,7 @@ function(
 	Avatar,
 	AvatarShape,
 	AvatarSize,
+	openWindow,
 	Configuration
 	) {
 	"use strict";
@@ -56,7 +58,7 @@ function(
 	 * @extends sap.m.ListItemBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -377,20 +379,12 @@ function(
 		if (this._checkTextIsExpandable() && !this._bTextExpanded) {
 			this._clearEmptyTagsInCollapsedText();
 		}
-		// Additional processing of the links takes place in the onAfterRendering function of sap.m.FormattedText, e.g. registration of the click event handlers.
-		// FeedListItem does not render sap.m.FormattedText control as part of its own DOM structure, therefore the onAfterRendering function of the FormattedText
-		// must be called manually with the correct context, providing access to the DOM elements that must be processed.
-		var $RealText = this.$("realtext");
-		FormattedText.prototype.onAfterRendering.apply({
-			$: function() {
-				return $RealText;
-			}
-		});
+		this.$("realtext").find('a[target="_blank"]').on("click", openLink);
 	};
 
 	FeedListItem.prototype.exit = function() {
 		// Should be done always, since the registration occurs independently of the properties that determine auto link recognition.
-		this.$("realtext").find('a[target="_blank"]').off("click");
+		this.$("realtext").find('a[target="_blank"]').off("click", openLink);
 
 		// destroy link control if initialized
 		if (this._oLinkControl) {
@@ -405,6 +399,12 @@ function(
 
 		ListItemBase.prototype.exit.apply(this);
 	};
+
+	// open links href using safe API
+	function openLink (oEvent) {
+		oEvent.preventDefault();
+		openWindow(oEvent.currentTarget.href, oEvent.currentTarget.target);
+	}
 
 	/**
 	 * Overwrite ListItemBase's ontap: Propagate tap event from FeedListItem to ListItemBase only when tap performed

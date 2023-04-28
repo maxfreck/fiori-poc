@@ -246,7 +246,7 @@
 		{
 			"name": "Button-dbg.js",
 			"module": "sap/ui/commons/Button.js",
-			"size": 9974,
+			"size": 9997,
 			"isDebug": true,
 			"required": [
 				"sap/ui/Device.js",
@@ -486,7 +486,7 @@
 		{
 			"name": "CheckBox-dbg.js",
 			"module": "sap/ui/commons/CheckBox.js",
-			"size": 7295,
+			"size": 7389,
 			"isDebug": true,
 			"required": [
 				"sap/ui/Device.js",
@@ -566,7 +566,7 @@
 		{
 			"name": "ComboBox-dbg.js",
 			"module": "sap/ui/commons/ComboBox.js",
-			"size": 57444,
+			"size": 57467,
 			"isDebug": true,
 			"required": [
 				"jquery.sap.strings.js",
@@ -644,7 +644,7 @@
 		{
 			"name": "DatePicker-dbg.js",
 			"module": "sap/ui/commons/DatePicker.js",
-			"size": 23714,
+			"size": 23737,
 			"isDebug": true,
 			"required": [
 				"sap/base/Log.js",
@@ -1138,7 +1138,7 @@
 		{
 			"name": "InPlaceEdit-dbg.js",
 			"module": "sap/ui/commons/InPlaceEdit.js",
-			"size": 31164,
+			"size": 31187,
 			"isDebug": true,
 			"required": [
 				"sap/ui/Device.js",
@@ -1208,7 +1208,7 @@
 		{
 			"name": "Label-dbg.js",
 			"module": "sap/ui/commons/Label.js",
-			"size": 6442,
+			"size": 6465,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/LabelRenderer.js",
@@ -1266,7 +1266,7 @@
 		{
 			"name": "Link-dbg.js",
 			"module": "sap/ui/commons/Link.js",
-			"size": 5256,
+			"size": 5346,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/LinkRenderer.js",
@@ -2662,7 +2662,7 @@
 		{
 			"name": "SearchField-dbg.js",
 			"module": "sap/ui/commons/SearchField.js",
-			"size": 30164,
+			"size": 30112,
 			"isDebug": true,
 			"required": [
 				"sap/ui/Device.js",
@@ -2691,7 +2691,7 @@
 		{
 			"name": "SearchField.js",
 			"module": "sap/ui/commons/SearchField.js",
-			"size": 15866,
+			"size": 15826,
 			"required": [
 				"sap/ui/Device.js",
 				"sap/ui/commons/Button.js",
@@ -2718,7 +2718,7 @@
 		},
 		{
 			"name": "SearchField.js.map",
-			"size": 19439,
+			"size": 19398,
 			"isDebug": true
 		},
 		{
@@ -3090,7 +3090,7 @@
 		{
 			"name": "TextField-dbg.js",
 			"module": "sap/ui/commons/TextField.js",
-			"size": 24794,
+			"size": 25681,
 			"isDebug": true,
 			"required": [
 				"sap/ui/Device.js",
@@ -3126,7 +3126,7 @@
 		},
 		{
 			"name": "TextField.js.map",
-			"size": 12275,
+			"size": 12277,
 			"isDebug": true
 		},
 		{
@@ -3160,7 +3160,7 @@
 		{
 			"name": "TextView-dbg.js",
 			"module": "sap/ui/commons/TextView.js",
-			"size": 4572,
+			"size": 4595,
 			"isDebug": true,
 			"required": [
 				"sap/base/security/encodeXML.js",
@@ -3238,7 +3238,7 @@
 		{
 			"name": "ToggleButton-dbg.js",
 			"module": "sap/ui/commons/ToggleButton.js",
-			"size": 2797,
+			"size": 2820,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/Button.js",
@@ -3926,7 +3926,7 @@
 		{
 			"name": "layout/AbsoluteLayout-dbg.js",
 			"module": "sap/ui/commons/layout/AbsoluteLayout.js",
-			"size": 17053,
+			"size": 17226,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/layout/AbsoluteLayoutRenderer.js",
@@ -3980,7 +3980,7 @@
 		{
 			"name": "layout/BorderLayout-dbg.js",
 			"module": "sap/ui/commons/layout/BorderLayout.js",
-			"size": 10724,
+			"size": 11557,
 			"isDebug": true,
 			"required": [
 				"sap/base/assert.js",
@@ -4004,7 +4004,7 @@
 		},
 		{
 			"name": "layout/BorderLayout.js.map",
-			"size": 3749,
+			"size": 3750,
 			"isDebug": true
 		},
 		{
@@ -4150,7 +4150,7 @@
 		{
 			"name": "layout/MatrixLayoutCell-dbg.js",
 			"module": "sap/ui/commons/layout/MatrixLayoutCell.js",
-			"size": 5589,
+			"size": 5550,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/library.js",
@@ -4161,7 +4161,7 @@
 		{
 			"name": "layout/MatrixLayoutCell.js",
 			"module": "sap/ui/commons/layout/MatrixLayoutCell.js",
-			"size": 1070,
+			"size": 1036,
 			"required": [
 				"sap/ui/commons/library.js",
 				"sap/ui/core/CustomStyleClassSupport.js",
@@ -4170,7 +4170,7 @@
 		},
 		{
 			"name": "layout/MatrixLayoutCell.js.map",
-			"size": 994,
+			"size": 961,
 			"isDebug": true
 		},
 		{
@@ -4202,7 +4202,7 @@
 		{
 			"name": "layout/MatrixLayoutRow-dbg.js",
 			"module": "sap/ui/commons/layout/MatrixLayoutRow.js",
-			"size": 3881,
+			"size": 3845,
 			"isDebug": true,
 			"required": [
 				"sap/ui/commons/library.js",
@@ -4213,7 +4213,7 @@
 		{
 			"name": "layout/MatrixLayoutRow.js",
 			"module": "sap/ui/commons/layout/MatrixLayoutRow.js",
-			"size": 713,
+			"size": 682,
 			"required": [
 				"sap/ui/commons/library.js",
 				"sap/ui/core/CustomStyleClassSupport.js",
@@ -4222,7 +4222,7 @@
 		},
 		{
 			"name": "layout/MatrixLayoutRow.js.map",
-			"size": 721,
+			"size": 686,
 			"isDebug": true
 		},
 		{
@@ -4396,7 +4396,7 @@
 		{
 			"name": "library-preload.js",
 			"module": "sap/ui/commons/library-preload.js",
-			"size": 555797,
+			"size": 555692,
 			"merged": true,
 			"required": [
 				"jquery.sap.strings.js",
@@ -4656,7 +4656,7 @@
 		},
 		{
 			"name": "library-preload.js.map",
-			"size": 686605,
+			"size": 686499,
 			"isDebug": true
 		},
 		{
@@ -5409,7 +5409,7 @@
 		},
 		{
 			"name": "themes/base/css_variables.source.less",
-			"size": 115946,
+			"size": 125077,
 			"designtime": true,
 			"theme": "base"
 		},
@@ -6167,13 +6167,13 @@
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.less",
-			"size": 102299,
+			"size": 112092,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},
 		{
 			"name": "themes/sap_hcb/css_variables.source.less",
-			"size": 101999,
+			"size": 111792,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},

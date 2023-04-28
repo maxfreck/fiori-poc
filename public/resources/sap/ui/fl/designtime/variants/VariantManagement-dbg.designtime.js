@@ -1,20 +1,22 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 // Provides the Design Time Metadata for the sap.ui.fl.variants.VariantManagement control.
 sap.ui.define([
+	"sap/ui/fl/apply/api/ControlVariantApplyAPI",
 	"sap/ui/fl/Utils"
 ], function(
+	ControlVariantApplyAPI,
 	flUtils
 ) {
 	"use strict";
 	var fnSetControlAttributes = function (oVariantManagement, bDesignTimeMode) {
 		var oAppComponent = flUtils.getAppComponentForControl(oVariantManagement);
 		var sControlId = oVariantManagement.getId();
-		var oModel = oAppComponent.getModel(flUtils.VARIANT_MODEL_NAME);
+		var oModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 		var sVariantManagementReference = oAppComponent.getLocalId(sControlId) || sControlId;
 
 		if (!oModel) {
@@ -74,17 +76,19 @@ sap.ui.define([
 				// In personalization mode the variant management overlay cannot be selected
 				var bDesignTimeMode = true;
 				fnSetControlAttributes(oVariantManagement, bDesignTimeMode);
+				oVariantManagement.enteringDesignMode();
 			},
 			stop: function(oVariantManagement) {
 				var bDesignTimeMode = false;
 				fnSetControlAttributes(oVariantManagement, bDesignTimeMode);
+				oVariantManagement.leavingDesignMode();
 			}
 		},
 		actions: {
 			controlVariant: function(oVariantManagement) {
 				var oAppComponent = flUtils.getAppComponentForControl(oVariantManagement);
 				var sControlId = oVariantManagement.getId();
-				var oModel = oAppComponent.getModel(flUtils.VARIANT_MODEL_NAME);
+				var oModel = oAppComponent.getModel(ControlVariantApplyAPI.getVariantModelName());
 				var sVariantManagementReference = oAppComponent.getLocalId(sControlId) || sControlId;
 				return {
 					validators: [

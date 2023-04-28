@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -9,7 +9,6 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 			   'sap/ui/core/Renderer', 'sap/ui/core/IconPool', "sap/base/Log"],
 	function(Device, library, Column, TableUtils, ExtensionBase, Renderer, IconPool, Log) {
 	"use strict";
-
 
 	// shortcuts
 	var VisibleRowCountMode = library.VisibleRowCountMode;
@@ -91,7 +90,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		if (TableUtils.hasRowActions(oTable)) {
 			var iRowActionCount = oTable.getRowActionCount();
 			rm.class(iRowActionCount == 1 ? "sapUiTableRActS" : "sapUiTableRAct");
-		} else if (TableUtils.hasRowNavigationIndicators(oTable)){
+		} else if (TableUtils.hasRowNavigationIndicators(oTable)) {
 			rm.class("sapUiTableRowNavIndicator");
 		}
 
@@ -191,7 +190,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 
 		// TODO: Move to "renderTableChildAtBottom" hook in row modes
 		if (oTable.getVisibleRowCountMode() == VisibleRowCountMode.Interactive) {
-			this.renderVariableHeight(rm ,oTable);
+			this.renderVariableHeight(rm, oTable);
 		}
 
 		// TODO: Move to "renderTableChildAtBottom" hook in row modes
@@ -451,7 +450,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 				}
 			}
 
-			if (oTable._getShowStandardTooltips() && sSelectAllResourceTextID) {
+			if (sSelectAllResourceTextID) {
 				rm.attr("title", TableUtils.getResourceText(sSelectAllResourceTextID));
 			}
 			if (!bAllRowsSelected) {
@@ -484,7 +483,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 			}
 		}
 
-		if (TableUtils.hasRowHeader(oTable) && oTable._getSelectionPlugin()._getSelectionMode() === library.SelectionMode.None) {
+		if (TableUtils.hasRowHeader(oTable) && oTable.getSelectionMode() === library.SelectionMode.None) {
 			rm.openStart("span", oTable.getId() + "-rowselecthdr");
 			rm.class("sapUiPseudoInvisibleText");
 			rm.openEnd();
@@ -772,7 +771,6 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		rm.close("div");
 	};
 
-
 	TableRenderer.renderTableControl = function(rm, oTable, bFixedTable) {
 		var iStartColumn, iEndColumn;
 
@@ -850,6 +848,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		var iCol;
 		var oColumn;
 		var bRenderDummyColumn = !bFixedTable && iEndColumn > iStartColumn;
+		var aVisibleColumns = oTable._getVisibleColumns();
 
 		for (iCol = iStartColumn; iCol < iEndColumn; iCol++) {
 			oColumn = aCols[iCol];
@@ -894,6 +893,9 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 				rm.style("width", oColParam.width);
 				rm.attr("data-sap-ui-headcolindex", iCol);
 				rm.attr("data-sap-ui-colid", oColumn.getId());
+				if (oColumn === aVisibleColumns[0]) {
+					rm.class("sapUiTableFirstVisibleColumnTH");
+				}
 				rm.openEnd();
 				if (iStartRow == 0 && TableUtils.getHeaderRowCount(oTable) == 0 && !bHeader) {
 					if (oColumn.getMultiLabels().length > 0) {
@@ -917,8 +919,6 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		rm.close("thead");
 
 		rm.openStart("tbody").openEnd();
-
-		var aVisibleColumns = oTable._getVisibleColumns();
 
 		// render the table rows
 		var aRows = oTable.getRows();
@@ -1009,7 +1009,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 
 		var oRowSettings = oRow.getAggregation("_settings");
 
-		rm.openStart("div",  oRow.getId() + "-navIndicator");
+		rm.openStart("div", oRow.getId() + "-navIndicator");
 		if (oRowSettings.getNavigated()) {
 			rm.class("sapUiTableRowNavigated");
 		}
@@ -1041,7 +1041,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 				if (colSpan > 1) {
 					// In case when a user makes some of the underlying columns invisible, adjust colspan
 					iColIndex = oColumn.getIndex();
-					colSpan = aCols.slice(index + 1, index + colSpan).reduce(function(span, column){
+					colSpan = aCols.slice(index + 1, index + colSpan).reduce(function(span, column) {
 						return column.getIndex() - iColIndex < colSpan ? span + 1 : span;
 					}, 1);
 				}
@@ -1241,7 +1241,7 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		rm.class("sapUiTableVSb");
 		rm.style("max-height", oScrollExtension.getVerticalScrollbarHeight() + "px");
 		if (mRowCounts.fixedTop > 0) {
-			rm.style("top", mRowCounts.fixedTop * oTable._getBaseRowHeight() - 1  + "px");
+			rm.style("top", mRowCounts.fixedTop * oTable._getBaseRowHeight() - 1 + "px");
 		}
 		if (mConfig.tabIndex) {
 			// https://bugzilla.mozilla.org/show_bug.cgi?id=1069739
@@ -1314,13 +1314,11 @@ sap.ui.define(['sap/ui/Device', './library', "./Column", './utils/TableUtils', "
 		}
 	};
 
-
 	TableRenderer.renderHSbBackground = function(rm, oTable) {
 		rm.openStart("div", oTable.getId() + "-hsb-bg");
 		rm.class("sapUiTableHSbBg");
 		rm.openEnd().close("div");
 	};
-
 
 	// =============================================================================
 	// HELPER FUNCTIONALITY

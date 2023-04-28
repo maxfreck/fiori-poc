@@ -1,11 +1,11 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	'./BaseController'
+	"./SelectionController"
 ], function (BaseController) {
 	"use strict";
 
@@ -26,12 +26,16 @@ sap.ui.define([
 
     ChartTypeController.prototype.getDelta = function(mPropertyBag) {
 
-        var sNewType = mPropertyBag.changedState.type ? mPropertyBag.changedState.type : mPropertyBag.changedState.properties.chartType;
+        var sNewType;
+        if (mPropertyBag.changedState && mPropertyBag.changedState.properties) {
+            sNewType = mPropertyBag.changedState.properties.chartType;
+        }
+
         var sOldType = this.getAdaptationControl().getChartType();
 
         var aChartTypeChanges = [];
 
-        if (sNewType !== sOldType) {
+        if (sNewType && sNewType !== sOldType) {
             aChartTypeChanges = [{
                 selectorElement: mPropertyBag.control,
                 changeSpecificData: {

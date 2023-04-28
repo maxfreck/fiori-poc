@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,14 +20,14 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 	 * @namespace
 	 * @alias sap.ui.table
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 0.8
 	 * @public
 	 */
 	var thisLib = sap.ui.getCore().initLibrary({
-		name : "sap.ui.table",
-		version: "1.108.2",
-		dependencies : ["sap.ui.core","sap.ui.unified"],
+		name: "sap.ui.table",
+		version: "1.113.0",
+		dependencies: ["sap.ui.core", "sap.ui.unified"],
 		designtime: "sap/ui/table/designtime/library.designtime",
 		types: [
 			"sap.ui.table.NavigationMode",
@@ -63,16 +63,16 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		],
 		extensions: {
 			flChangeHandlers: {
-				"sap.ui.table.Table" : {
+				"sap.ui.table.Table": {
 					"moveElements": "default"
 				},
-				"sap.ui.table.AnalyticalTable" : {
+				"sap.ui.table.AnalyticalTable": {
 					"moveElements": "default"
 				}
 			},
 			//Configuration used for rule loading of Support Assistant
 			"sap.ui.support": {
-				publicRules:true
+				publicRules: true
 			}
 		}
 	});
@@ -80,7 +80,7 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 	/**
 	 * Navigation mode of the table
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -90,7 +90,7 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * Uses the scrollbar control.
 		 * @public
 		 */
-		Scrollbar : "Scrollbar",
+		Scrollbar: "Scrollbar",
 
 		/**
 		 * Uses the paginator control.
@@ -100,14 +100,14 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * @public
 		 * @deprecated As of version 1.38, replaced by {@link sap.ui.table.NavigationMode.Scrollbar}
 		 */
-		Paginator : "Paginator"
+		Paginator: "Paginator"
 
 	};
 
 	/**
 	 * Row Action types.
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -117,27 +117,26 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * Custom defined Row Action.
 		 * @public
 		 */
-		Custom : "Custom",
+		Custom: "Custom",
 
 		/**
 		 * Navigation Row Action.
 		 * @public
 		 */
-		Navigation : "Navigation",
+		Navigation: "Navigation",
 
 		/**
 		 * Delete Row Action.
 		 * @public
 		 */
-		Delete : "Delete"
+		Delete: "Delete"
 
 	};
-
 
 	/**
 	 * Selection behavior of the table
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -147,27 +146,26 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * Rows can be selected on the complete row.
 		 * @public
 		 */
-		Row : "Row",
+		Row: "Row",
 
 		/**
 		 * Rows can only be selected on the row selector.
 		 * @public
 		 */
-		RowSelector : "RowSelector",
+		RowSelector: "RowSelector",
 
 		/**
 		 * Rows can only be selected on the row (and the selector is hidden).
 		 * @public
 		 */
-		RowOnly : "RowOnly"
+		RowOnly: "RowOnly"
 
 	};
-
 
 	/**
 	 * Selection mode of the table
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -177,34 +175,33 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * Select multiple rows at a time (toggle behavior).
 		 * @public
 		 */
-		MultiToggle : "MultiToggle",
+		MultiToggle: "MultiToggle",
 
 		/**
 		 * Select multiple rows at a time.
 		 * @public
 		 * @deprecated As of version 1.38, replaced by {@link sap.ui.table.SelectionMode.MultiToggle}
 		 */
-		Multi : "Multi",
+		Multi: "Multi",
 
 		/**
 		 * Select one row at a time.
 		 * @public
 		 */
-		Single : "Single",
+		Single: "Single",
 
 		/**
 		 * No rows can be selected.
 		 * @public
 		 */
-		None : "None"
+		None: "None"
 
 	};
-
 
 	/**
 	 * Sort order of a column
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -214,21 +211,20 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * Sort Order: ascending.
 		 * @public
 		 */
-		Ascending : "Ascending",
+		Ascending: "Ascending",
 
 		/**
 		 * Sort Order: descending.
 		 * @public
 		 */
-		Descending : "Descending"
+		Descending: "Descending"
 
 	};
-
 
 	/**
 	 * VisibleRowCountMode of the table
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -238,19 +234,19 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * The table always has as many rows as defined in the <code>visibleRowCount</code> property.
 		 * @public
 		 */
-		Fixed : "Fixed",
+		Fixed: "Fixed",
 
 		/**
 		 * The user can change the <code>visibleRowCount</code> by dragging a resizer.
 		 * @public
 		 */
-		Interactive : "Interactive",
+		Interactive: "Interactive",
 
 		/**
 		 * The table automatically fills the height of the surrounding container.
 		 * @public
 		 */
-		Auto : "Auto"
+		Auto: "Auto"
 
 	};
 
@@ -259,7 +255,7 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 	 *
 	 * Contains IDs of shared DOM references, which should be accessible to inheriting controls via getDomRef() function.
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */
@@ -269,13 +265,13 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 		 * The element id of the Horizontal Scroll Bar of the sap.ui.table.Table.
 		 * @public
 		 */
-		HorizontalScrollBar : "hsb",
+		HorizontalScrollBar: "hsb",
 
 		/**
 		 * The element id of the Vertical Scroll Bar of the sap.ui.table.Table.
 		 * @public
 		 */
-		VerticalScrollBar : "vsb"
+		VerticalScrollBar: "vsb"
 	};
 
 	/**
@@ -357,7 +353,7 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 	 *
 	 * This is an alias for {@link sap.ui.model.TreeAutoExpandMode} and kept for compatibility reasons.
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @typedef {sap.ui.model.TreeAutoExpandMode}
 	 * @public
 	 */
@@ -366,9 +362,9 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/model/TreeAutoExpandMode',
 	//factory for table to create labels and textviews to be overwritten by commons and mobile library
 	if (!thisLib.TableHelper) {
 		thisLib.TableHelper = {
-			addTableClass: function(){ return ""; }, /* must return some additional CSS class */
-			createLabel: function(mConfig){ throw new Error("no Label control available!"); }, /* must return a Label control */
-			createTextView: function(mConfig){ throw new Error("no TextView control available!"); }, /* must return a textview control */
+			addTableClass: function() { return ""; }, /* must return some additional CSS class */
+			createLabel: function(mConfig) { throw new Error("no Label control available!"); }, /* must return a Label control */
+			createTextView: function(mConfig) { throw new Error("no TextView control available!"); }, /* must return a textview control */
 			bFinal: false /* if true, the helper must not be overwritten by an other library */
 		};
 	}

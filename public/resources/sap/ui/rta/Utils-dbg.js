@@ -1,11 +1,10 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
-	"sap/ui/thirdparty/jquery",
 	"sap/ui/fl/write/api/FieldExtensibility",
 	"sap/ui/fl/Utils",
 	"sap/ui/fl/Layer",
@@ -19,10 +18,10 @@ sap.ui.define([
 	"sap/ui/rta/util/BindingsExtractor",
 	"sap/base/util/restricted/_omit",
 	"sap/ui/model/json/JSONModel",
-	"sap/ui/core/Fragment"
+	"sap/ui/core/Fragment",
+	"sap/ui/core/Core"
 ],
 function(
-	jQuery,
 	FieldExtensibility,
 	FlexUtils,
 	Layer,
@@ -36,7 +35,8 @@ function(
 	BindingsExtractor,
 	_omit,
 	JSONModel,
-	Fragment
+	Fragment,
+	Core
 ) {
 	"use strict";
 
@@ -45,7 +45,7 @@ function(
 	 *
 	 * @namespace
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @since 1.30
@@ -99,11 +99,12 @@ function(
 						if (bServiceOutdated) {
 							FieldExtensibility.setServiceValid(oModel.sServiceUrl);
 							//needs FLP to trigger UI restart popup
-							sap.ui.getCore().getEventBus().publish("sap.ui.core.UnrecoverableClientStateCorruption", "RequestReload", {});
+							Core.getEventBus().publish("sap.ui.core.UnrecoverableClientStateCorruption", "RequestReload", {});
 						}
 					});
 				}
 			}
+			return undefined;
 		});
 	};
 
@@ -115,7 +116,7 @@ function(
 	 * @returns{Promise} The Promise which resolves when popup is closed (via Remove OR Cancel actions)
 	 */
 	Utils.openRemoveConfirmationDialog = function(oElement, sText) {
-		var oTextResources = sap.ui.getCore().getLibraryResourceBundle("sap.ui.rta");
+		var oTextResources = Core.getLibraryResourceBundle("sap.ui.rta");
 		var sTitle;
 		return new Promise(
 			function(resolve) {
@@ -206,10 +207,11 @@ function(
 	 * @private
 	 */
 	Utils.getOverlayInstanceForDom = function(oDomRef) {
-		var sId = jQuery(oDomRef).attr("id");
+		var sId = oDomRef.getAttribute("id");
 		if (sId) {
-			return sap.ui.getCore().byId(sId);
+			return Core.byId(sId);
 		}
+		return undefined;
 	};
 
 	/**
@@ -220,11 +222,12 @@ function(
 	 */
 	Utils.getFocusedOverlay = function() {
 		if (document.activeElement) {
-			var oElement = sap.ui.getCore().byId(document.activeElement.id);
+			var oElement = Core.byId(document.activeElement.id);
 			if (oElement && oElement.isA("sap.ui.dt.ElementOverlay")) {
 				return oElement;
 			}
 		}
+		return undefined;
 	};
 
 	/**
@@ -453,9 +456,8 @@ function(
 	 * @returns{boolean} - Returns if <code>oDomElement</code> is currently visible on the screen.
 	 */
 	Utils.isElementInViewport = function(oDomElement) {
-		if (oDomElement instanceof jQuery) {
-			oDomElement = oDomElement.get(0);
-		}
+		//TODO: remove when all calls are replaced
+		oDomElement = oDomElement.jquery ? oDomElement.get(0) : oDomElement;
 
 		var mRect = oDomElement.getBoundingClientRect();
 
@@ -476,18 +478,36 @@ function(
 	 * @param  {object} [mPropertyBag] - Object with additional information; error and titleKey are evaluated, the rest is passed as option to the MessageBox
 	 * @param  {any} [mPropertyBag.error] - If an error is passed on, the message box text is derived from it
 	 * @param  {string} [mPropertyBag.titleKey] - The text key for the title of the message box; if none is provided the default of the selectde MessageBox type  will be displayed
-	 * @returns{Promise} Promise displaying the message box; resolves when it is closed
+	 * @param  {array} [mPropertyBag.actions] - Available actions for the messabe box
+	 * @param  {array} [mPropertyBag.actionKeys] - The text key for the action buttons of the message box. It is provided as actions property to the MessageBox.
+	 * 											   If mPropertyBag.actions property is set, it will not be overriden
+	 * @param {string} [mPropertyBag.emphasizedAction] - Action option to be emphasized
+	 * @param {string} [mPropertyBag.emphasizedActionKey] - Text key of the action option to be emphasized
+	 * @param {boolean} [mPropertyBag.showCancel] - Whether "cancel" should be part of the actions
+	 * @returns{Promise} Promise displaying the message box; resolves when it is closed with the pressed button
 	 */
 	Utils.showMessageBox = function(sMessageType, sMessageKey, mPropertyBag) {
-		return sap.ui.getCore().getLibraryResourceBundle("sap.ui.rta", true)
+		return Core.getLibraryResourceBundle("sap.ui.rta", true)
 		.then(function(oResourceBundle) {
 			mPropertyBag = mPropertyBag || {};
 			var sMessage = oResourceBundle.getText(sMessageKey, mPropertyBag.error ? [mPropertyBag.error.userMessage || mPropertyBag.error.message || mPropertyBag.error] : undefined);
 			var sTitle = mPropertyBag.titleKey && oResourceBundle.getText(mPropertyBag.titleKey);
+			var vActionTexts =
+				mPropertyBag.actionKeys &&
+				mPropertyBag.actionKeys.map(function(sActionKey) {
+					return oResourceBundle.getText(sActionKey);
+				});
+			var sEmphasizedAction = mPropertyBag.emphasizedActionKey ? oResourceBundle.getText(mPropertyBag.emphasizedActionKey) : undefined;
 
-			var mOptions = _omit(mPropertyBag, ["titleKey", "error"]);
+			var bShowCancel = mPropertyBag.showCancel;
+			var mOptions = _omit(mPropertyBag, ["titleKey", "error", "actionKeys", "emphasizedAction", "emphasizedActionKey", "showCancel"]);
 			mOptions.title = sTitle;
 			mOptions.styleClass = Utils.getRtaStyleClassName();
+			mOptions.actions = mOptions.actions || vActionTexts;
+			mOptions.emphasizedAction = sEmphasizedAction || mPropertyBag.emphasizedAction;
+			if (bShowCancel) {
+				mOptions.actions.push(MessageBox.Action.CANCEL);
+			}
 
 			return messageBoxPromise(sMessageType, sMessage, mOptions);
 		});
@@ -540,6 +560,7 @@ function(
 		})) {
 			return fnCallback();
 		}
+		return undefined;
 	};
 
 	/**

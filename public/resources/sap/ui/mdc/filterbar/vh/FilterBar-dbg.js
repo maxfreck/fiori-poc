@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define(
@@ -56,7 +56,7 @@ sap.ui.define(
 		 * The metadata information is provided via the {@link sap.ui.mdc.FilterBarDelegate FilterBarDelegate} implementation. This implementation has to be provided by the application.
 		 * @extends sap.ui.mdc.filterbar.FilterBarBase
 		 * @author SAP SE
-		 * @version 1.108.2
+		 * @version 1.113.0
 		 * @constructor
 		 * @private
 		 * @ui5-restricted sap.fe
@@ -68,7 +68,24 @@ sap.ui.define(
 			"sap.ui.mdc.filterbar.vh.FilterBar",
 			{
 				metadata: {
+					library: "sap.ui.mdc",
 					properties: {
+						delegate: {
+							type: "object",
+							defaultValue: {
+								/**
+								 * Contains the class name which implements the {@link sap.ui.mdc.FilterBarDelegate FilterBarDelegate} class.
+								 */
+								name: "sap/ui/mdc/filterbar/vh/FilterBarDelegate",
+								/**
+								 * Contains the mandatory information about the metamodel name <code>modelName</code> and the main data part in its <code>collectionName</code>.<br>
+								 * <b>Note:</b> Additional information relevant for the specific {@link sap.ui.mdc.FilterBarDelegate FilterBarDelegate} implementation might be included but is of no relevance for the filter bar itself.
+								 */
+								payload: {
+									modelName: undefined,
+									collectionName: ""
+								}}
+						},
 						/**
 						 * Determines whether the Show/Hide Filters button is in the state show or hide.<br>
 						 */
@@ -281,6 +298,22 @@ sap.ui.define(
 			}
 
 			return this;
+		};
+
+		/**
+		 * Getter for the initial focusable <code>control</code> on the <code>FilterBar</code>.
+		 *
+		 * @returns {sap.ui.core.Control} Control instance which could get the focus.
+		 *
+		 * @private
+		 * @ui5-restricted sap.ui.mdc
+		 */
+		FilterBar.prototype.getInitialFocusedControl = function() {
+			var oCtrl = this.getBasicSearchField();
+			if (!oCtrl && this.getShowGoButton()) {
+				oCtrl = this._btnSearch;
+			}
+			return oCtrl;
 		};
 
 		return FilterBar;

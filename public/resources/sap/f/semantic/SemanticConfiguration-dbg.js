@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,13 +11,11 @@ sap.ui.define([
 	"sap/ui/base/Object",
 	"sap/ui/core/IconPool",
 	"sap/m/library",
-	"sap/m/OverflowToolbarLayoutData",
-	"sap/ui/core/InvisibleText"
+	"sap/m/OverflowToolbarLayoutData"
 ], function(BaseObject,
 			IconPool,
 			mobileLibrary,
-			OverflowToolbarLayoutData,
-			InvisibleText) {
+			OverflowToolbarLayoutData) {
 		"use strict";
 
 	// shortcut for sap.m.OverflowToolbarPriority
@@ -32,7 +30,7 @@ sap.ui.define([
 	* @class
 	* Defines the visual properties and placement for each supported semantic type.
 	*
-	* @version 1.108.2
+	* @version 1.113.0
 	* @private
 	* @since 1.46.0
 	* @alias sap.f.semantic.SemanticConfiguration
@@ -326,7 +324,6 @@ sap.ui.define([
 			order: 0,
 			mainAction : false,
 			getSettings: function() {
-				var sTooltipId = InvisibleText.getStaticId("sap.f", "SEMANTIC_CONTROL_MESSAGES_INDICATOR");
 
 				return {
 					icon: IconPool.getIconURI("message-popup"),
@@ -337,7 +334,6 @@ sap.ui.define([
 						}
 					},
 					tooltip: oBundle.getText("SEMANTIC_CONTROL_MESSAGES_INDICATOR"),
-					ariaLabelledBy: sTooltipId,
 					type: ButtonType.Emphasized,
 					visible: {
 						path: "message>/",

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -89,7 +89,7 @@ sap.ui.define([
 	 *
 	 * @extends sap.ui.support.supportRules.ui.controllers.BaseController
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @alias sap.ui.support.supportRules.ui.controllers.PresetsController
 	 */

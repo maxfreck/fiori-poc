@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -15,7 +15,7 @@ sap.ui.define([
 	"sap/m/Link",
 	"sap/m/ProgressIndicator",
 	"sap/m/ObjectIdentifier",
-	"sap/m/ObjectStatus",
+	"sap/ui/integration/controls/ObjectStatus",
 	"sap/m/Avatar",
 	"sap/ui/core/library",
 	"sap/m/library",
@@ -77,7 +77,7 @@ sap.ui.define([
 	 * @extends sap.ui.integration.cards.BaseListContent
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @private
@@ -91,6 +91,16 @@ sap.ui.define([
 		renderer: TableContentRenderer
 	});
 
+	/**
+	 * Called on before rendering of the control.
+	 * @private
+	 */
+	TableContent.prototype.onBeforeRendering = function () {
+		BaseListContent.prototype.onBeforeRendering.apply(this, arguments);
+
+		this._getTable().setBackgroundDesign(this.getDesign());
+	};
+
 	TableContent.prototype.exit = function () {
 		BaseListContent.prototype.exit.apply(this, arguments);
 
@@ -101,7 +111,6 @@ sap.ui.define([
 	};
 
 	TableContent.prototype._getTable = function () {
-
 		if (this._bIsBeingDestroyed) {
 			return null;
 		}
@@ -111,8 +120,27 @@ sap.ui.define([
 		if (!oTable) {
 			oTable = new ResponsiveTable({
 				id: this.getId() + "-Table",
-				showSeparators: ListSeparators.None
+				showSeparators: ListSeparators.None,
+				ariaLabelledBy: this.getHeaderTitleId()
 			});
+
+			oTable.addEventDelegate({
+				onfocusin: function (oEvent) {
+					if (!(oEvent.srcControl instanceof ColumnListItem)) {
+						return;
+					}
+
+					var fItemBottom = oEvent.target.getBoundingClientRect().bottom;
+					var fContentBottom = this.getDomRef().getBoundingClientRect().bottom;
+					var fDist = Math.abs(fItemBottom - fContentBottom);
+					var ROUNDED_CORNER_PX_THRESHOLD = 10;
+
+					if (fDist < ROUNDED_CORNER_PX_THRESHOLD) {
+						oEvent.srcControl.addStyleClass("sapUiIntTCIRoundedCorners");
+					}
+				}
+			}, this);
+
 			this.setAggregation("_content", oTable);
 		}
 
@@ -122,24 +150,23 @@ sap.ui.define([
 	/**
 	 * @override
 	 */
-	TableContent.prototype.setConfiguration = function (oConfiguration) {
-		BaseListContent.prototype.setConfiguration.apply(this, arguments);
-		oConfiguration = this.getParsedConfiguration();
+	TableContent.prototype.applyConfiguration = function () {
+		BaseListContent.prototype.applyConfiguration.apply(this, arguments);
+
+		var oConfiguration = this.getParsedConfiguration();
 
 		if (!oConfiguration) {
-			return this;
+			return;
 		}
 
 		if (oConfiguration.rows && oConfiguration.columns) {
 			this._setStaticColumns(oConfiguration.rows, oConfiguration.columns);
-			return this;
+			return;
 		}
 
 		if (oConfiguration.row && oConfiguration.row.columns) {
 			this._setColumns(oConfiguration.row);
 		}
-
-		return this;
 	};
 
 	/**
@@ -218,7 +245,8 @@ sap.ui.define([
 	 * Handler for when data is changed.
 	 */
 	TableContent.prototype.onDataChanged = function () {
-		this._handleNoItemsError(this.getParsedConfiguration().row);
+		BaseListContent.prototype.onDataChanged.apply(this, arguments);
+
 		this._checkHiddenNavigationItems(this.getParsedConfiguration().row);
 	};
 
@@ -246,7 +274,9 @@ sap.ui.define([
 
 		this._oItemTemplate = new ColumnListItem({
 			cells: aCells,
-			vAlign: VerticalAlign.Middle
+			vAlign: VerticalAlign.Middle,
+			highlight: oRow.highlight,
+			highlightText: oRow.highlightText
 		});
 
 		this._oActions.attach({
@@ -285,7 +315,9 @@ sap.ui.define([
 
 		aRows.forEach(function (oRow) {
 			var oItem = new ColumnListItem({
-				vAlign: VerticalAlign.Middle
+				vAlign: VerticalAlign.Middle,
+				highlight: oRow.highlight,
+				highlightText: oRow.highlightText
 			});
 
 			if (oRow.cells && Array.isArray(oRow.cells)) {
@@ -340,7 +372,8 @@ sap.ui.define([
 			}
 
 			oControl = new ObjectIdentifier({
-				title: oColumn.value
+				title: oColumn.value,
+				text: oColumn.additionalText
 			});
 
 			if (oColumn.actions) {
@@ -390,7 +423,9 @@ sap.ui.define([
 		if (oColumn.state) {
 			return new ObjectStatus({
 				text: oColumn.value,
-				state: oColumn.state
+				state: oColumn.state,
+				showStateIcon: oColumn.showStateIcon,
+				icon: oColumn.customStateIcon
 			});
 		}
 

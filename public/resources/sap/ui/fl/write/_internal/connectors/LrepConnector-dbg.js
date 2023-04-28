@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -13,9 +13,7 @@ sap.ui.define([
 	"sap/ui/fl/write/_internal/transport/TransportSelection",
 	"sap/ui/fl/registry/Settings",
 	"sap/ui/fl/Layer",
-	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/Utils",
-	"sap/ui/fl/Change",
 	"sap/ui/core/Component",
 	"sap/ui/core/BusyIndicator",
 	"sap/base/Log",
@@ -30,9 +28,7 @@ sap.ui.define([
 	TransportSelection,
 	Settings,
 	Layer,
-	LayerUtils,
 	Utils,
-	Change,
 	Component,
 	BusyIndicator,
 	Log,
@@ -77,7 +73,7 @@ sap.ui.define([
 	 * @param {boolean} [mPropertyBag.isContextSharing] Indicator whether this is a request for context sharing
 	 * @param {boolean} [mPropertyBag.skipIam=false] - Indicates whether the default IAM item creation and registration is skipped. This is S4/Hana specific flag passed by only Smart Business
 	 * @param {boolean} [mPropertyBag.isCondensingEnabled] Indicator whether this is a request for condensing
-	 * @param {boolean} [mPropertyBag.isContextBasedAdaptationEnabled] Indicator whether this is an context based adaptation
+	 * @param {boolean} [mPropertyBag.isContextBasedAdaptationEnabled] Indicator whether this is a context-based adaptation
 	 * @param {boolean} [mPropertyBag.parentVersion] Indicates if changes should be written as a draft and on which version the changes should be based on
 	 * @private
 	 * @returns {Promise} Promise resolves as soon as the writing was completed
@@ -93,7 +89,9 @@ sap.ui.define([
 		} else if (mPropertyBag.isCondensingEnabled) {
 			sRoute = ROUTES.CONDENSE;
 		} else if (mPropertyBag.isContextBasedAdaptationEnabled) {
-			sRoute = ROUTES.CONTEXT_BASED_ADAPTATION + mPropertyBag.flexObject.reference + "/adaptations/";
+			sRoute = ROUTES.CONTEXT_BASED_ADAPTATION + mPropertyBag.reference + "/adaptations/";
+			//delete reference is needed, otherwise the reference occures twice in the route (is added again to the route in InitialUtils.getUrl())
+			delete mPropertyBag.reference;
 		} else {
 			sRoute = ROUTES.CHANGES;
 		}
@@ -128,12 +126,12 @@ sap.ui.define([
 		// Only content in the VENDOR layer have the real ABAP package
 		// This check avoid sending ATO package to get transport info
 		var sPackage = oAppVariant.getDefinition().layer === Layer.VENDOR ? oAppVariant.getPackage() : "";
-		return new Change({
-			fileName: oAppVariant.getDefinition().fileName,
-			fileType: oAppVariant.getDefinition().fileType,
-			packageName: sPackage,
-			namespace: oAppVariant.getNamespace()
-		});
+		return {
+			"package": sPackage,
+			namespace: oAppVariant.getNamespace(),
+			name: oAppVariant.getDefinition().fileName,
+			type: oAppVariant.getDefinition().fileType
+		};
 	};
 
 	var _selectTransportForAppVariant = function(mPropertyBag) {
@@ -143,8 +141,8 @@ sap.ui.define([
 		} else if (mPropertyBag.isForSmartBusiness) {
 			return Promise.resolve();
 		} else {
-			var oChange = _prepareAppVariantSpecificChange(mPropertyBag.appVariant);
-			oTransportSelectionPromise = new TransportSelection().openTransportSelection(oChange);
+			var oTransportInfo = _prepareAppVariantSpecificChange(mPropertyBag.appVariant);
+			oTransportSelectionPromise = new TransportSelection().openTransportSelection(oTransportInfo);
 		}
 		return oTransportSelectionPromise.then(function (oTransportInfo) {
 			if (oTransportInfo === "cancel") {
@@ -168,7 +166,7 @@ sap.ui.define([
 	 *
 	 * @namespace sap.ui.fl.write._internal.connectors.LrepConnector
 	 * @since 1.67
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.write._internal.Storage
 	 */
@@ -183,7 +181,7 @@ sap.ui.define([
 		 * @param {string} mPropertyBag.reference Flex reference of the application
 		 * @param {string} mPropertyBag.url Configured url for the connector
 		 * @param {string} mPropertyBag.changelist Transport Id
-		 * @param {sap.ui.fl.Change[]} mPropertyBag.changes Changes of the selected layer and flex reference
+		 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.changes Changes of the selected layer and flex reference
 		 * @param {string} [mPropertyBag.generator] Generator with which the changes were created
 		 * @param {string} [mPropertyBag.selectorIds] Selector IDs of controls for which the reset should filter (comma-separated list)
 		 * @param {string} [mPropertyBag.changeTypes] Change types of the changes which should be reset (comma-separated list)
@@ -260,7 +258,7 @@ sap.ui.define([
 		 * @param {string} mPropertyBag.transportDialogSettings.styleClass Style class name to be added in the TransportDialog
 		 * @param {string} mPropertyBag.layer Working layer
 		 * @param {string} mPropertyBag.reference Flex reference of the application
-		 * @param {sap.ui.fl.Change[]} mPropertyBag.localChanges Local changes to  be published
+		 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.localChanges Local changes to  be published
 		 * @param {object[]} [mPropertyBag.appVariantDescriptors] An array of app variant descriptors which needs to be transported
 		 * @returns {Promise<string>} Promise that can resolve to the following strings:
 		 * - "Cancel" if publish process was canceled
@@ -397,7 +395,6 @@ sap.ui.define([
 			return InitialUtils.sendRequest(sFeaturesUrl, "GET", {initialConnector: InitialConnector}).then(function (oResult) {
 				oResult.response.isVariantAdaptationEnabled = !!oResult.response.isPublicLayerAvailable;
 				oResult.response.isContextSharingEnabled = true;
-				oResult.response.isContextSharingEnabledForComp = true;
 				oResult.response.isLocalResetEnabled = true;
 				return oResult.response;
 			});
@@ -615,6 +612,21 @@ sap.ui.define([
 				mPropertyBag.isContextBasedAdaptationEnabled = true;
 				mPropertyBag.method = "POST";
 				return _doWrite(mPropertyBag);
+			},
+			reorder: function(mPropertyBag) {
+				mPropertyBag.isContextBasedAdaptationEnabled = true;
+				mPropertyBag.method = "PUT";
+				return _doWrite(mPropertyBag);
+			},
+			load: function(mPropertyBag) {
+				var aParameters = ["version"];
+				var mParameters = _pick(mPropertyBag, aParameters);
+				InitialConnector._addClientInfo(mParameters);
+				mPropertyBag.reference = mPropertyBag.reference + "/adaptations/";
+				var sDataUrl = InitialUtils.getUrl(ROUTES.CONTEXT_BASED_ADAPTATION, mPropertyBag, mParameters);
+				return InitialUtils.sendRequest(sDataUrl, "GET", {initialConnector: InitialConnector}).then(function (oResult) {
+					return oResult.response;
+				});
 			}
 		},
 		ui2Personalization: {

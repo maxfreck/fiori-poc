@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,13 +28,13 @@ sap.ui.define([
 	 * @namespace
 	 * @alias sap.ui.unified
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.28
 	 * @public
 	 */
 	var thisLib = sap.ui.getCore().initLibrary({
 		name : "sap.ui.unified",
-		version: "1.108.2",
+		version: "1.113.0",
 		dependencies : ["sap.ui.core"],
 		designtime: "sap/ui/unified/designtime/library.designtime",
 		types: [
@@ -417,14 +417,7 @@ sap.ui.define([
 
 	};
 
-	/**
-	 * Types of HTTP request methods.
-	 *
-	 * @enum {string}
-	 * @alias sap.ui.unified.FileUploaderHttpRequestMethod
-	 * @public
-	 * @since 1.81.0
-	 */
+	// expose imported enum as property of library namespace, for documentation see FileUploaderHttpRequestMethod.js
 	thisLib.FileUploaderHttpRequestMethod = FileUploaderHttpRequestMethod;
 
 	/**
@@ -527,7 +520,7 @@ sap.ui.define([
 
 	};
 
-	// expose imported enum as property of library namespace, for documentation see module
+	// expose imported enum as property of library namespace, for documentation see ColorPickerDisplayMode.js
 	thisLib.ColorPickerDisplayMode = ColorPickerDisplayMode;
 
 	/**
@@ -550,7 +543,7 @@ sap.ui.define([
 	 * @public
 	 * @since 1.52
 	 * @param {Blob[]} aBlobs The initial Blobs which can be used to determine a new array of Blobs for further processing.
-	 * @return {Promise} A Promise that resolves with an array of Blobs which is used for the final uploading.
+	 * @returns {Promise<Blob[]>} A Promise that resolves with an array of Blobs which is used for the final uploading.
 	 * @function
 	 * @name sap.ui.unified.IProcessableBlobs.getProcessedBlobsFromArray
 	 */

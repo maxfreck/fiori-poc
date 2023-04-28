@@ -1,15 +1,17 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
 	"sap/ui/core/util/reflection/JsControlTreeModifier",
-	"sap/ui/fl/apply/_internal/flexState/ManifestUtils"
+	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
+	"sap/ui/thirdparty/jquery"
 ], function(
 	JsControlTreeModifier,
-	ManifestUtils
+	ManifestUtils,
+	jQuery
 ) {
 	"use strict";
 
@@ -26,7 +28,8 @@ sap.ui.define([
 	 */
 	function getAppComponentInstance(sComponentName) {
 		var oCorrectAppComponent;
-		var aComponentContainers = jQuery.find(".sapUiComponentContainer");
+		var aComponentContainers = document.querySelector(".sapUiComponentContainer");
+		aComponentContainers = Array.isArray(aComponentContainers) ? aComponentContainers : [aComponentContainers];
 		aComponentContainers.some(function(oComponentContainerDomRef) {
 			var oComponentContainer = sap.ui.getCore().byId(oComponentContainerDomRef.id);
 			var oAppComponent = oComponentContainer && oComponentContainer.getComponentInstance();
@@ -45,7 +48,7 @@ sap.ui.define([
 		for (var sChangeId in oChangePersistence._mChangesEntries) {
 			var oChange = oChangePersistence._mChangesEntries[sChangeId];
 			oExport.mChangesEntries[sChangeId] = {
-				mDefinition: oChange._oDefinition,
+				mDefinition: oChange.getDefinition(),
 				aControlsDependencies: [],
 				aDependencies: []
 			};
@@ -133,6 +136,10 @@ sap.ui.define([
 	}
 
 	return function (oChangePersistence) {
+		if (!oChangePersistence) {
+			return;
+		}
+
 		var oExport = {
 			sVersion: "1",
 			bIsInvestigationExport: true,

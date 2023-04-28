@@ -1,12 +1,12 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
 sap.ui.define([
     "sap/ui/mdc/p13n/P13nBuilder",
-	"./BaseController",
+	"./SelectionController",
     "sap/ui/mdc/p13n/panels/LinkSelectionPanel",
     "sap/m/library",
     "sap/m/MessageBox"
@@ -38,8 +38,9 @@ sap.ui.define([
         return this.getAdaptationControl().getItems().concat(this.getAdaptationControl());
     };
 
-    LinkPanelController.prototype.getAdaptationUI = function(oPropertyHelper) {
+    LinkPanelController.prototype.initAdaptationUI = function(oPropertyHelper) {
         var oSelectionPanel = new SelectionPanel({
+            title: oResourceBundle.getText("info.SELECTION_DIALOG_ALIGNEDTITLE"),
             showHeader: true,
             fieldColumn: oResourceBundle.getText("info.SELECTION_DIALOG_COLUMNHEADER_WITHOUT_COUNT"),
             enableCount: true,
@@ -87,10 +88,10 @@ sap.ui.define([
 
         var oLinkItem = sap.ui.getCore().byId(sLinkItemId);
 
-        var aChanges = [];
+        var oAddRemoveChange;
 
         if (!oLinkItem) {
-            aChanges.push({
+            oAddRemoveChange = {
                 selectorElement: oControl,
                 changeSpecificData: {
                     changeType: "createItem",
@@ -98,18 +99,18 @@ sap.ui.define([
                         selector: sLinkItemId
                     }
                 }
-            });
+            };
         } else {
-            aChanges.push({
+            oAddRemoveChange = {
                 selectorElement: oLinkItem,
                 changeSpecificData: {
                     changeType: vOperations === "hideItem" ? "hideItem" : "revealItem",
                     content: {}
                 }
-            });
+            };
         }
 
-        return aChanges;
+        return oAddRemoveChange;
     };
 
     LinkPanelController.prototype.mixInfoAndState = function(oPropertyHelper) {
@@ -117,7 +118,7 @@ sap.ui.define([
         var aItemState = this.getCurrentState();
         var mExistingLinkItems = P13nBuilder.arrayToMap(aItemState);
 
-        var oP13nData = P13nBuilder.prepareAdaptationData(oPropertyHelper, function(mItem, oProperty){
+        var oP13nData = this.prepareAdaptationData(oPropertyHelper, function(mItem, oProperty){
 
             var oExistingLinkItem = mExistingLinkItems[oProperty.name];
             mItem.visible = oExistingLinkItem ? true : false;
@@ -132,7 +133,7 @@ sap.ui.define([
             return true;
         });
 
-        P13nBuilder.sortP13nData({
+        this.sortP13nData({
             visible: "visible",
             position: "position"
         }, oP13nData.items);
@@ -144,7 +145,7 @@ sap.ui.define([
         return oP13nData;
     };
 
-    LinkPanelController.prototype._createMoveChange = function(sId, sPropertyName, iNewIndex, sMoveOperation, oControl, bPersistId) {
+    LinkPanelController.prototype._createMoveChange = function(sPropertyName, iNewIndex, sMoveOperation, oControl) {
         return {
             selectorElement: oControl,
             changeSpecificData: {

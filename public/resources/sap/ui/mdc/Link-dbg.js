@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -45,7 +45,7 @@ sap.ui.define([
 	 * @extends sap.ui.mdc.field.FieldInfoBase
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @alias sap.ui.mdc.Link
@@ -136,6 +136,9 @@ sap.ui.define([
 	 */
 	Link.prototype.isTriggerable = function() {
 		return this.retrieveLinkType().then(function(oLinkTypeObject) {
+			if (!oLinkTypeObject) {
+				return false;
+			}
 			var oRuntimeLinkTypePromise = oLinkTypeObject.runtimeType;
 			var oInitialLinkType = oLinkTypeObject.initialType ? oLinkTypeObject.initialType : oLinkTypeObject;
 
@@ -174,6 +177,10 @@ sap.ui.define([
 	 */
 	Link.prototype.getDirectLinkHrefAndTarget = function() {
 		return this._retrieveDirectLinkItem().then(function(oDirectLinkItem) {
+			if (this.isDestroyed()) {
+				return null;
+			}
+
 			this.addDependent(oDirectLinkItem);
 			return oDirectLinkItem ? {
 				target: oDirectLinkItem.getTarget(),
@@ -188,6 +195,10 @@ sap.ui.define([
 	 */
 	Link.prototype._retrieveDirectLinkItem = function() {
 		return this.retrieveLinkType().then(function(oLinkTypeObject) {
+			if (!oLinkTypeObject) {
+				return null;
+			}
+
 			if (this._linkTypeHasDirectLink(this._oLinkType)) {
 				return this._oLinkType.directLink;
 			}
@@ -515,7 +526,7 @@ sap.ui.define([
 		if (this.awaitControlDelegate()) {
 			return this.awaitControlDelegate().then(function() {
 				var oPayload = Object.assign({}, this.getPayload());
-				return this.getControlDelegate().fetchLinkType(oPayload, this);
+				return this._bIsBeingDestroyed ? Promise.resolve() : this.getControlDelegate().fetchLinkType(oPayload, this);
 			}.bind(this));
 		}
 		SapBaseLog.error("mdc.Link retrieveLinkType: control delegate is not set - could not load LinkType from delegate.");

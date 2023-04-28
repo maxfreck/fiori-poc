@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,7 +40,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -469,7 +469,7 @@ sap.ui.define([
 			this._oButton = new Button(this.getId() + "-button", {
 				enabled : false,
 				type : ButtonType.Default,
-				icon : "sap-icon://feeder-arrow",
+				icon : "sap-icon://paper-plane",
 				tooltip : this.getButtonTooltip(),
 				press : jQuery.proxy(function () {
 					this._oTextArea.focus();

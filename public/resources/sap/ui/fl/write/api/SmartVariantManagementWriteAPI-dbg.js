@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -132,6 +132,7 @@ sap.ui.define([
 		 * 			sap.ui.comp.smartchart.SmartChart} mPropertyBag.control - Variant management control for which the variant should be updated
 		 * @param {string} mPropertyBag.id - ID of the variant
 		 * @param {sap.ui.fl.Layer} [mPropertyBag.layer] - Layer in which the save of variant content takes place
+		 * @returns {sap.ui.fl.apply._internal.flexObjects.CompVariant} The updated variant
 		 * @private
 		 * @ui5-restricted sap.ui.rta.command
 		 */

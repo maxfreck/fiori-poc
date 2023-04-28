@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -26,11 +26,12 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Content for the {@link sap.ui.mdc.valuehelp.base.Container Container} element showing a list with fix values.
 	 * @extends sap.ui.mdc.valuehelp.base.ListContent
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.content.FixedList
@@ -220,9 +221,10 @@ sap.ui.define([
 			this._iNavigateIndex = -1;
 		}
 		var oList = _getList.call(this);
+		var oListBinding = this.getListBinding();
+
 		if (oList) {
-			var oBinding = oList.getBinding("items");
-			oBinding.update();
+			oListBinding.update();
 			oList.updateItems();
 			oList.invalidate();
 			_updateSelection.call(this); // to update selection
@@ -361,6 +363,7 @@ sap.ui.define([
 
 	FixedList.prototype._handleFilterValueUpdate = function(oChanges) {
 		_updateFilter.call(this);
+		ListContent.prototype._handleFilterValueUpdate.apply(this, arguments);
 	};
 
 	FixedList.prototype.removeFocus = function() {
@@ -572,6 +575,11 @@ sap.ui.define([
 
 		this._iNavigateIndex = -1; // initially nothing is navigated
 
+	};
+
+	FixedList.prototype.getListBinding = function () {
+		var oList = _getList.call(this);
+		return oList && oList.getBinding("items");
 	};
 
 	return FixedList;

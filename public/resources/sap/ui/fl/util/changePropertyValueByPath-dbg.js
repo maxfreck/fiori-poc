@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -28,7 +28,7 @@ sap.ui.define([
 	/**
 	 * Use to update property value for propertyPath which starts in provided root context
 	 *
-	 * @param {sap.ui.fl.Change[]|sap.ui.fl.Change} vChanges - Changes to be merged which includes propertyPath and propertyValue
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]|sap.ui.fl.apply._internal.flexObjects.FlexObject} vChanges - Changes to be merged which includes propertyPath and propertyValue
 	 * @param {string} oRootPath - root context where the propertyPath starts
 	 * @ui5-restricted sap.ui.fl, sap.suite.ui.generic.template
 	 */

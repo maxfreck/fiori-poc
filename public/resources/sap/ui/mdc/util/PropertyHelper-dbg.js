@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -24,6 +24,8 @@ sap.ui.define([
 	/**
 	 * @typedef {object} sap.ui.mdc.util.PropertyInfo
 	 *
+	 * An object literal describing a data property.
+	 *
 	 * @property {string} name
 	 *   Unique, stable key for the property. It must only contain characters allowed for IDs, see {@link sap.ui.core.ID}. Does not have to be an
 	 *   existing attribute in the data model or the technical name of an attribute in the data model.
@@ -36,17 +38,19 @@ sap.ui.define([
 	 * @property {boolean} [visible=true]
 	 *   Whether the property is or can be visible to a user.
 	 * @property {int} [maxConditions]
-	 *     *   Defines the maximum number of filter conditions for the property. Possible values that can be used:
-	 *     *   <ul>
-	 *     *       <li>1 is a single-filter expression field</li>
-	 *     *       <li>-1 is a multi-filter expression field</li>
-	 *     *   </ul>
-	 *     *   This information is for example used in the <code>addItem</code> method of the <code>FilterBar</code> control to forward this
-	 *     information to
-	 *     *   the created <code>FilterField</code> instance.
-	 * @property {object} [typeConfig]
-	 *   Object which contains type-specific information about the property, especially the type instance (for example, for model filter creation in
-	 *   Table <code>rebind</code>).
+	 *   Defines the maximum number of filter conditions for the property. Possible values that can be used:
+	 *   <ul>
+	 *     <li>1 is a single-filter expression field</li>
+	 *     <li>-1 is a multi-filter expression field</li>
+	 *   </ul>
+	 *   This information is, for example, used in the <code>addItem</code> method of the <code>FilterBar</code> control to forward this information to
+	 *   the created <code>FilterField</code> instance.
+	 * @property {string} dataType
+	 *   The name of the data type
+	 * @property {object} [formatOptions]
+	 *   Defines the format options for the data type
+	 * @property {object} [constraints]
+	 * Defines the constraints for the data type
 	 * @property {string} [group]
 	 *   Key of the group the property is inside. Used to visually group properties in personalization dialogs.
 	 * @property {string} [groupLabel]
@@ -57,7 +61,7 @@ sap.ui.define([
 	 * @private
 	 * @experimental
 	 * @ui5-restricted sap.fe
-	 * MDC_PUBLIC_CANDIDATE
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 
 	/*
@@ -100,7 +104,7 @@ sap.ui.define([
 	var mAttributeMetadata = { // TODO: reserve reference attributes, e.g. unit -> unitProperty
 		// Common
 		name: { // Unique key
-			type: "string", // TODO: sap.ui.core.ID cannot be used currently, because some OPA tests fail
+			type: "string",
 			mandatory: true,
 			forComplexProperty: {
 				allowed: true
@@ -129,37 +133,23 @@ sap.ui.define([
 			}
 		},
 		path: { // The technical path for a data source property.
-			type: "string",
-			forComplexProperty: {
-				valueIfNotAllowed: null // TODO: Can be removed once warnings are replaced with errors.
-			}
+			type: "string"
 		},
-		// TODO: Is it possible to reduce the required information by integrating/using TypeUtil (obtained from delegate) here?
-		typeConfig: {
-			type: {
-				className: {
-					type: "string"
-				},
-				baseType: {
-					type: "string"
-				},
-				typeInstance: {
-					type: "object" // sap.ui.model.SimpleType
-				}
-			},
-			//defaultValue: ?? TODO: Is there a default value (e.g. type string), or is it even mandatory?
-			forComplexProperty: {
-				valueIfNotAllowed: null // TODO: Can be removed once warnings are replaced with errors.
-			}
+		dataType: {
+			type: "string", // The name of a subclass of sap.ui.model.SimpleType, e.g. "sap.ui.model.type.String".
+			mandatory: true
 		},
-		// TODO: What's the meaning? type = boolean? Is used only once in FilterBarBase: oProperty.maxConditions !== -1
+		formatOptions: {
+			type: "object"
+		},
+		constraints: {
+			type: "object"
+		},
+		// TODO: Used in odata.v4.util.DelegateUtil.getParametersInfo, which is used by FE. DelegateUtil is private, though.
 		maxConditions: {
 			type: "int",
 			"default": {
 				value: -1
-			},
-			forComplexProperty: {
-				valueIfNotAllowed: null // TODO: Can be removed once warnings are replaced with errors.
 			}
 		},
 		caseSensitive: {
@@ -271,7 +261,8 @@ sap.ui.define([
 		}
 	};
 
-	var aCommonAttributes = ["name", "label", "tooltip", "visible", "path", "typeConfig", "maxConditions", "group", "groupLabel", "caseSensitive"];
+	var aCommonAttributes = ["name", "label", "tooltip", "visible", "path", "dataType", "formatOptions", "constraints",
+							 "maxConditions", "group", "groupLabel", "caseSensitive"];
 	var _private = new WeakMap();
 
 	function stringifyPlainObject(oObject) {
@@ -283,6 +274,10 @@ sap.ui.define([
 	function reportInvalidProperty(sMessage, oAdditionalInfo) {
 		// TODO: warning is logged momentarily so that consumers can adapt to have valid property definitions
 		//  valid use case would be to throw an error
+		if (Log.getLevel() < Log.WARNING) {
+			return; // Avoid stringification overhead if logging is not required.
+		}
+
 		var sAdditionalInfo = stringifyPlainObject(oAdditionalInfo);
 		Log.warning("Invalid property definition: " + sMessage + (sAdditionalInfo ? "\n" + sAdditionalInfo : ""));
 	}
@@ -526,7 +521,7 @@ sap.ui.define([
 	 *     attribute, and the value is the attribute metadata definition. To add a standard property, the value must be <code>true</code>. Metadata
 	 *     of standard attributes cannot be overridden.
 	 *     The following common standard attributes are always included. They do not need to be added explicitly and cannot be excluded.
-	 *     name, label, visible, path, typeConfig, maxConditions, group, groupLabel, caseSensitive
+	 *     name, label, visible, path, dataType, formatOptions, constraints, maxConditions, group, groupLabel, caseSensitive
 	 *
 	 * @class
 	 * Property helpers in this SAPUI5 library provide a consistent and standardized structure of properties and their attributes.
@@ -536,7 +531,7 @@ sap.ui.define([
 	 * @extends sap.ui.base.Object
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @experimental
@@ -628,7 +623,16 @@ sap.ui.define([
 			}
 		}
 
-		_private.get(this).aMandatoryAttributes.forEach(function(sMandatoryAttribute) {
+		var mPrivate = _private.get(this);
+
+		mPrivate.aMandatoryAttributes.forEach(function(sMandatoryAttribute) {
+			var bAllowedForComplexProperty = mPrivate.mAttributeMetadata[sMandatoryAttribute].forComplexProperty.allowed;
+
+			if (oProperty[sMandatoryAttribute] == null && PropertyHelper.isPropertyComplex(oProperty) && !bAllowedForComplexProperty) {
+				// Don't throw an error if a complex property does not contain a mandatory attribute that is not allowed for complex properties.
+				return;
+			}
+
 			if (!(sMandatoryAttribute in oProperty)) {
 				reportInvalidProperty("Property does not contain mandatory attribute '" + sMandatoryAttribute + "'.", oProperty);
 			} else if (oProperty[sMandatoryAttribute] == null) {

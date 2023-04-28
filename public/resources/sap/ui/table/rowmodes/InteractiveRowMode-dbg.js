@@ -1,6 +1,6 @@
 /*
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -33,7 +33,7 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.mdc
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 */
 	var InteractiveRowMode = RowMode.extend("sap.ui.table.rowmodes.InteractiveRowMode", /** @lends sap.ui.table.rowmodes.InteractiveRowMode.prototype */ {
@@ -250,7 +250,7 @@ sap.ui.define([
 
 		if (iRowCount > 0) {
 			this.initTableRowsAfterDataRequested(iRowCount);
-			this.getRowContexts(iRowCount);  // Trigger data request.
+			this.getRowContexts(iRowCount); // Trigger data request.
 		}
 	};
 

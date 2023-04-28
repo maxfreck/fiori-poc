@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,14 +18,14 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/core/library'], // library dependency
 	 * @namespace
 	 * @alias sap.ui.suite
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 1.1
 	 * @public
 	 * @deprecated as of version 1.108
 	 */
 	var thisLibrary = sap.ui.getCore().initLibrary({
 		name : "sap.ui.suite",
-		version: "1.108.2",
+		version: "1.113.0",
 		dependencies : ["sap.ui.core"],
 		types: [
 			"sap.ui.suite.TaskCircleColor"
@@ -41,7 +41,7 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/core/library'], // library dependency
 	/**
 	 * Defined color values for the Task Circle Control
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @enum {string}
 	 * @public
 	 */

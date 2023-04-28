@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -32,9 +32,9 @@ sap.ui.define([
 	 * @extends sap.ui.fl.apply._internal.flexObjects.Variant
 	 * @alias sap.ui.fl.apply._internal.flexObjects.CompVariant
 	 * @since 1.103
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
-	 * @ui5-restricted sap.ui.fl sap.ui.comp
+	 * @ui5-restricted sap.ui.fl, sap.ui.comp
 	 */
 	var CompVariant = Variant.extend("sap.ui.fl.apply._internal.flexObjects.CompVariant", /** @lends sap.ui.fl.apply._internal.flexObjects.CompVariant.prototype */ {
 		metadata: {
@@ -59,18 +59,16 @@ sap.ui.define([
 				 * TODO: When the FL Variant is also a FlexObject, try to consolidate RevertData from both
 				 */
 				revertData: {
-					type: "sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData",
+					type: "sap.ui.base.ManagedObject", // "sap.ui.fl.apply._internal.flexObjects.CompVariantRevertData"
 					multiple: true,
-					singularName: "revertData",
-					defaultValue: []
+					singularName: "revertData"
 				},
 				/**
 				 * Changes belonging to the variant
 				 */
 				changes: {
-					type: "sap.ui.fl.Change",
-					multiple: true,
-					defaultValue: []
+					type: "sap.ui.base.ManagedObject", // "sap.ui.fl.apply._internal.flexObjects.FlexObject"
+					multiple: true
 				}
 			}
 		},
@@ -236,7 +234,7 @@ sap.ui.define([
 	 */
 	CompVariant.prototype.storeFavorite = function (bFavorite) {
 		if (bFavorite !== this.getFavorite()) {
-			this.setState(States.DIRTY);
+			this.setState(States.LifecycleState.DIRTY);
 			this.setFavorite(bFavorite);
 		}
 	};
@@ -270,7 +268,7 @@ sap.ui.define([
 	 */
 	CompVariant.prototype.storeExecuteOnSelection = function (bExecuteOnSelection) {
 		if (bExecuteOnSelection !== this.getExecuteOnSelection()) {
-			this.setState(States.DIRTY);
+			this.setState(States.LifecycleState.DIRTY);
 			this.setExecuteOnSelection(bExecuteOnSelection);
 		}
 	};
@@ -295,7 +293,7 @@ sap.ui.define([
 	 */
 	CompVariant.prototype.storeContexts = function (mContexts) {
 		this.setContexts(mContexts);
-		this.setState(States.DIRTY);
+		this.setState(States.LifecycleState.DIRTY);
 	};
 
 	return CompVariant;

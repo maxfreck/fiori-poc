@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -16,9 +16,10 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 * @class A <code>LinkItem</code> control is used in the {@link sap.ui.mdc.Link} control to provide a navigation target.
 	 * @extends sap.ui.core.Element
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
+	 * @ui5-restricted sap.ui.mdc
 	 * @since 1.58.0
 	 * @alias sap.ui.mdc.link.LinkItem
 	 */

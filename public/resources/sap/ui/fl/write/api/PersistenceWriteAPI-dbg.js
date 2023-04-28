@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -12,11 +12,12 @@ sap.ui.define([
 	"sap/ui/fl/apply/_internal/changes/FlexCustomData",
 	"sap/ui/fl/apply/_internal/ChangesController",
 	"sap/ui/fl/apply/_internal/appVariant/DescriptorChangeTypes",
+	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
 	"sap/ui/fl/write/_internal/condenser/Condenser",
 	"sap/ui/fl/write/_internal/flexState/FlexObjectState",
 	"sap/ui/fl/write/_internal/Storage",
-	"sap/ui/fl/apply/_internal/flexState/ManifestUtils",
 	"sap/ui/fl/write/api/FeaturesAPI",
+	"sap/ui/fl/write/_internal/FlexInfoSession",
 	"sap/ui/fl/Layer",
 	"sap/ui/fl/LayerUtils",
 	"sap/ui/fl/registry/Settings"
@@ -28,11 +29,12 @@ sap.ui.define([
 	FlexCustomData,
 	ChangesController,
 	DescriptorChangeTypes,
+	ManifestUtils,
 	Condenser,
 	FlexObjectState,
 	Storage,
-	ManifestUtils,
 	FeaturesAPI,
+	FlexInfoSession,
 	Layer,
 	LayerUtils,
 	Settings
@@ -40,7 +42,7 @@ sap.ui.define([
 	"use strict";
 
 	/**
-	 * Provides an API for tools to query, provide, save or reset {@link sap.ui.fl.Change}s.
+	 * Provides an API for tools to query, provide, save or reset {@link sap.ui.fl.apply._internal.flexObjects.FlexObject}s.
 	 *
 	 * @namespace sap.ui.fl.write.api.PersistenceWriteAPI
 	 * @experimental Since 1.68
@@ -54,7 +56,7 @@ sap.ui.define([
 	/**
 	 * Retrieves the changes from the flex persistence for the selector.
 	 *
-	 * @param {sap.ui.fl.Change} oChange - Change instance
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} oChange - Change instance
 	 *
 	 * @returns {boolean} Returns a boolean value if it is a descriptor change
 	 */
@@ -133,7 +135,14 @@ sap.ui.define([
 	 * @ui5-restricted
 	 */
 	PersistenceWriteAPI.save = function(mPropertyBag) {
-		return FlexObjectState.saveFlexObjects(mPropertyBag);
+		return FlexObjectState.saveFlexObjects(mPropertyBag).then(function(oFlexObject) {
+			if (oFlexObject && oFlexObject.length !== 0) {
+				PersistenceWriteAPI.getResetAndPublishInfo(mPropertyBag).then(function (oResult) {
+					FlexInfoSession.set(oResult, mPropertyBag.selector);
+				});
+			}
+			return oFlexObject;
+		});
 	};
 
 	/**
@@ -248,9 +257,9 @@ sap.ui.define([
 	 * If it's a descriptor change, a transport request is set.
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {sap.ui.fl.Change} mPropertyBag.change - Change instance
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} mPropertyBag.change - Change instance
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - To retrieve the associated flex persistence
-	 * @returns {sap.ui.fl.Change} The change instance
+	 * @returns {sap.ui.fl.apply._internal.flexObjects.FlexObject} The change instance
 	 *
 	 * @private
 	 * @ui5-restricted
@@ -267,7 +276,7 @@ sap.ui.define([
 	 * Removes a change from from the applied changes on a control and from the flex persistence map.
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
-	 * @param {sap.ui.fl.Change} mPropertyBag.change - Change to be removed
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject} mPropertyBag.change - Change to be removed
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - To retrieve the associated flex persistence
 	 * @returns {Promise} resolves when changes are removed
 	 * @private
@@ -287,7 +296,7 @@ sap.ui.define([
 				}
 				// descriptor change
 				if (isDescriptorChange(mPropertyBag.change)) {
-					var oDescriptorFlexController = ChangesController.getDescriptorFlexControllerInstance(oAppComponent);
+					var oDescriptorFlexController = ChangesController.getFlexControllerInstance(oAppComponent);
 					oDescriptorFlexController.deleteChange(mPropertyBag.change, oAppComponent);
 					return undefined;
 				}
@@ -295,7 +304,7 @@ sap.ui.define([
 				oFlexController = ChangesController.getFlexControllerInstance(oAppComponent);
 				// remove custom data for flex change
 				if (oElement) {
-					FlexCustomData.sync.destroyAppliedCustomData(oElement, mPropertyBag.change, JsControlTreeModifier);
+					FlexCustomData.destroyAppliedCustomData(oElement, mPropertyBag.change, JsControlTreeModifier);
 				}
 				// delete from flex persistence map
 				oFlexController.deleteChange(mPropertyBag.change, oAppComponent);
@@ -344,8 +353,8 @@ sap.ui.define([
 	 *
 	 * @param {object} mPropertyBag - Object with parameters as properties
 	 * @param {sap.ui.fl.Selector} mPropertyBag.selector - Retrieves the associated flex persistence
-	 * @param {sap.ui.fl.Change[]} mPropertyBag.changes - Array of changes
-	 * @returns {Promise<sap.ui.fl.Change[]>} Resolves with all necessary changes
+	 * @param {sap.ui.fl.apply._internal.flexObjects.FlexObject[]} mPropertyBag.changes - Array of changes
+	 * @returns {Promise<sap.ui.fl.apply._internal.flexObjects.FlexObject[]>} Resolves with all necessary changes
 	 * @private
 	 * @ui5-restricted sap.ui.rta.test
 	 */
@@ -380,7 +389,7 @@ sap.ui.define([
 	 * @param {boolean} [mPropertyBag.invalidateCache] - Indicates whether the cache is to be invalidated
 	 * @param {boolean} [mPropertyBag.onlyCurrentVariants] - Whether only changes for the currently active variants should be considered
 	 *
-	 * @returns {Promise} Promise resolves with an array of all change instances {@see sap.ui.fl.Change}
+	 * @returns {Promise} Promise resolves with an array of all change instances {@see sap.ui.fl.apply._internal.flexObjects.FlexObject}
 	 * @private
 	 */
 	PersistenceWriteAPI._getUIChanges = function(mPropertyBag) {

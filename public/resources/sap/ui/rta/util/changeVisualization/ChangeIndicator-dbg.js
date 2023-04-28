@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -40,7 +40,7 @@ sap.ui.define([
 	 * @alias sap.ui.rta.util.changeVisualization.ChangeIndicator
 	 * @author SAP SE
 	 * @since 1.84.0
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 */
 	var ChangeIndicator = Control.extend("sap.ui.rta.util.changeVisualization.ChangeIndicator", {
@@ -115,6 +115,10 @@ sap.ui.define([
 				oRm.openStart("div", oControl);
 				oRm.class("sapUiRtaChangeIndicator");
 				oRm.class("sapUiRtaChangeIndicatorChange");
+				var sTooltip = oControl.getTooltip_AsString();
+				if (sTooltip) {
+					oRm.attr("title", sTooltip);
+				}
 				if (oControl.getChanges().length > 4) {
 					oRm.class("sapUiRtaChangeIndicatorColorDark");
 				} else if (oControl.getChanges().length > 1) {
@@ -123,17 +127,22 @@ sap.ui.define([
 					oRm.class("sapUiRtaChangeIndicatorColorLight");
 				}
 				oRm.openEnd();
+				if (sTooltip) {
+					oRm.openStart("span", oControl.getId() + "-tooltip");
+					oRm.class("sapUiInvisibleText");
+					oRm.openEnd();
+					oRm.text(sTooltip);
+					oRm.close("span");
+				}
 				oRm.close("div");
 			}
 		},
 		constructor: function() {
 			this._oDetailModel = new JSONModel();
 			this._oDetailModel.setDefaultBindingMode("OneWay");
-
-			Control.prototype.constructor.apply(this, arguments);
-
 			this._fnHoverTrue = this._toggleHoverStyleClasses.bind(this, true);
 			this._fnHoverFalse = this._toggleHoverStyleClasses.bind(this, false);
+			Control.prototype.constructor.apply(this, arguments);
 			// is needed to prevent that multiple events listeners are attached
 			// to the same overlay because setVisible is called multiple times
 			this._bEventAttachedToElement = false;
@@ -300,7 +309,7 @@ sap.ui.define([
 	};
 
 	ChangeIndicator.prototype.onAfterRendering = function() {
-		var oOverlay = Core.getElementById(this.getOverlayId());
+		var oOverlay = Core.byId(this.getOverlayId());
 		if (oOverlay) {
 			// Attach to the overlay
 			oOverlay.getDomRef().appendChild(this.getDomRef());
@@ -332,8 +341,14 @@ sap.ui.define([
 	};
 
 	ChangeIndicator.prototype.setChanges = function(aChanges) {
+		var oRtaResourceBundle = Core.getLibraryResourceBundle("sap.ui.rta");
 		this.setProperty("changes", aChanges);
 		this._oDetailModel.setData((aChanges || []).reverse().map(formatChangesModelItem.bind(this, this.getOverlayId())));
+		if (aChanges && aChanges.length === 1) {
+			this.setTooltip(oRtaResourceBundle.getText("TXT_CHANGEVISUALIZATION_INDICATOR_TOOLTIP_SING"));
+		} else if (aChanges) {
+			this.setTooltip(oRtaResourceBundle.getText("TXT_CHANGEVISUALIZATION_INDICATOR_TOOLTIP_PLUR", [aChanges.length]));
+		}
 	};
 
 	ChangeIndicator.prototype._onSelect = function(oEvent) {
@@ -372,6 +387,7 @@ sap.ui.define([
 			this._iOldTabIndex = this.getDomRef().getAttribute("tabindex");
 			Fragment.load({
 				name: "sap.ui.rta.util.changeVisualization.ChangeIndicatorPopover",
+				id: this.sId + "Info",
 				controller: this
 			}).then(function(oPopover) {
 				oPopover._bOpenedByChangeIndicator = true;

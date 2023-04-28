@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -78,7 +78,7 @@ function(
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -273,9 +273,6 @@ function(
 	// defines the root tag name for rendering purposes
 	ListItemBase.prototype.TagName = "li";
 
-	// enable the ACC announcement for "not selected"
-	ListItemBase.prototype._bAnnounceNotSelected = true;
-
 	// internal active state of the listitem
 	ListItemBase.prototype.init = function() {
 		this._active = false;
@@ -394,7 +391,7 @@ function(
 	};
 
 	ListItemBase.prototype.getAccessibilityType = function(oBundle) {
-		return oBundle.getText("ACC_CTR_TYPE_OPTION");
+		return this.getListProperty("ariaRole") == "list" ? oBundle.getText("ACC_CTR_TYPE_LISTITEM") : "";
 	};
 
 	ListItemBase.prototype.getGroupAnnouncement = function() {
@@ -405,9 +402,9 @@ function(
 		var aOutput = [],
 			sType = this.getType(),
 			sHighlight = this.getHighlight(),
-			sTooltip = this.getTooltip_AsString();
+			bIsTree = this.getListProperty("ariaRole") === "tree";
 
-		if (this.getSelected()) {
+		if (this.getSelected() && !bIsTree) {
 			aOutput.push(oBundle.getText("LIST_ITEM_SELECTED"));
 		}
 
@@ -446,14 +443,11 @@ function(
 		}
 
 		if (this.getContentAnnouncement) {
-			aOutput.push((this.getContentAnnouncement(oBundle) || "").trim());
+			var sContentAnnouncement = (this.getContentAnnouncement(oBundle) || "").trim();
+			sContentAnnouncement && aOutput.push(sContentAnnouncement);
 		}
 
-		if (sTooltip) {
-			aOutput.push(sTooltip);
-		}
-
-		if (this._bAnnounceNotSelected && this.isSelectable() && !this.getSelected()) {
+		if (this.getListProperty("ariaRole") !== "listbox" && !bIsTree && this.isSelectable() && !this.getSelected()) {
 			aOutput.push(oBundle.getText("LIST_ITEM_NOT_SELECTED"));
 		}
 
@@ -968,7 +962,7 @@ function(
 		var oSelection = window.getSelection(),
 			sTextSelection = oSelection.toString().replace("\n", "");
 
-		return sTextSelection && jQuery.contains(oDomRef, oSelection.focusNode);
+		return sTextSelection && (oDomRef !== oSelection.focusNode && oDomRef.contains(oSelection.focusNode));
 	};
 
 	ListItemBase.prototype.ontap = function(oEvent) {

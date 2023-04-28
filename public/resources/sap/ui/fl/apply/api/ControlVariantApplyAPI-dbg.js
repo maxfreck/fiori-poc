@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,7 +10,6 @@ sap.ui.define([
 	"sap/ui/core/Core",
 	"sap/ui/core/Element",
 	"sap/ui/fl/apply/_internal/controlVariants/URLHandler",
-	"sap/ui/fl/variants/VariantManagement",
 	"sap/ui/fl/Utils"
 ], function(
 	Log,
@@ -18,21 +17,30 @@ sap.ui.define([
 	Core,
 	Element,
 	URLHandler,
-	VariantManagement,
 	Utils
 ) {
 	"use strict";
 
+	var VARIANT_MODEL_NAME = "$FlexVariants";
+
 	/**
 	 * Provides an API for applications to work with control variants. See also {@link sap.ui.fl.variants.VariantManagement}.
 	 *
-	 * @name sap.ui.fl.apply.api.ControlVariantApplyAPI
+	 * @namespace sap.ui.fl.apply.api.ControlVariantApplyAPI
 	 * @experimental Since 1.67
 	 * @since 1.67
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @public
 	 */
 	var ControlVariantApplyAPI = /** @lends sap.ui.fl.apply.api.ControlVariantApplyAPI */{
+		/**
+		 * Returns the name of the Variant Model
+		 *
+		 * @returns {string} Name of the Variant Model
+		 */
+		getVariantModelName: function() {
+			return VARIANT_MODEL_NAME;
+		},
 
 		/**
 		 * Clears URL technical parameter <code>sap-ui-fl-control-variant-id</code> for control variants.
@@ -48,7 +56,7 @@ sap.ui.define([
 		clearVariantParameterInURL: function (mPropertyBag) {
 			var aUpdatedVariantParameters;
 			var oAppComponent = Utils.getAppComponentForControl(mPropertyBag.control);
-			var oVariantModel = oAppComponent && oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+			var oVariantModel = oAppComponent && oAppComponent.getModel(VARIANT_MODEL_NAME);
 			if (!oVariantModel) {
 				//technical parameters are not updated, only URL hash is updated
 				Log.error("Variant model could not be found on the provided control");
@@ -56,7 +64,7 @@ sap.ui.define([
 			}
 
 			//check if variant for the passed variant management control is present
-			if (mPropertyBag.control instanceof VariantManagement) {
+			if (mPropertyBag.control.isA("sap.ui.fl.variants.VariantManagement")) {
 				var sVariantManagementReference = oVariantModel.getLocalId(mPropertyBag.control.getId(), oAppComponent);
 				var mCleansedParametersWithIndex = URLHandler.removeURLParameterForVariantManagement({
 					model: oVariantModel,
@@ -112,7 +120,7 @@ sap.ui.define([
 				return logAndReject(Error("A valid variant management control or component (instance or ID) should be passed as parameter"));
 			}
 
-			var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+			var oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
 			if (!oVariantModel) {
 				return logAndReject(Error("No variant management model found for the passed control or application component"));
 			}
@@ -155,7 +163,7 @@ sap.ui.define([
 		attachVariantApplied: function(mPropertyBag) {
 			var oControl = mPropertyBag.selector.id && sap.ui.getCore().byId(mPropertyBag.selector.id) || mPropertyBag.selector;
 			var oAppComponent = Utils.getAppComponentForControl(oControl);
-			var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+			var oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
 
 			oVariantModel.attachVariantApplied({
 				vmControlId: mPropertyBag.vmControlId,
@@ -177,7 +185,7 @@ sap.ui.define([
 		detachVariantApplied: function(mPropertyBag) {
 			var oControl = mPropertyBag.selector.id && sap.ui.getCore().byId(mPropertyBag.selector.id) || mPropertyBag.selector;
 			var oAppComponent = Utils.getAppComponentForControl(oControl);
-			var oVariantModel = oAppComponent.getModel(Utils.VARIANT_MODEL_NAME);
+			var oVariantModel = oAppComponent.getModel(VARIANT_MODEL_NAME);
 			oVariantModel.detachVariantApplied(mPropertyBag.vmControlId, oControl.getId());
 		}
 	};

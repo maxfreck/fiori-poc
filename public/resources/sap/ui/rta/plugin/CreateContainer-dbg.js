@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,7 +25,7 @@ sap.ui.define([
 	 * @class The CreateContainer allows trigger CreateContainer operations on the overlay
 	 * @extends sap.ui.rta.plugin.BaseCreate
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.34
@@ -43,8 +43,8 @@ sap.ui.define([
 
 	/**
 	 * Returns true if create container action is enabled for the selected element overlays
-	 * @param {boolean} bSibling Indicator for a sibling action
 	 * @param {sap.ui.dt.ElementOverlay[]} aElementOverlays Array of selected element overlays
+	 * @param {boolean} bSibling Indicator for a sibling action
 	 * @return {boolean} Indicates if action is enabled
 	 * @override
 	 */

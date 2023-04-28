@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -37,7 +37,7 @@ sap.ui.define([
 	 * It could happen that e.g. in onAfterRendering not all themes are available. In these cases the
 	 * check waits until the CSS is applied and fires an onThemeChanged event.
 	 *
-	 * @extends sap.ui.base.Object
+	 * @extends sap.ui.base.EventProvider
 	 * @since 1.10.0
 	 * @author SAP SE
 	 * @private
@@ -113,30 +113,12 @@ sap.ui.define([
 			mAllLoadedLibraries[oThemeManager._CUSTOMID] = {};
 		}
 
-		function checkAndRemoveStyle(sPrefix, sLib) {
-			var currentRes = ThemeHelper.checkStyle(sPrefix + sLib, true);
-			if (currentRes) {
-
-				// removes all old stylesheets (multiple could exist if theme change was triggered
-				// twice in a short timeframe) once the new stylesheet has been loaded
-				var aOldStyles = document.querySelectorAll("link[data-sap-ui-foucmarker='" + sPrefix + sLib + "']");
-				if (aOldStyles.length > 0) {
-					for (var i = 0, l = aOldStyles.length; i < l; i++) {
-						aOldStyles[i].remove();
-					}
-					Log.debug("ThemeManager: Old stylesheets removed for library: " + sLib);
-				}
-
-			}
-			return currentRes;
-		}
-
 		function checkLib(lib) {
 			var sStyleId = "sap-ui-theme-" + lib;
-			var currentRes = checkAndRemoveStyle("sap-ui-theme-", lib);
+			var currentRes = ThemeHelper.checkAndRemoveStyle({ prefix: "sap-ui-theme-", id: lib });
 			if (currentRes && document.getElementById("sap-ui-themeskeleton-" + lib)) {
 				// remove also the skeleton if present in the DOM
-				currentRes = checkAndRemoveStyle("sap-ui-themeskeleton-", lib);
+				currentRes = ThemeHelper.checkAndRemoveStyle({ prefix: "sap-ui-themeskeleton-", id: lib });
 			}
 			res = res && currentRes;
 			if (res) {
@@ -144,8 +126,9 @@ sap.ui.define([
 				/* as soon as css has been loaded, look if there is a flag for custom css inclusion inside, but only
 				 * if this has not been checked successfully before for the same theme
 				 */
-				if (oThemeManager._themeCheckedForCustom != sThemeName) {
-					// custom css is supported for custom themes, so this check is skipped for standard themes
+				// Only need to adjust custom css in case the theme changed or we have no custom.css yet
+				if (!oThemeManager._customCSSAdded || oThemeManager._themeCheckedForCustom != sThemeName) {
+					// custom css is only supported for custom themes
 					if (!bIsStandardTheme && checkCustom(lib)) {
 						// load custom css available at sap/ui/core/themename/custom.css
 						var sCustomCssPath = sPath;
@@ -162,7 +145,8 @@ sap.ui.define([
 						oThemeManager._themeCheckedForCustom = sThemeName;
 						res = false;
 						return false;
-					}	else {
+					// only remove custom css in case a custom.css was added
+					} else if (oThemeManager._customCSSAdded) {
 						// remove stylesheet once the particular class is not available (e.g. after theme switch)
 						/*check for custom theme was not successful, so we need to make sure there are no custom style sheets attached*/
 						var oCustomCssLink = document.querySelector("LINK[id='" +  oThemeManager._CUSTOMID + "']");
@@ -172,6 +156,7 @@ sap.ui.define([
 						}
 						oThemeManager._customCSSAdded = false;
 					}
+
 				}
 			}
 
@@ -428,8 +413,17 @@ sap.ui.define([
 			var sLinkId = "sap-ui-theme-" + sLibId;
 			var sOldCssUri = document.getElementById(sLinkId) && document.getElementById(sLinkId).href;
 			var sCssBasePath = new URL(this._getThemePath(sLibName, this.sTheme), document.baseURI).toString();
-			var sCssPathAndName = sCssBasePath + sLibFileName + ".css" + (sQuery ? sQuery : "");
-			var sCssVariablesPathAndName = sCssBasePath + "css_variables.css" + (sQuery ? sQuery : "");
+			// Create a link tag and set the URL as href in order to ensure AppCacheBuster handling.
+			// AppCacheBuster ID is added to the href by defineProperty for the "href" property of
+			// HTMLLinkElement in AppCacheBuster.js
+			// Note: Considered to use AppCacheBuster.js#convertURL for adding the AppCachebuster ID
+			//       but there would be a dependency to AppCacheBuster as trade-off
+			var oTmpLink = document.createElement("link");
+			oTmpLink.href = sCssBasePath + sLibFileName + ".css" + (sQuery ? sQuery : "");
+			var sCssPathAndName = oTmpLink.href;
+			oTmpLink.href = sCssBasePath + "css_variables.css" + (sQuery ? sQuery : "");
+			var sCssVariablesPathAndName = oTmpLink.href;
+
 			// includeStylesheet takes care of adding link tag for library only once but we need to take care to skip
 			// checkThemeChanged in case the link tag does not change in order to avoid fireThemeChanged
 			if (!(sCssPathAndName === sOldCssUri || sCssVariablesPathAndName === sOldCssUri)) {

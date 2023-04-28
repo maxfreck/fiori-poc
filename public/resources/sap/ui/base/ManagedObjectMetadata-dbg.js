@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -8,22 +8,26 @@
 sap.ui.define([
 	'./DataType',
 	'./Metadata',
+	'./Object',
 	'sap/base/Log',
 	'sap/base/assert',
-	'sap/base/util/ObjectPath',
+	'sap/base/strings/capitalize',
 	'sap/base/strings/escapeRegExp',
 	'sap/base/util/merge',
-	'sap/base/util/isPlainObject'
+	'sap/base/util/isPlainObject',
+	'sap/ui/core/Lib'
 ],
 function(
 	DataType,
 	Metadata,
+	BaseObject,
 	Log,
 	assert,
-	ObjectPath,
+	capitalize,
 	escapeRegExp,
 	merge,
-	isPlainObject
+	isPlainObject,
+	Library
 ) {
 	"use strict";
 
@@ -73,7 +77,7 @@ function(
 	 *
 	 *
 	 * @author Frank Weigel
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 0.8.6
 	 * @alias sap.ui.base.ManagedObjectMetadata
 	 * @extends sap.ui.base.Metadata
@@ -90,11 +94,7 @@ function(
 	ManagedObjectMetadata.prototype = Object.create(Metadata.prototype);
 	ManagedObjectMetadata.prototype.constructor = ManagedObjectMetadata;
 
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-	function capitalize(sName) {
-		return sName.charAt(0).toUpperCase() + sName.slice(1);
-	}
+	var Object_hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 
 	var rPlural = /(children|ies|ves|oes|ses|ches|shes|xes|s)$/i;
 	var mSingular = {'children' : -3, 'ies' : 'y', 'ves' : 'f', 'oes' : -2, 'ses' : -2, 'ches' : -2, 'shes' : -2, 'xes' : -2, 's' : -1 };
@@ -117,7 +117,7 @@ function(
 		var result = null;
 
 		for (var n in info) {
-			if ( hasOwnProperty.call(info, n) && typeof obj[n] === 'undefined' ) {
+			if ( Object_hasOwn(info, n) && typeof obj[n] === 'undefined' ) {
 				result = result || {};
 				result[n] = info[n];
 			}
@@ -835,7 +835,7 @@ function(
 
 			if ( mInfoMap ) {
 				for (sName in mInfoMap) {
-					if ( hasOwnProperty.call(mInfoMap, sName) ) {
+					if ( Object_hasOwn(mInfoMap, sName) ) {
 						mResult[sName] = new FNClass(that, sName, mInfoMap[sName]);
 					}
 				}
@@ -1314,7 +1314,7 @@ function(
 	 * @since 1.54
 	 *
 	 * @private
-	 * @ui5-restricted SAPUI5 Distribution libraries only
+	 * @ui5-restricted SAPUI5 Distribution Layer Libraries
 	 * @experimental As of 1.54, this method is still in an experimental state. Its signature might change or it might be removed
 	 *   completely. Controls should prefer to declare aggregation forwarding in the metadata for the aggregation. See property
 	 *   <code>forwarding</code> in the documentation of {@link sap.ui.base.ManagedObject.extend ManagedObject.extend}.
@@ -1745,7 +1745,7 @@ function(
 			sName;
 
 		for ( sName in mSettings ) {
-			if ( hasOwnProperty.call(mValidKeys, sName) ) {
+			if ( Object_hasOwn(mValidKeys, sName) ) {
 				mResult[sName] = mSettings[sName];
 			}
 		}
@@ -1795,7 +1795,7 @@ function(
 		//preload the designtime data for the library
 		var sLibrary = oMetadata.getLibraryName(),
 			sPreload = sap.ui.getCore().getConfiguration().getPreload(),
-			oLibrary = sap.ui.getCore().getLoadedLibraries()[sLibrary];
+			oLibrary = Library.all()[sLibrary];
 		if (oLibrary && oLibrary.designtime) {
 			var oPromise;
 			if (sPreload === "async" || sPreload === "sync") {
@@ -1865,7 +1865,7 @@ function(
 	 */
 	function loadInstanceDesignTime(oInstance) {
 		var sInstanceSpecificModule =
-			oInstance instanceof ObjectPath.get('sap.ui.base.ManagedObject')
+			BaseObject.isA(oInstance, "sap.ui.base.ManagedObject")
 			&& typeof oInstance.data === "function"
 			&& oInstance.data("sap-ui-custom-settings")
 			&& oInstance.data("sap-ui-custom-settings")["sap.ui.dt"]

@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -11,7 +11,6 @@ sap.ui.define([
 	'sap/ui/mdc/condition/FilterOperatorUtil',
 	'sap/ui/mdc/condition/FilterConverter',
 	'sap/ui/mdc/enum/SelectType',
-	'sap/ui/mdc/enum/OutParameterMode',
 	'sap/ui/mdc/enum/ConditionValidated',
 	'sap/ui/model/Context',
 	'sap/ui/model/FormatException',
@@ -28,7 +27,6 @@ sap.ui.define([
 	FilterOperatorUtil,
 	FilterConverter,
 	SelectType,
-	OutParameterMode,
 	ConditionValidated,
 	Context,
 	FormatException,
@@ -48,7 +46,8 @@ sap.ui.define([
 	 * @since 1.95.0
 	 * @private
 	 * @experimental As of version 1.95
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 
 	/**
@@ -60,7 +59,8 @@ sap.ui.define([
 	 * @since 1.95.0
 	 * @private
 	 * @experimental As of version 1.95
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 
 	/**
@@ -72,7 +72,8 @@ sap.ui.define([
 	 * @since 1.95.0
 	 * @private
 	 * @experimental As of version 1.95
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 */
 
 	/**
@@ -82,7 +83,7 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Element for the <code>FieldHelp</code> association in the {@link sap.ui.mdc.field.FieldBase FieldBase} controls.
 	 * @extends sap.ui.mdc.Element
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
@@ -229,6 +230,30 @@ sap.ui.define([
 				closed: {},
 
 				/**
+				 * This event is fired as the value help opening is triggered.
+				 */
+				open: {
+					parameters: {
+						/**
+						 * The container which will be opened
+						 */
+						container: {type: "sap.ui.mdc.valuehelp.base.Container"}
+					}
+				},
+
+				/**
+				 * This event is fired as the value help is fully open.
+				 */
+				opened: {
+					parameters: {
+						/**
+						 * The container which was opened
+						 */
+						container: {type: "sap.ui.mdc.valuehelp.base.Container"}
+					}
+				},
+
+				/**
 				 * This event is fired after the user navigated, using the arrow keys, in the value help.
 				 */
 				navigated: {
@@ -312,8 +337,6 @@ sap.ui.define([
 	 * @param {object} [oConfig.delegate] Field delegate to handle model-specific logic (required for condition panel)
 	 * @param {object} [oConfig.delegateName] Field delegate name to handle model-specific logic (required for condition panel)
 	 * @param {object} [oConfig.payload] Payload of the field delegate (required for condition panel)
-	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, if bound to one (required if used for {@link sap.ui.mdc.FilterField FilterField})
-	 * @param {string} [oConfig.defaultOperatorName] Name of the default <code>Operator</code> (required if used for {@link sap.ui.mdc.FilterField FilterField})
 	 * @returns {this} Reference to <code>this</code> in order to allow method chaining
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.field.FieldBase
@@ -461,7 +484,8 @@ sap.ui.define([
 		}
 
 		if (oContainer && !oContainer.isOpen() && !oContainer.isOpening()) {
-			oContainer.open(this._retrieveDelegateContent(oContainer));
+			oContainer.open(this._retrieveDelegateContent(oContainer), bTypeahead);
+			this.fireOpen({container: oContainer});
 		}
 	};
 
@@ -539,7 +563,7 @@ sap.ui.define([
 	ValueHelp.prototype.isOpen = function() {
 		var oTypeahead = this.getTypeahead();
 		var oDialog = this.getDialog();
-		return !!((oTypeahead && oTypeahead.isOpen()) || (oDialog && oDialog.isOpen()));
+		return !!((oTypeahead && (oTypeahead.isOpen() || oTypeahead.isOpening())) || (oDialog && (oDialog.isOpen() || oDialog.isOpening())));
 	};
 
 	/**
@@ -566,8 +590,8 @@ sap.ui.define([
 
 	/**
 	 * Calls initialization of the <code>ValueHelp</code> element before the value help is really opened.
-	 * This is called during type-ahead on first letter before the value help is opened with a delay. This way the
-	 * content can be determined in the delegate coding early.
+	 * This is called during type-ahead when the user types the first letter and before the value help is opened with a delay.
+	 * This way the content can be determined in the delegate coding early.
 	 *
 	 * <b>Note:</b> This function must only be called by the control the <code>ValueHelp</code> element
 	 * belongs to, not by the application.
@@ -608,6 +632,24 @@ sap.ui.define([
 	};
 
 	/**
+	 * Determines if the value help should be opened when the user focuses the connected control.
+	 *
+	 * Opening the value help must be triggered by the control the <code>ValueHelp</code> element
+	 * belongs to.
+	 *
+	 * <b>Note:</b> This function must only be called by the control the <code>ValueHelp</code> element
+	 * belongs to, not by the application.
+	 *
+	 * @returns {boolean} If <code>true</code>, the value help should open when user focuses the connected field control
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.field.FieldBase
+	 */
+	ValueHelp.prototype.shouldOpenOnFocus = function () {
+		var oContainer = _getValueHelpContainer.call(this, true);
+		return oContainer && oContainer.shouldOpenOnFocus();
+	};
+
+	/**
 	 * Determines if the value help should be opened when the user clicks into the connected control.
 	 *
 	 * Opening the value help must be triggered by the control the <code>ValueHelp</code> element
@@ -620,15 +662,9 @@ sap.ui.define([
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.field.FieldBase
 	 */
-	ValueHelp.prototype.shouldOpenOnClick = function () { // was openByClick before, better naming?
-
-		var oContainer = _getValueHelpContainer.call(this);
-
-		if (oContainer) {
-			return oContainer.shouldOpenOnClick(); // TODO: needed async to load content
-		}
-
-		return false;
+	ValueHelp.prototype.shouldOpenOnClick = function () {
+		var oContainer = _getValueHelpContainer.call(this, true);
+		return oContainer && oContainer.shouldOpenOnClick();
 	};
 
 	/**
@@ -716,30 +752,6 @@ sap.ui.define([
 		return false;
 	};
 
-	ValueHelp.prototype.getTextForKey = function (vKey, oContext, oBindingContext, oConditionModel, sConditionModelName) {
-		return this.getItemForValue({
-			parsedValue: vKey,
-			value: vKey,
-			context: oContext,
-			bindingContext: oBindingContext,
-			conditionModel: oConditionModel,
-			conditionModelName: sConditionModelName,
-			checkKey: true,
-			exception: FormatException,
-			caseSensitive: true // case sensitive as used to get description for known key
-		});
-	};
-
-	ValueHelp.prototype.getKeyForText = function(sText, oContext) {
-		return this.getItemForValue({
-			value: sText,
-			context: oContext,
-			checkDescription: true,
-			exception: ParseException,
-			caseSensitive: true // case sensitive as used to get description for known description
-		});
-	};
-
 	/**
 	 * Determines the item (key and description) for a given value.
 	 *
@@ -758,11 +770,9 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [oConfig.bindingContext] <code>BindingContext</code> of the checked field. Inside a table the <code>ValueHelp</code> element might be connected to a different row.
 	 * @param {boolean} oConfig.checkKey If set, the value help checks only if there is an item with the given key. This is set to <code>false</code> if the value cannot be a valid key because of type validation.
 	 * @param {boolean} oConfig.checkDescription If set, the value help checks only if there is an item with the given description. This is set to <code>false</code> if only the key is used in the field.
-	 * @param {sap.ui.mdc.condition.ConditionModel} [oConfig.conditionModel] <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, in case of <code>FilterField</code>
 	 * @param {boolean} [oConfig.caseSensitive] If set, the check is done case sensitive
 	 * @param {sap.ui.core.Control} oConfig.control Instance of the calling control
-	 * @returns {Promise<sap.ui.mdc.field.FieldHelpItem>} Promise returning object containing description, key, in and out parameters.
+	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key and payload.
 	 * @throws {sap.ui.model.FormatException|sap.ui.model.ParseException} if entry is not found or not unique
 	 *
 	 * @private
@@ -772,19 +782,11 @@ sap.ui.define([
 		// TODO: Discuss how we handle binding / typeahead changes ??
 		var oTypeahead = this.getTypeahead();
 		if (oTypeahead) {
-			//TODO: determine values from Inparameters from BindingContext (If not given from outside)
-			var aPromiseKey = ["getItemForValue", oConfig.parsedValue || oConfig.value, JSON.stringify(oConfig.context), oConfig.oBindingContext && oConfig.oBindingContext.getPath()];
-			var sPromisekey = aPromiseKey.join("_");
-			return this._retrievePromise(sPromisekey, function () {
-				return this._retrieveDelegateContent(oTypeahead).then(function() {
-					oConfig.caseSensitive = oConfig.hasOwnProperty("caseSensitive") ? oConfig.caseSensitive : false; // If supported, search case insensitive
-					var pGetItemPromise = oTypeahead.getItemForValue(oConfig);
-					// pGetItemPromise.then(function (oResult) {
-					// 	_onConditionPropagation.call(this, PropagationReason.Info, oConfig);
-					// }.bind(this));
-					return pGetItemPromise;
-				}/*.bind(this)*/);
-			}.bind(this));
+			return this._retrieveDelegateContent(oTypeahead).then(function() {
+				oConfig.caseSensitive = oConfig.hasOwnProperty("caseSensitive") ? oConfig.caseSensitive : false; // If supported, search case insensitive
+				var pGetItemPromise = oTypeahead.getItemForValue(oConfig);
+				return pGetItemPromise;
+			});
 		} else {
 			// to return always a Promise
 			return Promise.reject("No Typeahead"); // TODO message - no translation needed, could only occur on wrng configuration, not on user interaction
@@ -850,10 +852,6 @@ sap.ui.define([
 		}
 
 	};
-
-//	ValueHelp.prototype.getUIArea = function() { // Ask Frank, if better way available
-//
-//	};
 
 	ValueHelp.prototype.getMaxConditions = function() { // ?
 		var oConfig = this.getProperty("_config");
@@ -976,7 +974,7 @@ sap.ui.define([
 	}
 
 	function _handleOpened(oEvent) {
-
+		this.fireOpened({container: oEvent.getSource()});
 	}
 
 	function _handleClosed(oEvent) {
@@ -1022,19 +1020,17 @@ sap.ui.define([
 		this.setBindingContext(oBindingContext);
 	}
 
-	function _getValueHelpContainer() {
+	function _getValueHelpContainer(bPreferTypeahead) {
 
-		var oContainer = this.getDialog();
+		var oTypeahead = this.getTypeahead();
+		var bUseAsValueHelp = !!oTypeahead && oTypeahead.getUseAsValueHelp();
+		var oDialog = this.getDialog();
 
-		if (!oContainer) { // no Dialog -> check if Typeahead should be opened
-			var oTypeahead = this.getTypeahead();
-			if (oTypeahead && oTypeahead.getUseAsValueHelp()) {
-				oContainer = oTypeahead;
-			}
+		if (bPreferTypeahead) {
+			return (bUseAsValueHelp || oDialog) && oTypeahead || oDialog;
+		} else {
+			return oDialog || bUseAsValueHelp && oTypeahead;
 		}
-
-		return oContainer;
-
 	}
 
 	// overwrite standard logic of Element to use FieldGroups of connected Field for all content (children aggregations)

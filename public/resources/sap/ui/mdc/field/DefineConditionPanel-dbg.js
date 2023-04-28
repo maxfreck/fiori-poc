@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -34,8 +34,7 @@ sap.ui.define([
 	'sap/m/Panel',
 	'sap/base/Log',
 	'sap/ui/core/InvisibleMessage',
-	'sap/ui/thirdparty/jquery',
-	'sap/ui/mdc/field/ListFieldHelp' // must be loaded before creating of specificMonth operator control in filterOperatorUtil
+	'sap/ui/thirdparty/jquery'
 ], function(
 		Control,
 		ManagedObjectObserver,
@@ -88,13 +87,13 @@ sap.ui.define([
 	 * @param {object} [mSettings] Initial settings for the new control
 	 *
 	 * @class
-	 * A <code>DefineConditionPanel</code> control is used inside the <code>ValueHelpPanel</code> control to enter different types
+	 * A <code>DefineConditionPanel</code> control is used inside the <code>ValueHelp</code> content to enter different types
 	 * of conditions.
 	 *
 	 * @extends sap.ui.core.Control
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @alias sap.ui.mdc.field.DefineConditionPanel
@@ -102,7 +101,7 @@ sap.ui.define([
 	 * @abstract
 	 *
 	 * @private
-	 * @ui5-restricted sap.ui.mdc.field.ValueHelpPanel, sap.ui.mdc.field.ConditionFieldHelp
+	 * @ui5-restricted sap.ui.mdc.valuehelp.content.Conditions
 	 */
 	var DefineConditionPanel = Control.extend("sap.ui.mdc.field.DefineConditionPanel", {
 		metadata: {
@@ -111,6 +110,7 @@ sap.ui.define([
 				/**
 				 * Sets the conditions that represent the selected values of the help.
 				 *
+				 * <b>Note:</b> A condition must have the structure of {@link sap.ui.mdc.condition.ConditionObject ConditionObject}.
 				 * @since 1.62.0
 				 */
 				conditions: {
@@ -122,7 +122,7 @@ sap.ui.define([
 
 				// TODO: better way to pass MaxConditions, Operators, ...
 				/**
-				 * The <code>formatOptions</code> for the <code>ConditionType</code> used to format tokens.
+				 * The <code>formatOptions</code> for the {@link sap.ui.mdc.field.ConditionType ConditionType} used to format tokens.
 				 *
 				 * @since 1.62.0
 				 */
@@ -145,7 +145,7 @@ sap.ui.define([
 				 * If set, there has been no invalid user input.
 				 *
 				 * <b>Note:</b> This property must not be set from outside. It is a property because that way it can be bound to the
-				 * <code>ManagedObjectModel</code> of the calling field help and automatically update it.
+				 * <code>ManagedObjectModel</code> of the calling value help and automatically update it.
 				 *
 				 * @since 1.87.0
 				 */
@@ -157,17 +157,7 @@ sap.ui.define([
 			},
 			aggregations: {
 				/**
-				 * Optional content that can be rendered.
-				 *
-				 * <b>Note:</b> Bind the value-holding property of the control to <code>'$field>/conditions'</code>
-				 * using <code>sap.ui.mdc.field.ConditionsType</code> as type.
-				 *
-				 * If the control needs to show multiple conditions, bind its aggregation to </code>'$field>/conditions'</code>.
-				 * Bind the item controls value-holding property using <code>sap.ui.mdc.field.ConditionType</code> as type.
-				 *
-				 * <b>Warning:</b> Only controls allowed in a </code>Form</code> are allowed to be used for this optional content.
-				 * Other controls might break the layout.
-				 * This means the <code>sap.ui.core.IFormContent</code> interface needs to be implemented by these controls.
+				 * Internal content that is rendered.
 				 */
 				_content: {
 					type: "sap.ui.core.Control",
@@ -179,11 +169,11 @@ sap.ui.define([
 				/**
 				 * Optional <code>FieldHelp</code>.
 				 *
-				 * This is an association that allows the usage of one <code>FieldHelp</code> instance for the value fields for the <code>DefineConditionPanel</code>.
+				 * This is an association that allows the usage of one <code>ValueHelp</code> instance for the value fields for the <code>DefineConditionPanel</code>.
 
 				 * <b>Note:</b> The fields are single-value input, and the display is always set to <code>FieldDisplay.Value</code>. Only a <code>ValueHelp</code> with a <code>TypeAhead</code> and single-selection <code>MTable</code> can be used.
 
-				 * <b>Note:</b> For <code>Boolean</code>, <code>Date</code>, or <code>Time</code>, no <code>FieldHelp</code> should be added, but a default <code>FieldHelp</code> used instead.
+				 * <b>Note:</b> For <code>Boolean</code>, <code>Date</code>, or <code>Time</code>, no <code>FieldHelp</code> should be added, but a default <code>ValueHelp</code> used instead.
 				 */
 				fieldHelp: {
 					type: "sap.ui.mdc.ValueHelp",
@@ -291,7 +281,7 @@ sap.ui.define([
 			for (var i = 0; i < aGridContent.length && iRow <= iIndex; i++) {
 				var oField = aGridContent[i];
 				if (iRow === iIndex && oField instanceof Field && oField.hasOwnProperty("_iValueIndex")) {
-					if (oField._bParseError) { // TODO: better was to find out parsing error
+					if (oField._isInvalidInput()) { // TODO: better was to find out parsing error
 						oField.setValue(null); // to remove invalid value from parsing
 					}
 				}
@@ -321,10 +311,10 @@ sap.ui.define([
 			if (iMaxConditions === -1 || aConditions.length < iMaxConditions) {
 				// create a new dummy condition for a new condition on the UI - must be removed later if not used or filled correct
 				this.addDummyCondition(aConditions.length + 1);
-				if (this.getConditions().length === iMaxConditions) {
-					this._bFocusLastCondition = true; // as add-Button will disappear and focus should stay in DefineConditionPanel
-				}
+				this._bFocusLastCondition = true; // as add-Button will disappear and focus should stay in DefineConditionPanel
 			}
+
+			this.oInvisibleMessage.announce(oMessageBundle.getText("valuehelp.DEFINECONDITIONS_ADDCONDITION_ANNOUNCE"), InvisibleMessageMode.Polite);
 		},
 
 		addDummyCondition: function(index) {
@@ -352,6 +342,7 @@ sap.ui.define([
 				// static condition added, it is ready to use -> fire event
 				this.fireConditionProcessed();
 			}
+
 		},
 
 		updateDefineConditions: function() {
@@ -529,7 +520,6 @@ sap.ui.define([
 				setTimeout(function() {
 					var oFormatOptions = merge({}, this.getFormatOptions());
 					delete oFormatOptions.fieldHelpID;
-					delete oFormatOptions.conditionModelName;
 					oFormatOptions.maxConditions = 1;
 					oFormatOptions.display = FieldDisplay.Value;
 					//oFormatOptions.valueType = this._getFieldType.call(this, oOperator.name, 0); //TODO using the _getFieldType for better support of types
@@ -595,12 +585,26 @@ sap.ui.define([
 			for (var i = 0; i < aGridContent.length; i++) {
 				var oField = aGridContent[i];
 				if (oField instanceof Field && oField.hasOwnProperty("_iValueIndex")) {
-					if (oField._bParseError) { // TODO: better was to find out parsing error
+					if (oField._isInvalidInput()) { // TODO: better was to find out parsing error
 						oField.setValue(); // to remove invalid value from parsing
 					}
 				}
 			}
 			this.setProperty("inputOK", true, true); // do not invalidate whole DefineConditionPanel
+		},
+
+		/**
+		 * Getter for the initial focusable <code>control</code> on the <code>DefineConditionPanel</code>.
+		 *
+		 * @returns {control} Control instance which could get the focus.
+		 *
+		 * @private
+		 * @ui5-restricted sap.ui.mdc
+		 */
+		getInitialFocusedControl: function() {
+			var oGrid = this.getAggregation("_content").getContent()[1];
+			var oCtrl = oGrid.getContent()[0]; // 0=Operator Field, 2=first Value Field which might not exist
+			return oCtrl;
 		}
 
 	});
@@ -692,14 +696,14 @@ sap.ui.define([
 			// find fields and initialize error state
 			oValue0Field = oGrid.getContent()[iIndex + 2];
 			if (oValue0Field && oValue0Field.hasOwnProperty("_iValueIndex") && oValue0Field._iValueIndex === 0) {
-				if (oValue0Field instanceof Field && !oValue0Field._bParseError) { // TODO: better was to find out parsing error // TODO: handle custom controls
+				if (oValue0Field instanceof Field && !oValue0Field._isInvalidInput()) { // TODO: better was to find out parsing error // TODO: handle custom controls
 					// if Field is in parsing error state, don't remove error
 					oValue0Field.setValueState(ValueState.None);
 					oValue0Field.setValueStateText();
 				}
 				oValue1Field = oGrid.getContent()[iIndex + 3]; // second field only exists if first field exist
 				if (oValue1Field && oValue1Field.hasOwnProperty("_iValueIndex") && oValue1Field._iValueIndex === 1) {
-					if (oValue1Field instanceof Field && !oValue1Field._bParseError) { // TODO: better was to find out parsing error // TODO: handle custom controls
+					if (oValue1Field instanceof Field && !oValue1Field._isInvalidInput()) { // TODO: better was to find out parsing error // TODO: handle custom controls
 						// if Field is in parsing error state, don't remove error
 						oValue1Field.setValueState(ValueState.None);
 						oValue1Field.setValueStateText();
@@ -984,12 +988,7 @@ sap.ui.define([
 			}
 
 			// try to load the operator longText which is type dependent
-			var sTxtKey = oOperator.textKey || "operators." + oOperator.name + ".longText";
-			var sText = oOperator.getTypeText(sTxtKey, _getBaseType.call(this, oType).toLowerCase());
-			if (sText === sTxtKey) {
-				// when the returned text is the key, a type dependent longText does not exist and we use the default longText for the operator
-				sText = oOperator.longText;
-			}
+			var sText = oOperator.getLongText(_getBaseType.call(this, oType));
 
 			//Update the additionalInfo text for the operator
 			var sAdditionalText = oOperator.additionalInfo;
@@ -1210,8 +1209,10 @@ sap.ui.define([
 		}
 
 		if (this._bFocusLastCondition) {
-			// focus last condition after it is rendered
-			aGridContent[0].focus();
+			// focus last condition operator field after it is rendered
+			iIndex = _getGridIndexOfLastRow.call(this, "-operator");
+			// setting the focus on a field only work with a Timeout
+			setTimeout(function() { aGridContent[iIndex].focus(); }, 0);
 			this._bFocusLastCondition = false;
 		}
 		if (this._bFocusLastRemoveBtn) {
@@ -1245,6 +1246,24 @@ sap.ui.define([
 					i++;
 					sSearch = aIdEndsWith[i];
 				}
+			}
+			n--;
+		}
+
+		return 0;
+	}
+
+	function _getGridIndexOfLastRow(sIdEndsWith) {
+		var oGrid = this.byId("conditions");
+		var aElements = oGrid.getContent();
+		var n = aElements.length - 1;
+
+		var sSearch = sIdEndsWith;
+
+		while (n >= 0) {
+			var oElement = aElements[n];
+			if (oElement.getId().endsWith(sSearch)) {
+				return n;
 			}
 			n--;
 		}
@@ -1571,7 +1590,7 @@ sap.ui.define([
 				}
 			}
 
-			if (oField.getMetadata().getAllProperties().valueState && !oField._bParseError && (!oField2 || !oField2._bParseError)) { // TODO: better was to find out parsing error
+			if (oField.getMetadata().getAllProperties().valueState && !oField._isInvalidInput() && (!oField2 || !oField2._isInvalidInput())) { // TODO: better was to find out parsing error
 				// if Field is in parsing error state, user entry is not transfered to condition, so validating makes no sense.
 				var oType = oField.getBinding("value").getType(); // use nullable data type from Field - don't create new type for each check
 				try {

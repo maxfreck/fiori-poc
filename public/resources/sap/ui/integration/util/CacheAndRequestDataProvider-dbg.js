@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -111,15 +111,15 @@ sap.ui.define([
 		var pRequestPromise,
 			oCardHeader = this.getCardInstanceHeader();
 
-		this._sCurrentRequestFullUrl = getFullUrl(oRequest);
+		this._sCurrentRequestFullUrl = getFullUrl(oRequest.url);
 
 		this._subscribeToHostMessages();
 
 		pRequestPromise = RequestDataProvider.prototype._request.apply(this, arguments);
 
 		pRequestPromise.then(function (vResult) {
-			var jqXHR = vResult[1],
-				sDate = jqXHR.getResponseHeader("Date");
+			var oResponse = vResult[1],
+				sDate = oResponse.headers.get("Date");
 
 			if (sDate && oCardHeader) {
 				this._attachTimestampPress();
@@ -165,12 +165,9 @@ sap.ui.define([
 	};
 
 	/**
-	 * Adds cache related headers.
-	 * @param {map} mHeaders Current headers.
-	 * @param {Object} oSettings Request settings
-	 * @returns {map} The new headers
+	 * @inheritdoc
 	 */
-	CacheAndRequestDataProvider.prototype._prepareHeaders = function (mHeaders, oSettings) {
+	CacheAndRequestDataProvider.prototype._modifyRequestBeforeSent = function (oRequest, oSettings) {
 		var oDefault = {
 				enabled: true,
 				maxAge: 0,
@@ -196,7 +193,7 @@ sap.ui.define([
 
 		oNewSettings.request.cache = oCache;
 
-		return RequestDataProvider.prototype._prepareHeaders.call(this, mHeaders, oNewSettings);
+		return RequestDataProvider.prototype._modifyRequestBeforeSent.call(this, oRequest, oNewSettings);
 	};
 
 	/**

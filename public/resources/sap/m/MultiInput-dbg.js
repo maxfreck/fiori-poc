@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -10,40 +10,40 @@ sap.ui.define([
 	'./Tokenizer',
 	'./Token',
 	'./library',
+	'sap/ui/core/Element',
 	'sap/ui/core/EnabledPropagator',
 	'sap/ui/base/ManagedObject',
 	'sap/ui/base/ManagedObjectMetadata',
 	'sap/ui/base/ManagedObjectObserver',
 	'sap/ui/core/ResizeHandler',
 	'sap/ui/core/IconPool',
+	'sap/ui/Device',
 	'./MultiInputRenderer',
 	"sap/ui/dom/containsOrEquals",
 	"sap/m/inputUtils/completeTextSelected",
 	"sap/ui/events/KeyCodes",
 	'sap/ui/core/InvisibleText',
-	"sap/ui/thirdparty/jquery",
 	// jQuery Plugin "cursorPos"
-	"sap/ui/dom/jquery/cursorPos",
-	// jQuery Plugin "control"
-	"sap/ui/dom/jquery/control"
+	"sap/ui/dom/jquery/cursorPos"
 ],
 function(
 	Input,
 	Tokenizer,
 	Token,
 	library,
+	Element,
 	EnabledPropagator,
 	ManagedObject,
 	ManagedObjectMetadata,
 	ManagedObjectObserver,
 	ResizeHandler,
 	IconPool,
+	Device,
 	MultiInputRenderer,
 	containsOrEquals,
 	completeTextSelected,
 	KeyCodes,
-	InvisibleText,
-	jQuery
+	InvisibleText
 ) {
 		"use strict";
 
@@ -107,7 +107,7 @@ function(
 	* @implements sap.ui.core.ISemanticFormContent
 	*
 	* @author SAP SE
-	* @version 1.108.2
+	* @version 1.113.0
 	*
 	* @constructor
 	* @public
@@ -257,9 +257,18 @@ function(
 
 		/* Backward compatibility */
 		oTokenizer.updateTokens = function () {
+			var oDomRef = that.getDomRef();
+
 			this.destroyTokens();
 			this.updateAggregation("tokens");
+
+			// trigger tokenizer's focus handling only if focus is already applied to the Multi Input
+			if (oDomRef && oDomRef.contains(document.activeElement)) {
+				that.bTokensUpdated = true;
+			}
 		};
+
+		oTokenizer.setShouldRenderTabIndex(false);
 
 		this.setAggregation("tokenizer", oTokenizer);
 
@@ -269,6 +278,21 @@ function(
 
 			/* Prevent closing of n more popover when input is clicked */
 			._getPopup().setExtraContent([oTokenizer, this]);
+
+		oTokenizer.getTokensPopup().addEventDelegate({
+			onAfterRendering: function() {
+				var iInputWidth = this.getDomRef().getBoundingClientRect().width;
+				var sPopoverMaxWidth = getComputedStyle(this.getDomRef()).getPropertyValue("--sPopoverMaxWidth");
+
+				if (iInputWidth <= parseInt(sPopoverMaxWidth) && !Device.system.phone) {
+					oTokenizer.getTokensPopup().getDomRef().style.setProperty("max-width", "40rem");
+				} else {
+					oTokenizer.getTokensPopup().getDomRef().style.setProperty("max-width", iInputWidth + "px");
+				}
+
+				oTokenizer.getTokensPopup().getDomRef().style.setProperty("min-width", iInputWidth + "px");
+			}
+		}, this);
 
 		this.setAggregation("tokenizer", oTokenizer);
 
@@ -394,6 +418,19 @@ function(
 		this._registerResizeHandler();
 
 		Input.prototype.onAfterRendering.apply(this, arguments);
+
+		// if tokens are updated via binding focus the newly bound tokens based on last state
+		if (this.bTokensUpdated && this.bDeletePressed) {
+			var aTokens = oTokenizer.getTokens();
+
+			if (aTokens[this.iFocusedIndexBeforeUpdate]) {
+				aTokens[this.iFocusedIndexBeforeUpdate].focus();
+			} else {
+				this.focus();
+			}
+		}
+
+		this.bTokensUpdated = false;
 	};
 
 	/**
@@ -425,6 +462,11 @@ function(
 		var oFirstRemovedToken = aDeletingTokens[0];
 
 		iIndex = this.getTokens().indexOf(bBackspace ? oFirstRemovedToken : oLastRemovedToken);
+
+		// store these for after rendering
+		// used to focus correct token when aggregation is bound
+		this.iFocusedIndexBeforeUpdate = iIndex;
+		this.bDeletePressed = !bBackspace;
 
 		oTokenizer.focusToken(iIndex, oOptions, function () {
 			this.focus();
@@ -709,7 +751,7 @@ function(
 		}
 
 		// find focused element
-		var oFocusedElement = jQuery(document.activeElement).control()[0];
+		var oFocusedElement = Element.closestTo(document.activeElement);
 
 		if (!oFocusedElement) {
 			// we cannot rule out that the focused element does not correspond to an SAPUI5 control in which case oFocusedElement
@@ -1364,7 +1406,7 @@ function(
 	 * In case of added token it will not reset the value.
 	 *
 	 * @protected
-	 * @param {object} oEvent Event object
+	 * @param {jQuery.Event} oEvent Event object
 	 * @param {object} [mParameters] Additional event parameters to be passed in to the change event handler if * the value has changed
 	 * @param {string} sNewValue Passed value on change
 	 * @returns {boolean|undefined} true when change event is fired
@@ -1396,7 +1438,7 @@ function(
 
 	/**
 	 * @see sap.ui.core.Control#getAccessibilityInfo
-	 * @returns {object} The accessibility object
+	 * @returns {sap.ui.core.AccessibilityInfo} The accessibility object
 	 * @protected
 	 */
 	MultiInput.prototype.getAccessibilityInfo = function () {
@@ -1470,7 +1512,7 @@ function(
 	MultiInput.prototype.forwardEventHandlersToSuggPopover = function (oSuggPopover) {
 		oSuggPopover.setShowSelectedPressHandler(this._handleShowSelectedPress.bind(this));
 		oSuggPopover.setOkPressHandler(this._handleConfirmation.bind(this, true));
-		oSuggPopover.setCancelPressHandler(this._handleCancelPress.bind(this));
+		oSuggPopover.setCancelPressHandler(this._revertPopupSelection.bind(this));
 	};
 
 	// Handles "Enter" key press and OK button press
@@ -1488,11 +1530,6 @@ function(
 		this.onChange(oEvent, null, oPopupInput.getValue());
 	};
 
-	MultiInput.prototype._handleCancelPress  = function (oEvent) {
-		this._getSuggestionsPopover().getInput().setDOMValue(this.getLastValue());
-		this._closeSuggestionPopup();
-	};
-
 	MultiInput.prototype._handleShowSelectedPress = function (oEvent) {
 		this._bShowListWithTokens = oEvent.getSource().getPressed();
 		this._manageListsVisibility(this._bShowListWithTokens);
@@ -1504,25 +1541,8 @@ function(
 	 * @private
 	 */
 	MultiInput.prototype._onBeforeOpenTokensPicker = function () {
-		var oTokenizer = this.getAggregation("tokenizer"),
-			oPopover = oTokenizer.getTokensPopup(),
-			oDomRef = this.getDomRef(),
-			bEditable = this.getEditable(),
-			iCurrentWidth, iCalculatedWidth;
-
 		this._setValueVisible(false);
 		this._manageListsVisibility(true);
-
-		if (oDomRef && oPopover) {
-			// Popover's width was calculated once in its onBeforeOpen method and is set in PX
-			iCurrentWidth = parseInt(oPopover.getContentWidth());
-			iCalculatedWidth = isNaN(iCurrentWidth) || oDomRef.offsetWidth > iCurrentWidth ? oDomRef.offsetWidth : iCurrentWidth;
-
-			iCalculatedWidth = ((oTokenizer.getTokens().length === 1) || !bEditable) ? "auto" :
-				(iCalculatedWidth / parseFloat(library.BaseFontSize)) + "rem";
-
-			oPopover.setContentWidth(iCalculatedWidth);
-		}
 	};
 
 	/**

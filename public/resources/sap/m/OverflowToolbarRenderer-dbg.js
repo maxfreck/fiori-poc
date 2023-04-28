@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -25,6 +25,9 @@ sap.ui.define(["./library", 'sap/ui/core/Renderer', './ToolbarRenderer', "sap/m/
 			var bHasAlwaysOverflowVisibleContent  = false,
 				bHasAnyVisibleContent;
 
+			if (oToolbar.getActive()) {
+				rm.renderControl(oToolbar._getActiveButton());
+			}
 			oToolbar._getVisibleContent().forEach(function(oControl) {
 				BarInPageEnabler.addChildClassTo(oControl, oToolbar);
 

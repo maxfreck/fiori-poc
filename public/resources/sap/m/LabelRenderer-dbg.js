@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -73,8 +73,6 @@ sap.ui.define(['sap/ui/core/Core', 'sap/ui/core/Renderer', 'sap/ui/core/AccessKe
 
 		if (sLabelForRendering) {
 			LabelEnablement.writeLabelForAttribute(rm, oLabel);
-		} else if (oLabel.getParent() && oLabel.getParent().isA("sap.m.Toolbar")) {
-			rm.class("sapMLabelTBHeader");
 		}
 
 		// text direction

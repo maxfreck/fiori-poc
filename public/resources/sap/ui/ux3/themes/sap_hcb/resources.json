@@ -157,13 +157,13 @@
 		},
 		{
 			"name": "css_variables.less",
-			"size": 100777,
+			"size": 110570,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},
 		{
 			"name": "css_variables.source.less",
-			"size": 100477,
+			"size": 110270,
 			"designtime": true,
 			"theme": "sap_hcb"
 		},

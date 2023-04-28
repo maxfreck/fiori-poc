@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,8 +18,7 @@ sap.ui.define([
 	 * Available for both runtime and build {@link sap.ui.fl.apply._internal.changes.descriptor.Registration}.
 	 *
 	 * @namespace sap.ui.fl.apply._internal.changes.descriptor.ovp.AddNewCard
-	 * @experimental
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @private
 	 * @ui5-restricted sap.ui.fl.apply._internal
 	 */
@@ -27,9 +26,9 @@ sap.ui.define([
 
 		/**
 		 * Method to apply the <code>appdescr_ovp_addNewCard</code> change to the manifest.
-		 * @param {object} oManifest Original manifest
-		 * @param {object} oChange Change made by key user
-		 * @param {object} oChange.content.card New card created by Key user
+		 * @param {object} oManifest - Original manifest
+		 * @param {sap.ui.fl.apply._internal.flexObjects.AppDescriptorChange} oChange - Change made by key user
+		 * @param {object} oChange.content.card - New card created by Key user
 		 * @returns {object} Updated manifest
 		 * @private
 		 * @ui5-restricted sap.ui.fl.apply._internal

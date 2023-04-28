@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -79,7 +79,7 @@ sap.ui.define([
 	 * @extends sap.ui.core.Element
 	 * @abstract
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @alias sap.ui.core.Control
 	 */
 	var Control = Element.extend("sap.ui.core.Control", /** @lends sap.ui.core.Control.prototype */ {
@@ -307,6 +307,22 @@ sap.ui.define([
 	};
 
 	/**
+	 * Determines whether the control is in rendering phase.
+	 *
+	 * @returns {boolean}
+	 * @private
+	 */
+	function isInRenderingPhase(oControl) {
+		if (!oControl || !oControl.isA) {
+			return false;
+		}
+		if (oControl.isA("sap.ui.core.Control")) {
+			return oControl._bRenderingPhase;
+		}
+		return isInRenderingPhase(oControl.getParent());
+	}
+
+	/**
 	 * Marks this control and its children for a re-rendering, usually because its state has changed and now differs
 	 * from the rendered DOM.
 	 *
@@ -327,14 +343,22 @@ sap.ui.define([
 	Control.prototype.invalidate = function(oOrigin) {
 		var oUIArea;
 
-		// invalidations that happen in the onBeforeRendering hook of controls can be ignored
-		// since the rendering of the control has not yet been started
+		// Invalidations that happen in the onBeforeRendering hook of controls can be ignored
+		// since the rendering of the control is about to start.
 		if ( this._bOnBeforeRenderingPhase ) {
 			return;
 		}
 
-		if ( this.bOutput && (oUIArea = this.getUIArea()) ) {
+		// Mark the control that it is in a dirty state and requires rendering.
+		// This flag will be used by the RenderManager to determine whether the rendering
+		// is necessary for the child controls while they are getting rendered with their parents.
+		// This will be cleared by the RenderManager when the control is rendered completely.
+		this._bNeedsRendering = true;
+
+		var oParent = this.getParent();
+		if ( (this.bOutput || isInRenderingPhase(oParent)) && (oUIArea = this.getUIArea()) ) {
 			// if this control has been rendered before (bOutput)
+			// or if the invalidation happens while parent rendering (isInRenderingPhase(oParent))
 			// and if it is contained in a UIArea (!!oUIArea)
 			// then control re-rendering can be used (see UIArea.rerender() for details)
 			//
@@ -352,7 +376,6 @@ sap.ui.define([
 			}
 		} else {
 			// else we bubble up the hierarchy
-			var oParent = this.getParent();
 			if (oParent && (
 					this.bOutput /* && !this.getUIArea() */ ||
 					/* !this.bOutput && */ !(this.getVisible && this.getVisible() === false))) {
@@ -391,6 +414,7 @@ sap.ui.define([
 	 * @protected
 	 */
 	Control.prototype.rerender = function() {
+		this._bNeedsRendering = true;
 		UIArea.rerenderControl(this);
 	};
 
@@ -517,8 +541,8 @@ sap.ui.define([
 	 *
 	 * Use {@link #detachBrowserEvent} to remove the event handler(s) again.
 	 *
-	 * @param {string} [sEventType] A string containing one or more JavaScript event types, such as "click" or "blur".
-	 * @param {function} [fnHandler] A function to execute each time the event is triggered.
+	 * @param {string} sEventType A string containing one or more JavaScript event types, such as "click" or "blur".
+	 * @param {function} fnHandler A function to execute each time the event is triggered.
 	 * @param {object} [oListener] The object, that wants to be notified, when the event occurs
 	 * @returns {this} Returns <code>this</code> to allow method chaining
 	 * @public
@@ -558,8 +582,8 @@ sap.ui.define([
 	 * Note: listeners are only removed, if the same combination of event type, callback function
 	 * and context object is given as in the call to <code>attachBrowserEvent</code>.
 	 *
-	 * @param {string} [sEventType] A string containing one or more JavaScript event types, such as "click" or "blur".
-	 * @param {function} [fnHandler] The function that is to be no longer executed.
+	 * @param {string} sEventType A string containing one or more JavaScript event types, such as "click" or "blur".
+	 * @param {function} fnHandler The function that is to be no longer executed.
 	 * @param {object} [oListener] The context object that was given in the call to <code>attachBrowserEvent</code>.
 	 * @returns {this} Returns <code>this</code> to allow method chaining
 	 * @public
@@ -970,7 +994,8 @@ sap.ui.define([
 
 		if (bBlocked) {
 			this.addDelegate(oRenderingDelegate, false, this);
-		} else {
+		} else if (!this.getBusy()) {
+			// only remove delegate if control is not still in "busy" state
 			this.removeDelegate(oRenderingDelegate);
 		}
 
@@ -1040,7 +1065,11 @@ sap.ui.define([
 			Interaction.notifyShowBusyIndicator(this);
 			this.addDelegate(oRenderingDelegate, false, this);
 		} else {
-			this.removeDelegate(oRenderingDelegate);
+			// only remove the delegate if the control is not still in "blocked" state
+			if (!this.getProperty("blocked")) {
+				this.removeDelegate(oRenderingDelegate);
+			}
+
 			//If there is a pending delayed call we clear it
 			if (this._busyIndicatorDelayedCallId) {
 				clearTimeout(this._busyIndicatorDelayedCallId);
@@ -1203,31 +1232,21 @@ sap.ui.define([
 	 * <pre>
 	 * MyControl.prototype.getAccessibilityInfo = function() {
 	 *    return {
-	 *      role: "textbox",      // String which represents the WAI-ARIA role which is implemented by the control.
-	 *      type: "date input",   // String which represents the control type (Must be a translated text). Might correlate with
-	 *                            // the role.
-	 *      description: "value", // String which describes the most relevant control state (e.g. the inputs value). Must be a
-	 *                            // translated text.
-	 *                            // Note: The type and the enabled/editable state must not be handled here.
-	 *      focusable: true,      // Boolean which describes whether the control can get the focus.
-	 *      enabled: true,        // Boolean which describes whether the control is enabled. If not relevant it must not be set or
-	 *                            // <code>null</code> can be provided.
-	 *      editable: true,       // Boolean which describes whether the control is editable. If not relevant it must not be set or
-	 *                            // <code>null</code> can be provided.
-	 *      required: true,       // Boolean which describes whether the control is mandatory. If not relevant it must not be set or
-	 *                            // <code>null</code> can be provided. The required state might also be handled as part of the description. In this
-	 *                            // case this flag should not be used.
-	 *      children: []          // Aggregations of the given control (e.g. when the control is a layout). Primitive aggregations will be ignored.
-	 *                            // Note: Children should only be provided when it is helpful to understand the accessibility context
-	 *                            //       (e.g. a form control must not provide details of its internals (fields, labels, ...) but a
-	 *                            //       layout should).
+	 *      role: "textbox",
+	 *      type: "date input",
+	 *      description: "value",
+	 *      focusable: true,
+	 *      enabled: true,
+	 *      editable: true,
+	 *      required: true,
+	 *      children: []
 	 *    };
 	 * };
 	 * </pre>
 	 *
 	 * Note: The returned object provides the accessibility state of the control at the point in time when this function is called.
 	 *
-	 * @return {object} Current accessibility state of the control.
+	 * @return {sap.ui.core.AccessibilityInfo} Current accessibility state of the control.
 	 * @since 1.37.0
 	 * @function
 	 * @name sap.ui.core.Control.prototype.getAccessibilityInfo

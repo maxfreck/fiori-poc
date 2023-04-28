@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -15,7 +15,7 @@ sap.ui.define([
 	var MessageType = CoreLibrary.MessageType;
 
 	/*
-	 * Validates whether title or aria-labelledby is correctly set
+	 * Validates whether aria-labelledby is correctly set
 	 */
 	var oAccessibleLabel = SupportHelper.normalizeRule({
 		id: "AccessibleLabel",
@@ -23,7 +23,7 @@ sap.ui.define([
 		categories: [Categories.Accessibility],
 		title: "Accessible Label",
 		description: "Checks whether 'sap.ui.table.Table' controls have an accessible label.",
-		resolution: "Use the 'title' aggregation or the 'ariaLabelledBy' association of the 'sap.ui.table.Table' control "
+		resolution: "Use the 'ariaLabelledBy' association of the 'sap.ui.table.Table' control "
 					+ "to define a proper accessible labeling.",
 		check: function(oIssueManager, oCoreFacade, oScope) {
 			var aTables = SupportHelper.find(oScope, true, "sap.ui.table.Table");

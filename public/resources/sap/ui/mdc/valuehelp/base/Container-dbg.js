@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -20,15 +20,18 @@ sap.ui.define([
 	/**
 	 * Constructor for a new <code>Container</code>.
 	 *
+	 * This is the basis for different value help containers. It cannot be used directly.
+	 *
 	 * @param {string} [sId] ID for the new element, generated automatically if no ID is given
 	 * @param {object} [mSettings] Initial settings for the new element
 	 * @class Container for the {@link sap.ui.mdc.ValueHelp ValueHelp} element.
 	 * @extends sap.ui.core.Element
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @abstract
 	 * @private
-	 * @ui5-restricted sap.ui.mdc
+	 * @ui5-restricted sap.fe
+	 * @MDC_PUBLIC_CANDIDATE
 	 * @since 1.95.0
 	 * @experimental As of version 1.95
 	 * @alias sap.ui.mdc.valuehelp.base.Container
@@ -257,19 +260,20 @@ sap.ui.define([
 	 * Opens the container
 	 *
 	 * @param {Promise} oValueHelpContentPromise Promise for content request
+ 	 * @param {boolean} bTypeahead Flag indicating whether the container is opened as type-ahead or dialog-like help
 	 * @returns {Promise} This promise resolves after the container completely opened.
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.ValueHelp
 	 */
-	Container.prototype.open = function (oValueHelpContentPromise) {
+	Container.prototype.open = function (oValueHelpContentPromise, bTypeahead) {
 		if (!this.isOpening()) {
 			var oOpenPromise = this._addPromise("open");
 			return Promise.all([this._getContainer(), oValueHelpContentPromise]).then(function (aResults) {
 				return this._placeContent(aResults[0]);
 			}.bind(this)).then(function(oContainer) {
 				if (!oOpenPromise.isCanceled()) {
-					this._open(oContainer);
+					this._open(oContainer, bTypeahead);
 				}
 				return oOpenPromise;
 			}.bind(this));
@@ -299,7 +303,7 @@ sap.ui.define([
 		return oContainer;
 	};
 
-	Container.prototype._open = function (oContainer) {
+	Container.prototype._open = function (oContainer, bTypeahead) {
 
 		var aContent = this.getContent();
 		for (var i = 0; i < aContent.length; i++) { // for Dialog overwrite to only bind shown content
@@ -387,17 +391,16 @@ sap.ui.define([
 	 * @param {sap.ui.model.Context} [oConfig.bindingContext] <code>BindingContext</code> of the checked field. Inside a table the <code>ValueHelp</code> element might be connected to a different row.
 	 * @param {boolean} oConfig.checkKey If set, the value help checks only if there is an item with the given key. This is set to <code>false</code> if the value cannot be a valid key because of type validation.
 	 * @param {boolean} oConfig.checkDescription If set, the value help checks only if there is an item with the given description. This is set to <code>false</code> if only the key is used in the field.
-	 * @param {sap.ui.mdc.condition.ConditionModel} [oConfig.conditionModel] <code>ConditionModel</code>, in case of <code>FilterField</code>
-	 * @param {string} [oConfig.conditionModelName] Name of the <code>ConditionModel</code>, in case of <code>FilterField</code>
 	 * @param {boolean} [oConfig.caseSensitive] If set, the check is done case sensitive
 	 * @param {sap.ui.core.Control} oConfig.control Instance of the calling control
-	 * @returns {Promise<sap.ui.mdc.field.FieldHelpItem>} Promise returning object containing description, key, in and out parameters.
+	 * @returns {Promise<sap.ui.mdc.valuehelp.ValueHelpItem>} Promise returning object containing description, key and payload.
 	 * @throws {sap.ui.model.FormatException|sap.ui.model.ParseException} if entry is not found or not unique
 	 *
 	 * @private
 	 * @ui5-restricted sap.ui.mdc.ValueHelp
 	 */
 	Container.prototype.getItemForValue = function(oConfig) { // TODO only for TypeAhead container
+		return undefined;
 	};
 
 	/**
@@ -490,6 +493,21 @@ sap.ui.define([
 	Container.prototype.isDialog = function () {
 		var oValueHelp = this.getParent();
 		return oValueHelp && (oValueHelp.getDialog() === this || (this.isTypeahead() && !oValueHelp.getDialog() && this.getUseAsValueHelp()));
+	};
+
+	/**
+	 * Determines if the container parent has a dialog inside the value help
+	 *
+	 * <b>Note:</b> This function is used by the container and content and must not be used from outside
+	 *
+	 * @returns {boolean} True if parent has a dialog
+	 *
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.valueHelp.base.Content
+	 */
+	Container.prototype.hasDialog = function () {
+		var oValueHelp = this.getParent();
+		return !!(oValueHelp && (oValueHelp.getDialog()));
 	};
 
 	/**
@@ -618,6 +636,17 @@ sap.ui.define([
 	Container.prototype.getScrollDelegate = function(iMaxConditions) {
 		var oContainer = this.getAggregation("_container");
 		return oContainer && oContainer.getScrollDelegate && oContainer.getScrollDelegate();
+	};
+
+	/**
+	 * Determines if the value help should be opened when the user focuses the connected control.
+	 *
+	 * @returns {boolean} If <code>true</code>, the value help should open when user focuses the connected field control
+	 * @private
+	 * @ui5-restricted sap.ui.mdc.ValueHelp
+	 */
+	Container.prototype.shouldOpenOnFocus = function() {
+		return false;
 	};
 
 	/**

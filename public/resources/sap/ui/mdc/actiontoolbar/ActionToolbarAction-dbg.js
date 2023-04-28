@@ -1,14 +1,14 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
-    "sap/ui/core/Control",
-    "sap/ui/mdc/actiontoolbar/ActionToolbarActionRenderer",
-    "sap/ui/mdc/enum/ActionToolbarActionAlignment"
+	"sap/ui/core/Control",
+	"sap/ui/mdc/actiontoolbar/ActionToolbarActionRenderer",
+	"sap/ui/mdc/enum/ActionToolbarActionAlignment"
 ], function(Control, ActionToolbarActionRenderer, ActionToolbarActionAlignment) {
-    "use strict";
+	"use strict";
 
 	/**
 	 * Constructor for a new ActionToolbarAction.<br>
@@ -21,7 +21,7 @@ sap.ui.define([
 	 * @class The action for an {@link sap.ui.mdc.ActionToolbar ActionToolbar}) control
 	 * @extends sap.ui.core.Control
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @constructor
 	 * @private
 	 * @since 1.58
@@ -29,76 +29,97 @@ sap.ui.define([
 	 * @ui5-restricted sap.ui.mdc
 	 * @alias sap.ui.mdc.actiontoolbar.ActionToolbarAction
 	 */
-    var ActionToolbarAction = Control.extend("sap.ui.mdc.actiontoolbar.ActionToolbarAction", {
-        metadata: {
-            library: "sap.ui.mdc",
-            designtime: "sap/ui/mdc/designtime/actiontoolbar/ActionToolbarAction.designtime",
-            interfaces : [
+	var ActionToolbarAction = Control.extend("sap.ui.mdc.actiontoolbar.ActionToolbarAction", {
+		metadata: {
+			library: "sap.ui.mdc",
+			designtime: "sap/ui/mdc/designtime/actiontoolbar/ActionToolbarAction.designtime",
+			interfaces : [
 				"sap.m.IOverflowToolbarContent"
 			],
-            properties: {
-                /**
-                 * Layout information
-                 */
-                layoutInformation: {
-                    type: "object",
-                    defaultValue: {
-                        // available aggragation names: "beginning", "between", "end"
-                        aggregationName: "end",
-                        alignment: ActionToolbarActionAlignment.Begin
-                    }
-                }
-            },
-            defaultAggregation: "action",
-            aggregations: {
-                /**
-                 * Action
-                 */
-                action: {
-                    type: "sap.ui.core.Control",
+			properties: {
+				/**
+				 * Layout information
+				 */
+				layoutInformation: {
+					type: "object",
+					defaultValue: {
+						// available aggragation names: "beginning", "between", "end"
+						aggregationName: "end",
+						alignment: ActionToolbarActionAlignment.Begin
+					}
+				}
+			},
+			defaultAggregation: "action",
+			aggregations: {
+				/**
+				 * Action
+				 */
+				action: {
+					type: "sap.ui.core.Control",
 					multiple: false
-                }
-            }
-        },
-        renderer: ActionToolbarActionRenderer
-    });
+				}
+			}
+		},
+		renderer: ActionToolbarActionRenderer
+	});
 
-    /**
+	ActionToolbarAction.prototype.getDomRef = function() {
+		// return the DomRef of the inner Action, otherwise the Overflow calculation does not work
+		return this.getAction() && this.getAction().getDomRef();
+	};
+
+	ActionToolbarAction.prototype.getLayoutData = function() {
+		var oLayoutData = Control.prototype.getLayoutData.apply(this);
+		// return the LayoutData of the inner Action if there is no LayoutData set
+		return oLayoutData ? oLayoutData : this.getAction() && this.getAction().getLayoutData();
+	};
+
+	/**
 	 * Sets the behavior of the <code>ActionToolbarAction</code> inside an <code>OverflowToolbar</code> configuration.
 	 *
-	 * @public
+	 * @protected
 	 * @returns {object} Configuration information for the <code>sap.m.IOverflowToolbarContent</code> interface.
 	 */
-    ActionToolbarAction.prototype.getOverflowToolbarConfig = function() {
-        var oConfig = {
-			canOverflow: true
-		};
-        oConfig.onBeforeEnterOverflow = this._onBeforeEnterOverflow.bind(this);
-        oConfig.onAfterExitOverflow = this._onAfterExitOverflow.bind(this);
-
+	ActionToolbarAction.prototype.getOverflowToolbarConfig = function() {
+		// use the Action OverflowToolbarConfig if exist
+		var oConfig = this.getAction() && this.getAction().getOverflowToolbarConfig ? this.getAction().getOverflowToolbarConfig() : { canOverflow: true };
+		oConfig.onBeforeEnterOverflow = this._getOnBeforeEnterOverflow(oConfig);
+		oConfig.onAfterExitOverflow = this._getOnAfterExitOverflow(oConfig);
 		return oConfig;
-    };
+	};
 
-    ActionToolbarAction.prototype._onBeforeEnterOverflow = function() {
-        if (this.getParent()) {
-            this.getParent()._updateSeparators();
-        }
-    };
+	ActionToolbarAction.prototype._getOnBeforeEnterOverflow = function(oConfig) {
+		var fnOnBeforeEnterOverflow = oConfig.onBeforeEnterOverflow;
+		return function(oControl) {
+			if (fnOnBeforeEnterOverflow) {
+				fnOnBeforeEnterOverflow(oControl.getAction());
+			}
+			if (oControl.getParent() && oControl.getParent()._updateSeparators) {
+				oControl.getParent()._updateSeparators();
+			}
+		};
+	};
 
-    ActionToolbarAction.prototype._onAfterExitOverflow = function() {
-        if (this.getParent()) {
-            this.getParent()._updateSeparators();
-        }
-    };
+	ActionToolbarAction.prototype._getOnAfterExitOverflow = function(oConfig) {
+		var fnOnAfterExitOverflow = oConfig.onAfterExitOverflow;
+		return function(oControl) {
+			if (fnOnAfterExitOverflow) {
+				fnOnAfterExitOverflow(oControl.getAction());
+			}
+			if (oControl.getParent() && oControl.getParent()._updateSeparators) {
+				oControl.getParent()._updateSeparators();
+			}
+		};
+	};
 
-    /**
-     *
-     * @returns {string} a text defining the label of this <code>ActionToolbarAction</code> defined by the inner action.
-     */
-    ActionToolbarAction.prototype.getLabel = function() {
-        var oAction = this.getAction();
-        return oAction && oAction.getText ? oAction.getText() : this.getId();
-    };
+	/**
+	 *
+	 * @returns {string} a text defining the label of this <code>ActionToolbarAction</code> defined by the inner action.
+	 */
+	ActionToolbarAction.prototype.getLabel = function() {
+		var oAction = this.getAction();
+		return oAction && oAction.getText ? oAction.getText() : this.getId();
+	};
 
-    return ActionToolbarAction;
+	return ActionToolbarAction;
 });

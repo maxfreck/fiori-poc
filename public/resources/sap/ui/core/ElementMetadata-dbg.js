@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -14,6 +14,7 @@ sap.ui.define([
 	function(Log, ObjectPath, ManagedObjectMetadata, Renderer) {
 	"use strict";
 
+	var Object_hasOwn = Function.prototype.call.bind(Object.prototype.hasOwnProperty);
 
 	/**
 	 * Creates a new metadata object for a UIElement subclass.
@@ -23,7 +24,7 @@ sap.ui.define([
 	 *
 	 * @class
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @since 0.8.6
 	 * @alias sap.ui.core.ElementMetadata
 	 * @extends sap.ui.base.ManagedObjectMetadata
@@ -117,7 +118,7 @@ sap.ui.define([
 		this._sVisibility = oStaticInfo.visibility || "public";
 
 		// remove renderer stuff before calling super.
-		var vRenderer = oClassInfo.hasOwnProperty("renderer") ? (oClassInfo.renderer || "") : undefined;
+		var vRenderer = Object_hasOwn(oClassInfo, "renderer") ? (oClassInfo.renderer || "") : undefined;
 		delete oClassInfo.renderer;
 
 		ManagedObjectMetadata.prototype.applySettings.call(this, oClassInfo);

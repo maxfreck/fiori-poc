@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -202,7 +202,7 @@ sap.ui.define([
 	/**
 	 * Root Namespace for the jQuery plug-in provided by SAP SE.
 	 *
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 * @namespace
 	 * @public
 	 * @static
@@ -1981,6 +1981,9 @@ sap.ui.define([
 		/*eslint-enable no-eval */
 	};
 
+	/**
+	 * @deprecated As of version 1.112
+	 */
 	(function() {
 
 		var b = Device.browser;

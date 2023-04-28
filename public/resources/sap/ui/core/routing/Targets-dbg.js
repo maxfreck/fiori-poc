@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 sap.ui.define([
@@ -294,9 +294,6 @@ sap.ui.define([
 		var Targets = EventProvider.extend("sap.ui.core.routing.Targets", /** @lends sap.ui.core.routing.Targets.prototype */ {
 
 			constructor : function(oOptions) {
-				var sTargetOptions,
-					sTargetName;
-
 				EventProvider.apply(this);
 
 				this._mTargets = {};
@@ -333,18 +330,13 @@ sap.ui.define([
 					this[fn] = TargetsStub[fn];
 				}
 
-				for (sTargetOptions in oOptions.targets) {
-					if (oOptions.targets.hasOwnProperty(sTargetOptions)) {
-						this._createTarget(sTargetOptions, oOptions.targets[sTargetOptions]);
-					}
-				}
+				Object.keys(oOptions.targets).forEach(function(sTargetName) {
+					this._createTarget(sTargetName, oOptions.targets[sTargetName]);
+				}.bind(this));
 
-				for (sTargetName in this._mTargets) {
-					if (this._mTargets.hasOwnProperty(sTargetName)) {
-						this._addParentTo(this._mTargets[sTargetName]);
-					}
-				}
-
+				Object.keys(this._mTargets).forEach(function(sTargetName) {
+					this._addParentTo(this._mTargets[sTargetName]);
+				}.bind(this));
 			},
 
 			/**
@@ -398,7 +390,7 @@ sap.ui.define([
 			 *     When switching to a different route, then the dynamic target will be suspended.
 			 * @property {boolean} [ignoreInitialHash=false] Since 1.90. Whether the router of the "Component" target ignores the browser hash when it's re-initialized.
 			 *     This parameter only has effect when the target is of type "Component" and its router is currently stopped. It has no effect on the first call of
-			 *     {link sap.ui.core.routing.Router#initialize}, because this is done by the application and not by the UI5 routing.
+			 *     {@link sap.ui.core.routing.Router#initialize}, because this is done by the application and not by the UI5 routing.
 			 * @protected
 			 * @since 1.84.0
 			 */

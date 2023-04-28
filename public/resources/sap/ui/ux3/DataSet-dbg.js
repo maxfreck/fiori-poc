@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -44,7 +44,7 @@ sap.ui.define([
 	 * @class
 	 * DataSet
 	 * @extends sap.ui.core.Control
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @constructor
 	 * @public
@@ -382,7 +382,7 @@ sap.ui.define([
 	/**
 	 * Returns the LeadSelection index
 	 *
-	 * @return {int} selected index
+	 * @returns {int} selected index
 	 * @protected
 	 */
 	DataSet.prototype.getLeadSelection = function() {
@@ -404,7 +404,7 @@ sap.ui.define([
 	 * Returns true if iIndex is selected
 	 *
 	 * @param {int} iIndex index of selection
-	 * @return {boolean} index selected true/false
+	 * @returns {boolean} index selected true/false
 	 * @protected
 	*/
 	DataSet.prototype.isSelectedIndex = function(iIndex) {
@@ -415,7 +415,7 @@ sap.ui.define([
 	 * Returns id of selected Item from given index
 	 *
 	 * @param {int} iIndex index of selection
-	 * @return {string} id of selected item
+	 * @returns {string} id of selected item
 	 * @protected
 	*/
 	DataSet.prototype.getSelectedItemId = function(iIndex) {
@@ -425,9 +425,9 @@ sap.ui.define([
 	/**
 	 * Creates a view switch button
 	 *
-	 * @param {object} oView View
+	 * @param {sap.m.Element} oView View
 	 * @param {int} iIndex Index of view
-	 * @return {object} viewSwitch instance
+	 * @returns {sap.m.Button} viewSwitch instance
 	 * @protected
 	*/
 	DataSet.prototype.createViewSwitch = function(oView, iIndex) {

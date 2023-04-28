@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -61,7 +61,7 @@ sap.ui.define([
 		return aFilterItems;
 	};
 
-	GroupContainer.prototype.update = function(oP13nData) {
+	GroupContainer.prototype.update = function(oAdaptationData) {
 		this.oLayout.restoreDefaults();
 	};
 
@@ -73,6 +73,10 @@ sap.ui.define([
 		this.mFilterItems = null;
 		this.mFilterFields = null;
 		IFilterContainer.prototype.exit.apply(this, arguments);
+	};
+
+	GroupContainer.prototype.getInitialFocusedControl = function() {
+		return this.oLayout.getInitialFocusedControl && this.oLayout.getInitialFocusedControl();
 	};
 
 	return GroupContainer;

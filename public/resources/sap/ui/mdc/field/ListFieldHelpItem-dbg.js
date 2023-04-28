@@ -1,6 +1,6 @@
 /*!
  * OpenUI5
- * (c) Copyright 2009-2022 SAP SE or an SAP affiliate company.
+ * (c) Copyright 2009-2023 SAP SE or an SAP affiliate company.
  * Licensed under the Apache License, Version 2.0 - see LICENSE.txt.
  */
 
@@ -18,12 +18,12 @@ sap.ui.define([
 	 * @param {object} [mSettings] initial settings for the new control
 	 *
 	 * @class
-	 * An item that is used in the {@link sap.ui.mdc.field.ListFieldHelp ListFieldHelp} element if grouping is needed.
+	 * An item that is used in the {@link sap.ui.mdc.valuehelp.content.FixedList FixedList}.
 	 *
 	 * @extends sap.ui.core.ListItem
 	 *
 	 * @author SAP SE
-	 * @version 1.108.2
+	 * @version 1.113.0
 	 *
 	 * @private
 	 * @ui5-restricted sap.fe
