@@ -7,7 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "casbin/laravel-authz": "^3.1",
-        "flat3/lodata": "^5.21",
+        "flat3/lodata": "^5.32",
         "guzzlehttp/guzzle": "^7.0",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
