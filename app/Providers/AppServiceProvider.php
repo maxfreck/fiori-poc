@@ -23,7 +23,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //oData
-        \Lodata::discover(\App\Models\persons::class);
+        $this->fioriSetup();
+    }
+
+    private function fioriSetup()
+    {
+        $fioriCfgPath = config_path('fiori.php');
+        if (!is_file($fioriCfgPath)) return;
+
+        $cfg = require($fioriCfgPath);
+        if (!is_object($cfg) || !method_exists($cfg, 'setup')) return;
+
+        $cfg->setup();
     }
 }
