@@ -1,5 +1,0 @@
-$user = new App\Models\User();
-$user->password = Hash::make('R00t');
-$user->email = 'root@localhost';
-$user->name = 'root';
-$user->save();

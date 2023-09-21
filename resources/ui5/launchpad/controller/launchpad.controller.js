@@ -1,1 +1,0 @@
-sap.ui.define(["sap/ui/core/mvc/Controller"],function(n){"use strict";return n.extend("net.php.launchpad.launchpad.controller.launchpad",{onInit:function(){},onUserPress:function(){alert("Hello World")}})});

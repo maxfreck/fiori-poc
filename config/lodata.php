@@ -14,7 +14,7 @@ return [
     /*
      * Whether this service should allow data modification requests. Set to true by default just for safety.
      */
-    'readonly' => false,
+    'readonly' => true,
 
     /*
      * Set this to true if you want to use Laravel authorization gates for your OData requests.
@@ -30,7 +30,12 @@ return [
     /*
      * This is an OData concept to group your data model according to a globally unique namespace. Some clients may use this information for display purposes.
      */
-    'namespace' => env('LODATA_NAMESPACE', 'net.php.flp.odata'),
+    'namespace' => env('LODATA_NAMESPACE', 'com.example.odata'),
+
+    /*
+     * The default version of the OData protocol to support for every request.
+     */
+    'version' => env('LODATA_VERSION', '4.01'),
 
     /*
      * The name of the Laravel disk to use to store asynchronously processed requests.
@@ -98,6 +103,4 @@ return [
      * Configuration for OpenAPI schema generation
      */
     'openapi' => [],
-
-    'maxVersion' => '4.0'
 ];

@@ -8,32 +8,17 @@ class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
-     *
-     * @return void
      */
-    public function register()
+    public function register(): void
     {
         //
     }
 
     /**
      * Bootstrap any application services.
-     *
-     * @return void
      */
-    public function boot()
+    public function boot(): void
     {
-        $this->fioriSetup();
-    }
-
-    private function fioriSetup()
-    {
-        $fioriCfgPath = config_path('fiori.php');
-        if (!is_file($fioriCfgPath)) return;
-
-        $cfg = require($fioriCfgPath);
-        if (!is_object($cfg) || !method_exists($cfg, 'setup')) return;
-
-        $cfg->setup();
+        //
     }
 }
