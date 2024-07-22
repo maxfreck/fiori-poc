@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/core/UIComponent","sap/ui/Device","net/php/flights/flights/model/models"],function(e,t,i){"use strict";return e.extend("net.php.flights.flights.Component",{metadata:{manifest:"json"},init:function(){e.prototype.init.apply(this,arguments);this.getRouter().initialize();this.setModel(i.createDeviceModel(),"device")}})});
+//# sourceMappingURL=Component.js.map

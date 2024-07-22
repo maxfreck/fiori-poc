@@ -1,0 +1,2 @@
+sap.ui.define(["sap/fe/test/ObjectPage"],function(t){"use strict";var e={actions:{},assertions:{}};return new t({appId:"flightsfe.flightsfe",componentId:"FlightsObjectPage",contextPath:"/Flights"},e)});
+//# sourceMappingURL=FlightsObjectPage.js.map

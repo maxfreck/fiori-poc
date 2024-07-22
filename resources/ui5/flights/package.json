@@ -1,0 +1,29 @@
+{
+  "name": "flights",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Flights example application",
+  "keywords": [
+    "ui5",
+    "openui5",
+    "sapui5"
+  ],
+  "main": "webapp/index.html",
+  "dependencies": {
+    "@openui5/sap.m": "^1",
+    "@openui5/sap.uxap": "^1",
+    "@openui5/themelib_sap_fiori_3": "^1"
+  },
+  "devDependencies": {
+    "@ui5/cli": "^3.6.0"
+  },
+  "scripts": {
+    "build": "ui5 build --config=ui5.yaml --clean-dest --dest ../../../storage/ui5/flights/"
+  },
+  "ui5": {
+    "dependencies": [
+      "@sap/ux-ui5-tooling"
+    ]
+  },
+  "sapuxLayer": "CUSTOMER_BASE"
+}

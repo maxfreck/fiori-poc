@@ -1,0 +1,1 @@
+{"version":3,"file":"flights.controller.js","names":["sap","ui","define","Controller","extend","onInit","onUserPress","alert"],"sources":["flights-dbg.controller.js"],"mappings":"AAAAA,IAAIC,GAAGC,OAAO,CACb,8BAKA,SAAUC,GACT,aAEA,OAAOA,EAAWC,OAAO,6CAA8C,CACtEC,OAAQ,WAER,EAEAC,YAAc,WAEbC,MAAM,cACP,GAEF"}

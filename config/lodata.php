@@ -35,7 +35,7 @@ return [
     /*
      * The default version of the OData protocol to support for every request.
      */
-    'version' => env('LODATA_VERSION', '4.01'),
+    'version' => env('LODATA_VERSION', '4.0'),
 
     /*
      * The name of the Laravel disk to use to store asynchronously processed requests.

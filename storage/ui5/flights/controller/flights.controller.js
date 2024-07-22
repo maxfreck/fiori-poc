@@ -1,0 +1,2 @@
+sap.ui.define(["sap/ui/core/mvc/Controller"],function(n){"use strict";return n.extend("net.php.flights.flights.controller.flights",{onInit:function(){},onUserPress:function(){alert("Hello World")}})});
+//# sourceMappingURL=flights.controller.js.map

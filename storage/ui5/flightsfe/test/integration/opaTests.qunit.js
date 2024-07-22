@@ -1,0 +1,2 @@
+sap.ui.require(["sap/fe/test/JourneyRunner","flightsfe/flightsfe/test/integration/FirstJourney","flightsfe/flightsfe/test/integration/pages/FlightsList","flightsfe/flightsfe/test/integration/pages/FlightsObjectPage"],function(t,e,i,s){"use strict";var t=new t({launchUrl:sap.ui.require.toUrl("flightsfe/flightsfe")+"/index.html"});t.run({pages:{onTheFlightsList:i,onTheFlightsObjectPage:s}},e.run)});
+//# sourceMappingURL=opaTests.qunit.js.map
